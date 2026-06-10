@@ -30,28 +30,26 @@ Index item #5 "Bots & Agents" — descriptions of all agents the user builds.
 Doc ID: 16zKRBZpMc27fs94kyOUPbTBTgNWUd8KSxEaqllUXrRA
 When the user asks about a specific agent below, read this doc for its full spec.
 
-Agents/bots defined there:
+Agents/bots to remember (read the doc above for each one's full spec when the
+user names it). Removed by user and NOT to be remembered: BR, Utility upgrader
+bot, uamy log-bot, fact bot, ROADMAP (Charter).
+
 1. ACTA — Activation Agent (master credit/context switch)
-2. BR — Boot Resilience (reboot auto-resume strategy)
-3. Utility upgrader bot
-4. Daily price-bot
-5. daily price log and learn-bot
-6. ALERT AGENT
-7. XBOT (X/Twitter intelligence)
-8. Dip Agent
-9. uamy log-bot
-10. Better agent
-11. Dashboard discussion log (dashblog)
-12. trump bot
-13. daily macro news bot
-14. fact bot
-15. Fact Bot (Counsel)
-16. Trump Bot (Counsel)
-17. Roadmap agent (rma)
-18. ROADMAP (Charter)
-19. FACT (Charter)
-20. X (Charter)
-21. TRUMP (Charter)
-22. DIP (Charter)
-23. ALERT (Charter)
-24. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+2. Daily price-bot
+3. daily price log and learn-bot
+4. ALERT AGENT
+5. XBOT (X/Twitter intelligence)
+6. Dip Agent
+7. Better agent
+8. Dashboard discussion log (dashblog)
+9. trump bot
+10. daily macro news bot
+11. Fact Bot (Counsel)
+12. Trump Bot (Counsel)
+13. Roadmap agent (rma)
+14. FACT (Charter)
+15. X (Charter)
+16. TRUMP (Charter)
+17. DIP (Charter)
+18. ALERT (Charter)
+19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
