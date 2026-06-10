@@ -15,3 +15,11 @@ Shortcuts:
 - "y" = yes
 - "n" = no
 - "sqo" = same question, different matter/objective/element as specified (usually follows a question)
+
+# Index file (Google Drive)
+
+When the user says "go to index", open this Google Doc:
+https://docs.google.com/document/d/10yDkQa_MbJwQdZxZa2k4kpJp4GIeHZf5bOc2qP1rXbI/edit
+
+Doc ID: 10yDkQa_MbJwQdZxZa2k4kpJp4GIeHZf5bOc2qP1rXbI
+It is the index that links to many other files.
