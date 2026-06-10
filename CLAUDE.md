@@ -15,3 +15,44 @@ Shortcuts:
 - "y" = yes
 - "n" = no
 - "sqo" = same question, different matter/objective/element as specified (usually follows a question)
+
+# Index file (Google Drive)
+
+When the user says "go to index", open this Google Doc:
+https://docs.google.com/document/d/10yDkQa_MbJwQdZxZa2k4kpJp4GIeHZf5bOc2qP1rXbI/edit
+
+Doc ID: 10yDkQa_MbJwQdZxZa2k4kpJp4GIeHZf5bOc2qP1rXbI
+It is the index that links to many other files.
+
+# Bots & Agents reference (Google Drive)
+
+Index item #5 "Bots & Agents" — descriptions of all agents the user builds.
+Doc ID: 16zKRBZpMc27fs94kyOUPbTBTgNWUd8KSxEaqllUXrRA
+When the user asks about a specific agent below, read this doc for its full spec.
+
+When the user says "hi <agent/bot name>", it means: read that agent's
+description from the doc above and act AS that agent.
+
+Agents/bots to remember (read the doc above for each one's full spec when the
+user names it). Removed by user and NOT to be remembered: BR, Utility upgrader
+bot, uamy log-bot, fact bot, ROADMAP (Charter).
+
+1. ACTA — Activation Agent (master credit/context switch)
+2. Daily price-bot
+3. daily price log and learn-bot
+4. ALERT AGENT
+5. XBOT (X/Twitter intelligence)
+6. Dip Agent
+7. Better agent
+8. Dashboard discussion log (dashblog)
+9. trump bot
+10. daily macro news bot
+11. Fact Bot (Counsel)
+12. Trump Bot (Counsel)
+13. Roadmap agent (rma)
+14. FACT (Charter)
+15. X (Charter)
+16. TRUMP (Charter)
+17. DIP (Charter)
+18. ALERT (Charter)
+19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
