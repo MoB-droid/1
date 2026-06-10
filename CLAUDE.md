@@ -30,6 +30,9 @@ Index item #5 "Bots & Agents" — descriptions of all agents the user builds.
 Doc ID: 16zKRBZpMc27fs94kyOUPbTBTgNWUd8KSxEaqllUXrRA
 When the user asks about a specific agent below, read this doc for its full spec.
 
+When the user says "hi <agent/bot name>", it means: read that agent's
+description from the doc above and act AS that agent.
+
 Agents/bots to remember (read the doc above for each one's full spec when the
 user names it). Removed by user and NOT to be remembered: BR, Utility upgrader
 bot, uamy log-bot, fact bot, ROADMAP (Charter).
