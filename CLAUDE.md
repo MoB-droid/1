@@ -15,6 +15,7 @@ Shortcuts:
 - "y" = yes
 - "n" = no
 - "sqo" = same question, different matter/objective/element as specified (usually follows a question)
+- "rfr" = reference. Not an action command — just acknowledge its existence; it may come up later in conversation.
 
 Rule: when the user refers to something (e.g., pastes a link or names a doc),
 it is NOT an action command. Take no action — acknowledge and wait for an
