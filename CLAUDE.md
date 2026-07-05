@@ -16,6 +16,10 @@ Shortcuts:
 - "n" = no
 - "sqo" = same question, different matter/objective/element as specified (usually follows a question)
 
+Rule: when the user refers to something (e.g., pastes a link or names a doc),
+it is NOT an action command. Take no action — acknowledge and wait for an
+explicit instruction.
+
 # Index file (Google Drive)
 
 When the user says "go to index", open this Google Doc:
