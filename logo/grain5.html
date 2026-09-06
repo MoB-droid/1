@@ -1,0 +1,211 @@
+<title>grain5</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root{
+  --bg:#F7F4EC; --panel:#FFFDF8; --ink:#1B1812; --muted:#6F675A; --line:#E3DCCB;
+  --gold:#D4A017; --gold-deep:#8C6A0B; --code-bg:#F0EBDE; --dark-swatch:#15130E;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15130E; --panel:#1E1A13; --ink:#F1EBDD; --muted:#A79C86; --line:#332D22;
+    --gold:#E6C34A; --gold-deep:#D4A017; --code-bg:#100E0A; --dark-swatch:#0B0A07;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15130E; --panel:#1E1A13; --ink:#F1EBDD; --muted:#A79C86; --line:#332D22;
+  --gold:#E6C34A; --gold-deep:#D4A017; --code-bg:#100E0A; --dark-swatch:#0B0A07;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 24px 80px}
+header{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:32px}
+h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:56px;line-height:1;margin:0;letter-spacing:-0.01em;color:var(--gold-deep)}
+header p{margin:0;color:var(--muted);max-width:52ch}
+.grid{display:grid;grid-template-columns:minmax(260px,340px) 1fr;gap:40px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+aside{position:sticky;top:24px;display:grid;gap:12px}
+.swatch{border:1px solid var(--line);border-radius:6px;display:grid;place-items:center;aspect-ratio:1;padding:12%}
+.swatch svg{width:100%;height:auto;display:block}
+.swatch.light{background:#FFFDF8}
+.swatch.dark{background:var(--dark-swatch)}
+.sizes{display:flex;align-items:flex-end;gap:16px;padding:12px 8px 0;border-top:1px solid var(--line)}
+.sizes svg{display:block}
+.caption{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+main{display:grid;gap:28px;min-width:0}
+.recipe{min-width:0}
+.recipe-head{display:flex;align-items:center;gap:12px}
+.num{font-family:"IBM Plex Mono",monospace;color:var(--gold-deep);font-size:14px;min-width:1.5em}
+h2{font-size:18px;font-weight:500;margin:0;flex:1}
+.note{margin:4px 0 10px calc(1.5em + 12px);color:var(--muted);font-size:14px;max-width:65ch}
+pre{margin:0 0 0 calc(1.5em + 12px);background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:14px 16px;overflow-x:auto;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;line-height:1.5;max-height:320px}
+code{white-space:pre}
+.copy{font:500 13px "IBM Plex Sans",system-ui,sans-serif;color:var(--gold-deep);background:none;border:1px solid var(--gold-deep);border-radius:3px;padding:4px 12px;cursor:pointer}
+.copy:hover{background:var(--gold-deep);color:var(--bg)}
+.copy:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.palette{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-left:calc(1.5em + 12px)}
+.chip{border:1px solid var(--line);border-radius:4px;overflow:hidden;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.chip i{display:block;height:44px}
+.chip span{display:block;padding:6px 8px}
+</style>
+<div class="wrap">
+<header>
+  <h1>grain5</h1>
+  <p>Five gold grains, one tail straight up. Shared mark for reuse in other artifacts. Every id is prefixed <code>grain5-</code>, so any block below can be pasted without collisions.</p>
+</header>
+<div class="grid">
+<aside>
+  <div class="swatch light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-320 -320 640 640"><defs><linearGradient id="grain5-gold" x1="-200" y1="-320" x2="200" y2="320" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F9E27D"/><stop offset="0.45" stop-color="#D4A017"/><stop offset="0.75" stop-color="#B8860B"/><stop offset="1" stop-color="#E6C34A"/></linearGradient><path id="grain5-unit" d="M 36 0 C 36 -22, 54 -34, 76 -34 C 104 -34, 126 -20, 136 -7 C 180 -5, 240 -3, 305 -1.6 L 305 1.6 C 240 3, 180 5, 136 7 C 126 20, 104 34, 76 34 C 54 34, 36 22, 36 0 Z"/></defs><g fill="url(#grain5-gold)"><use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/></g></svg></div>
+  <div class="swatch dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-320 -320 640 640"><defs><linearGradient id="grain5-gold-o" x1="-200" y1="-320" x2="200" y2="320" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F9E27D"/><stop offset="0.45" stop-color="#D4A017"/><stop offset="0.75" stop-color="#B8860B"/><stop offset="1" stop-color="#E6C34A"/></linearGradient><g id="grain5-unit-o"><path d="M 136 0 C 128 -22, 104 -34, 76 -34 C 54 -34, 36 -22, 36 0 C 36 22, 54 34, 76 34 C 104 34, 128 22, 136 0 Z"/><path d="M 136 0 L 305 0"/></g></defs><g fill="none" stroke="url(#grain5-gold-o)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><use href="#grain5-unit-o" transform="rotate(270)"/><use href="#grain5-unit-o" transform="rotate(342)"/><use href="#grain5-unit-o" transform="rotate(54)"/><use href="#grain5-unit-o" transform="rotate(126)"/><use href="#grain5-unit-o" transform="rotate(198)"/></g></svg></div>
+  <div class="sizes">
+    <svg viewBox="-320 -320 640 640" width="96" height="96"><g fill="url(#grain5-gold)"><use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/></g></svg>
+    <svg viewBox="-320 -320 640 640" width="48" height="48"><g fill="url(#grain5-gold)"><use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/></g></svg>
+    <svg viewBox="-320 -320 640 640" width="24" height="24"><g fill="url(#grain5-gold)"><use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/></g></svg>
+    <span class="caption">96 · 48 · 24</span>
+  </div>
+</aside>
+<main>
+
+<section class="recipe" id="r1">
+  <div class="recipe-head">
+    <span class="num">1</span>
+    <h2>Inline SVG, filled</h2>
+    <button class="copy" data-target="c1" type="button">Copy</button>
+  </div>
+  <p class="note">Paste directly into HTML. Scales with width/height you set on the &lt;svg&gt;.</p>
+  <pre><code id="c1">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;-320 -320 640 640&quot;&gt;
+  &lt;title&gt;Five-tail mark&lt;/title&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;grain5-gold&quot; x1=&quot;-200&quot; y1=&quot;-320&quot; x2=&quot;200&quot; y2=&quot;320&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#F9E27D&quot;/&gt;
+      &lt;stop offset=&quot;0.45&quot; stop-color=&quot;#D4A017&quot;/&gt;
+      &lt;stop offset=&quot;0.75&quot; stop-color=&quot;#B8860B&quot;/&gt;
+      &lt;stop offset=&quot;1&quot; stop-color=&quot;#E6C34A&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;path id=&quot;grain5-unit&quot; d=&quot;M 36 0
+      C 36 -22, 54 -34, 76 -34
+      C 104 -34, 126 -20, 136 -7
+      C 180 -5, 240 -3, 305 -1.6
+      L 305 1.6
+      C 240 3, 180 5, 136 7
+      C 126 20, 104 34, 76 34
+      C 54 34, 36 22, 36 0 Z&quot;/&gt;
+  &lt;/defs&gt;
+  &lt;g fill=&quot;url(#grain5-gold)&quot;&gt;
+    &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(270)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(342)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(54)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(126)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(198)&quot;/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+</section>
+
+<section class="recipe" id="r2">
+  <div class="recipe-head">
+    <span class="num">2</span>
+    <h2>Inline SVG, outline</h2>
+    <button class="copy" data-target="c2" type="button">Copy</button>
+  </div>
+  <p class="note">Pen-style variant. Same size and ids pattern, suffixed -o.</p>
+  <pre><code id="c2">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;-320 -320 640 640&quot;&gt;
+  &lt;title&gt;Five-tail mark (outline)&lt;/title&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;grain5-gold-o&quot; x1=&quot;-200&quot; y1=&quot;-320&quot; x2=&quot;200&quot; y2=&quot;320&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#F9E27D&quot;/&gt;
+      &lt;stop offset=&quot;0.45&quot; stop-color=&quot;#D4A017&quot;/&gt;
+      &lt;stop offset=&quot;0.75&quot; stop-color=&quot;#B8860B&quot;/&gt;
+      &lt;stop offset=&quot;1&quot; stop-color=&quot;#E6C34A&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;g id=&quot;grain5-unit-o&quot;&gt;
+      &lt;path d=&quot;M 136 0 C 128 -22, 104 -34, 76 -34 C 54 -34, 36 -22, 36 0 C 36 22, 54 34, 76 34 C 104 34, 128 22, 136 0 Z&quot;/&gt;
+      &lt;path d=&quot;M 136 0 L 305 0&quot;/&gt;
+    &lt;/g&gt;
+  &lt;/defs&gt;
+  &lt;g fill=&quot;none&quot; stroke=&quot;url(#grain5-gold-o)&quot; stroke-width=&quot;7&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;
+    &lt;use href=&quot;#grain5-unit-o&quot; transform=&quot;rotate(270)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit-o&quot; transform=&quot;rotate(342)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit-o&quot; transform=&quot;rotate(54)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit-o&quot; transform=&quot;rotate(126)&quot;/&gt;
+    &lt;use href=&quot;#grain5-unit-o&quot; transform=&quot;rotate(198)&quot;/&gt;
+  &lt;/g&gt;
+&lt;/svg&gt;</code></pre>
+</section>
+
+<section class="recipe" id="r3">
+  <div class="recipe-head">
+    <span class="num">3</span>
+    <h2>Sprite: define once, use many</h2>
+    <button class="copy" data-target="c3" type="button">Copy</button>
+  </div>
+  <p class="note">Best when the mark appears several times on one page (nav, footer, list bullets).</p>
+  <pre><code id="c3">&lt;!-- paste once, anywhere in the body --&gt;
+&lt;svg width=&quot;0&quot; height=&quot;0&quot; style=&quot;position:absolute&quot; aria-hidden=&quot;true&quot;&gt;
+  &lt;defs&gt;
+    &lt;linearGradient id=&quot;grain5-gold&quot; x1=&quot;-200&quot; y1=&quot;-320&quot; x2=&quot;200&quot; y2=&quot;320&quot; gradientUnits=&quot;userSpaceOnUse&quot;&gt;
+      &lt;stop offset=&quot;0&quot; stop-color=&quot;#F9E27D&quot;/&gt;
+      &lt;stop offset=&quot;0.45&quot; stop-color=&quot;#D4A017&quot;/&gt;
+      &lt;stop offset=&quot;0.75&quot; stop-color=&quot;#B8860B&quot;/&gt;
+      &lt;stop offset=&quot;1&quot; stop-color=&quot;#E6C34A&quot;/&gt;
+    &lt;/linearGradient&gt;
+    &lt;path id=&quot;grain5-unit&quot; d=&quot;M 36 0 C 36 -22, 54 -34, 76 -34 C 104 -34, 126 -20, 136 -7 C 180 -5, 240 -3, 305 -1.6 L 305 1.6 C 240 3, 180 5, 136 7 C 126 20, 104 34, 76 34 C 54 34, 36 22, 36 0 Z&quot;/&gt;
+    &lt;symbol id=&quot;grain5&quot; viewBox=&quot;-320 -320 640 640&quot;&gt;
+      &lt;g fill=&quot;url(#grain5-gold)&quot;&gt;
+        &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(270)&quot;/&gt;
+        &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(342)&quot;/&gt;
+        &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(54)&quot;/&gt;
+        &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(126)&quot;/&gt;
+        &lt;use href=&quot;#grain5-unit&quot; transform=&quot;rotate(198)&quot;/&gt;
+      &lt;/g&gt;
+    &lt;/symbol&gt;
+  &lt;/defs&gt;
+&lt;/svg&gt;
+
+&lt;!-- then use it as many times as you like --&gt;
+&lt;svg width=&quot;48&quot; height=&quot;48&quot;&gt;&lt;use href=&quot;#grain5&quot;/&gt;&lt;/svg&gt;</code></pre>
+</section>
+
+<section class="recipe" id="r4">
+  <div class="recipe-head">
+    <span class="num">4</span>
+    <h2>&lt;img&gt; with data URI</h2>
+    <button class="copy" data-target="c4" type="button">Copy</button>
+  </div>
+  <p class="note">Self-contained. Works where inline SVG is not allowed.</p>
+  <pre><code id="c4">&lt;img src=&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0zMjAgLTMyMCA2NDAgNjQwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWluNS1nb2xkIiB4MT0iLTIwMCIgeTE9Ii0zMjAiIHgyPSIyMDAiIHkyPSIzMjAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGOUUyN0QiLz48c3RvcCBvZmZzZXQ9IjAuNDUiIHN0b3AtY29sb3I9IiNENEEwMTciLz48c3RvcCBvZmZzZXQ9IjAuNzUiIHN0b3AtY29sb3I9IiNCODg2MEIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNFNkMzNEEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGlkPSJncmFpbjUtdW5pdCIgZD0iTSAzNiAwIEMgMzYgLTIyLCA1NCAtMzQsIDc2IC0zNCBDIDEwNCAtMzQsIDEyNiAtMjAsIDEzNiAtNyBDIDE4MCAtNSwgMjQwIC0zLCAzMDUgLTEuNiBMIDMwNSAxLjYgQyAyNDAgMywgMTgwIDUsIDEzNiA3IEMgMTI2IDIwLCAxMDQgMzQsIDc2IDM0IEMgNTQgMzQsIDM2IDIyLCAzNiAwIFoiLz48L2RlZnM+PGcgZmlsbD0idXJsKCNncmFpbjUtZ29sZCkiPjx1c2UgaHJlZj0iI2dyYWluNS11bml0IiB0cmFuc2Zvcm09InJvdGF0ZSgyNzApIi8+PHVzZSBocmVmPSIjZ3JhaW41LXVuaXQiIHRyYW5zZm9ybT0icm90YXRlKDM0MikiLz48dXNlIGhyZWY9IiNncmFpbjUtdW5pdCIgdHJhbnNmb3JtPSJyb3RhdGUoNTQpIi8+PHVzZSBocmVmPSIjZ3JhaW41LXVuaXQiIHRyYW5zZm9ybT0icm90YXRlKDEyNikiLz48dXNlIGhyZWY9IiNncmFpbjUtdW5pdCIgdHJhbnNmb3JtPSJyb3RhdGUoMTk4KSIvPjwvZz48L3N2Zz4=&quot; alt=&quot;grain5&quot; width=&quot;64&quot; height=&quot;64&quot;&gt;</code></pre>
+</section>
+
+<section class="recipe" id="r5">
+  <div class="recipe-head">
+    <span class="num">5</span>
+    <h2>CSS background</h2>
+    <button class="copy" data-target="c5" type="button">Copy</button>
+  </div>
+  <p class="note">For pseudo-elements, buttons, favicons via CSS.</p>
+  <pre><code id="c5">.grain5 {
+  width: 64px; height: 64px;
+  background: url(&quot;data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9Ii0zMjAgLTMyMCA2NDAgNjQwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImdyYWluNS1nb2xkIiB4MT0iLTIwMCIgeTE9Ii0zMjAiIHgyPSIyMDAiIHkyPSIzMjAiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGOUUyN0QiLz48c3RvcCBvZmZzZXQ9IjAuNDUiIHN0b3AtY29sb3I9IiNENEEwMTciLz48c3RvcCBvZmZzZXQ9IjAuNzUiIHN0b3AtY29sb3I9IiNCODg2MEIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNFNkMzNEEiLz48L2xpbmVhckdyYWRpZW50PjxwYXRoIGlkPSJncmFpbjUtdW5pdCIgZD0iTSAzNiAwIEMgMzYgLTIyLCA1NCAtMzQsIDc2IC0zNCBDIDEwNCAtMzQsIDEyNiAtMjAsIDEzNiAtNyBDIDE4MCAtNSwgMjQwIC0zLCAzMDUgLTEuNiBMIDMwNSAxLjYgQyAyNDAgMywgMTgwIDUsIDEzNiA3IEMgMTI2IDIwLCAxMDQgMzQsIDc2IDM0IEMgNTQgMzQsIDM2IDIyLCAzNiAwIFoiLz48L2RlZnM+PGcgZmlsbD0idXJsKCNncmFpbjUtZ29sZCkiPjx1c2UgaHJlZj0iI2dyYWluNS11bml0IiB0cmFuc2Zvcm09InJvdGF0ZSgyNzApIi8+PHVzZSBocmVmPSIjZ3JhaW41LXVuaXQiIHRyYW5zZm9ybT0icm90YXRlKDM0MikiLz48dXNlIGhyZWY9IiNncmFpbjUtdW5pdCIgdHJhbnNmb3JtPSJyb3RhdGUoNTQpIi8+PHVzZSBocmVmPSIjZ3JhaW41LXVuaXQiIHRyYW5zZm9ybT0icm90YXRlKDEyNikiLz48dXNlIGhyZWY9IiNncmFpbjUtdW5pdCIgdHJhbnNmb3JtPSJyb3RhdGUoMTk4KSIvPjwvZz48L3N2Zz4=&quot;) center / contain no-repeat;
+}</code></pre>
+</section>
+<section class="recipe" id="r6">
+  <div class="recipe-head"><span class="num">6</span><h2>Gold palette</h2></div>
+  <p class="note">Gradient runs top-left to bottom-right through these stops.</p>
+  <div class="palette">
+    <div class="chip"><i style="background:#F9E27D"></i><span>#F9E27D</span></div>
+    <div class="chip"><i style="background:#D4A017"></i><span>#D4A017</span></div>
+    <div class="chip"><i style="background:#B8860B"></i><span>#B8860B</span></div>
+    <div class="chip"><i style="background:#E6C34A"></i><span>#E6C34A</span></div>
+  </div>
+</section>
+</main>
+</div>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(b=>{
+  b.addEventListener('click',async()=>{
+    const t=document.getElementById(b.dataset.target).textContent;
+    try{await navigator.clipboard.writeText(t);b.textContent='Copied';}
+    catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.target));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected';}
+    setTimeout(()=>b.textContent='Copy',1400);
+  });
+});
+</script>
