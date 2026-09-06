@@ -1,12 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="-320 -320 640 640" width="640" height="640">
   <title>Five-tail mark (outline)</title>
   <defs>
+    <linearGradient id="gold" x1="-200" y1="-320" x2="200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F9E27D"/>
+      <stop offset="0.45" stop-color="#D4A017"/>
+      <stop offset="0.75" stop-color="#B8860B"/>
+      <stop offset="1" stop-color="#E6C34A"/>
+    </linearGradient>
     <g id="unit">
       <path d="M 136 0 C 128 -22, 104 -34, 76 -34 C 54 -34, 36 -22, 36 0 C 36 22, 54 34, 76 34 C 104 34, 128 22, 136 0 Z"/>
       <path d="M 136 0 L 305 0"/>
     </g>
   </defs>
-  <g fill="none" stroke="#1F3C88" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="url(#gold)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
     <use href="#unit" transform="rotate(270)"/>
     <use href="#unit" transform="rotate(342)"/>
     <use href="#unit" transform="rotate(54)"/>
