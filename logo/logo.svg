@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-320 -320 640 640" width="640" height="640">
+  <title>Five-tail mark</title>
+  <defs>
+    <path id="unit" d="M 36 0
+      C 36 -22, 54 -34, 76 -34
+      C 104 -34, 126 -20, 136 -7
+      C 180 -5, 240 -3, 305 -1.6
+      L 305 1.6
+      C 240 3, 180 5, 136 7
+      C 126 20, 104 34, 76 34
+      C 54 34, 36 22, 36 0 Z"/>
+  </defs>
+  <g fill="#1F3C88">
+    <use href="#unit" transform="rotate(180)"/>
+    <use href="#unit" transform="rotate(252)"/>
+    <use href="#unit" transform="rotate(324)"/>
+    <use href="#unit" transform="rotate(36)"/>
+    <use href="#unit" transform="rotate(108)"/>
+  </g>
+</svg>
