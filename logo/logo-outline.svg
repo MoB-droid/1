@@ -7,10 +7,10 @@
     </g>
   </defs>
   <g fill="none" stroke="#1F3C88" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
-    <use href="#unit" transform="rotate(180)"/>
-    <use href="#unit" transform="rotate(252)"/>
-    <use href="#unit" transform="rotate(324)"/>
-    <use href="#unit" transform="rotate(36)"/>
-    <use href="#unit" transform="rotate(108)"/>
+    <use href="#unit" transform="rotate(270)"/>
+    <use href="#unit" transform="rotate(342)"/>
+    <use href="#unit" transform="rotate(54)"/>
+    <use href="#unit" transform="rotate(126)"/>
+    <use href="#unit" transform="rotate(198)"/>
   </g>
 </svg>

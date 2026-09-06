@@ -11,10 +11,10 @@
       C 54 34, 36 22, 36 0 Z"/>
   </defs>
   <g fill="#1F3C88">
-    <use href="#unit" transform="rotate(180)"/>
-    <use href="#unit" transform="rotate(252)"/>
-    <use href="#unit" transform="rotate(324)"/>
-    <use href="#unit" transform="rotate(36)"/>
-    <use href="#unit" transform="rotate(108)"/>
+    <use href="#unit" transform="rotate(270)"/>
+    <use href="#unit" transform="rotate(342)"/>
+    <use href="#unit" transform="rotate(54)"/>
+    <use href="#unit" transform="rotate(126)"/>
+    <use href="#unit" transform="rotate(198)"/>
   </g>
 </svg>
