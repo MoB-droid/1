@@ -63,3 +63,8 @@ Never assume market-session state or prices. For any price, pre-market, overnigh
 or after-hours number, fetch it live from Yahoo Finance
 (https://finance.yahoo.com/quote/<TICKER>/) and quote the exact price, % change
 and timestamp shown. Do not derive prices from % changes or use cached quote pages.
+
+# News tagging rule (set by user, 08 Sep 2026, artifact comment)
+
+Whenever news is given out (chat, artifacts, briefs), tag each item as
+Positive, Negative or Both, and explain why in one sentence.
