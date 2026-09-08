@@ -68,3 +68,10 @@ and timestamp shown. Do not derive prices from % changes or use cached quote pag
 
 Whenever news is given out (chat, artifacts, briefs), tag each item as
 Positive, Negative or Both, and explain why in one sentence.
+
+# Premarket News artifact
+
+URL: https://claude.ai/code/artifact/b859661b-ed44-4221-bfcf-ccc5e8cdfe63
+Tickers covered: ASTS, RKLB, SNDK (SNDK added by user, 08 Sep 2026).
+Explain each news item in terms of what the price actually did (open, close,
+% move, pre-market print), not in the abstract.
