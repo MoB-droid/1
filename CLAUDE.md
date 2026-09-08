@@ -57,3 +57,21 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Premarket News artifact (built 2026-09-08)
+
+URL: https://claude.ai/code/artifact/b859661b-ed44-4221-bfcf-ccc5e8cdfe63
+Style: Macro Desk house style (dark navy, Instrument Serif + IBM Plex, 480px).
+Pipeline: reads Ticker Desk (focus tickers), Macro Desk, Trader (+ its db), Daily
+Price sheet; then adds its own layer: after-hours news and price changes since the
+last US close, explained (what / why / how much), plus anything new that the other
+desks did not have.
+Schedule: Routine "Premarket News (daily 08:00 Israel)", cron 0 5 * * * UTC
+(= 08:00 Israel in daylight time; switch to 0 6 * * * when Israel leaves DST).
+
+Related artifacts:
+- Ticker Desk https://claude.ai/code/artifact/ffaab858-7632-455b-a783-d3fc02f1eaaf
+- Macro Desk https://claude.ai/code/artifact/39c6a3cc-df00-43d8-a8e7-13def5b6151d
+- Trader https://claude.ai/code/artifact/ccd58786-abf4-4e99-aae8-d69406b5edee
+- Daily Price https://claude.ai/code/artifact/3c1deb7b-312a-4fda-829f-4e19e666d42d
+  (sheet id 1-I8rGODnqLC_AARz0uXjst4fIks-Pllbpwfx1-lJmD0)
