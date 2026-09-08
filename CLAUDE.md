@@ -56,3 +56,10 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Price data rule (set by user, 08 Sep 2026)
+
+Never assume market-session state or prices. For any price, pre-market, overnight
+or after-hours number, fetch it live from Yahoo Finance
+(https://finance.yahoo.com/quote/<TICKER>/) and quote the exact price, % change
+and timestamp shown. Do not derive prices from % changes or use cached quote pages.
