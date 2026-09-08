@@ -15,6 +15,7 @@ Shortcuts:
 - "y" = yes
 - "n" = no
 - "sqo" = same question, different matter/objective/element as specified (usually follows a question)
+- "wt" = "what?" — the user did not understand; restate the last answer in a shorter, simpler version
 
 # Index file (Google Drive)
 
