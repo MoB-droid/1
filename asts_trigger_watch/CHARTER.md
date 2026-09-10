@@ -11,7 +11,7 @@ Continuous, 2-min loop, 24/7. Registry column G: `continuous`. ACTA starts it on
 
 **WHAT IT READS (never edits)**
 - Sheet "ASTS trigger watch" `1cjZru5WmFwLWVflApD07wM1FUgtJbMAZCXaAcY10w18`: tabs Sources, Map, Rules (re-read every 10 min).
-- The feeds listed in Sources with on/off = on. Optional col F "min kw" raises the keyword bar per source (set 6+ on Google News search feeds, or turn them off; they match their own query on every item). Today: GlobeNewswire ×2, PRNewswire ×2, SEC EDGAR ASTS, Google News ×2. BusinessWire, FCC, X, Truth Social are off (phase 2).
+- The feeds listed in Sources with on/off = on. Optional col F "min kw" raises the keyword bar per source (set 7 on Google News search feeds, or turn them off; they match their own query on every item). Today: GlobeNewswire ×2, PRNewswire ×2, SEC EDGAR ASTS, Google News ×2. BusinessWire, FCC, X, Truth Social are off (phase 2).
 
 **WHAT IT EDITS**
 - Hits tab only, newest on top: time ET | source | headline | link | kw score | llm score | direction | why | fired.

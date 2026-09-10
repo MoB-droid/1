@@ -1,7 +1,7 @@
 @echo off
-rem ASTS Trigger Watch - continuous poller (2 min loop). Started by ACTA / Task Scheduler.
-rem Exits immediately if another instance is already running (pid check).
+rem ASTS trigger watch - always-on 2-min poller. Started by Task Scheduler (asts-trigger-watch) or ACTA.
+rem Exits at once if another instance is alive (pid check). pythonw = no console window.
 set CLD1=C:\Users\rayon\Desktop\cld1
 cd /d %CLD1%
 set ANTHROPIC_API_KEY=
-python "%CLD1%\asts_trigger_watch.py" %*
+pythonw "%CLD1%\asts_trigger_watch.py" %*
