@@ -124,16 +124,15 @@
     from { transform: translateY(0); }
     to   { transform: translateY(var(--jaw-gap, 14px)); }
   }
+  .field[hidden] { display: none; }
   .field .range-row { display: flex; align-items: center; gap: 10px; }
   .field input[type="range"] { padding: 0; border: 0; background: transparent; }
   .field output { min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
-  .dog.talk { animation: wag .55s cubic-bezier(.34, 1.56, .64, 1) 1; }
-  @keyframes wag {
-    0%   { transform: scale(1) rotate(0); }
-    25%  { transform: scale(1.04, .96) rotate(-2deg); }
-    50%  { transform: scale(.97, 1.05) rotate(2deg); }
-    75%  { transform: scale(1.02, .98) rotate(-1deg); }
-    100% { transform: scale(1) rotate(0); }
+  .mouth {
+    position: absolute;
+    inset: 0;
+    background: #1b1412;
+    pointer-events: none;
   }
 
   /* Empty state: a doodle placeholder until a photo is added */
@@ -272,7 +271,6 @@
   .file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 
   @media (prefers-reduced-motion: reduce) {
-    .dog.talk { animation: none; }
     .jaw.chomp { animation-duration: .5s; }
     .bubble { transition: opacity .15s ease; transform: translate(-50%, 0) scale(1); }
   }
@@ -285,6 +283,7 @@
 
 <div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
+  <div class="mouth" id="mouth" hidden></div>
   <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -323,7 +322,7 @@
       <label for="lines">What it says (one line each)</label>
       <textarea id="lines"></textarea>
     </div>
-    <div class="field">
+    <div class="field" id="jawField">
       <label for="jawLine">Jaw line (where the mouth splits)</label>
       <div class="range-row">
         <input id="jawLine" type="range" min="25" max="85" step="1" value="57">
@@ -364,6 +363,8 @@
   var stage = document.getElementById("stage");
   var dog = document.getElementById("dog");
   var jaw = document.getElementById("jaw");
+  var mouth = document.getElementById("mouth");
+  var jawField = document.getElementById("jawField");
   var jawLine = document.getElementById("jawLine");
   var jawOut = document.getElementById("jawOut");
   var empty = document.getElementById("empty");
@@ -381,34 +382,51 @@
   function render() {
     stage.dataset.fit = state.fit;
     fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
-    var src = state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg");
+    var src = state.photoId ? "/_blob/" + state.photoId : (state.photoData || "head.png");
+    var jawSrc = usingDrawing() ? "jaw.png" : src;
     if (src) {
-      if (dog.getAttribute("src") !== src) { dog.src = src; jaw.src = src; }
+      if (dog.getAttribute("src") !== src) dog.src = src;
+      if (jaw.getAttribute("src") !== jawSrc) jaw.src = jawSrc;
       dog.hidden = false;
       jaw.hidden = false;
+      mouth.hidden = false;
       empty.hidden = true;
       layoutJaw();
       stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
     } else {
       dog.hidden = true;
       jaw.hidden = true;
+      mouth.hidden = true;
       empty.hidden = false;
     }
     document.getElementById("hint").textContent = src ? "Tap " + state.name + " to make it talk" : "Add a photo of your drawing";
   }
 
   /* ---------- jaw layers: top of the drawing stays, bottom moves ---------- */
+  // The built-in drawing ships as two pre-cut layers: head.png (with the
+  // mouth interior darkened) and jaw.png (only the lower jaw, transparent
+  // elsewhere). A photo the user adds is split along a horizontal line.
+  function usingDrawing() { return !state.photoId && !state.photoData; }
+
   function layoutJaw() {
     if (!dog.naturalWidth) return;
     var W = stage.clientWidth, H = stage.clientHeight;
     var w = dog.naturalWidth, h = dog.naturalHeight;
     var scale = state.fit === "fit" ? Math.min(W / w, H / h) : Math.max(W / w, H / h);
-    var rh = h * scale, top = (H - rh) / 2;
-    var y = Math.round(top + rh * (state.jaw / 100));
-    y = Math.max(0, Math.min(H, y));
-    dog.style.clipPath = "inset(0 0 " + (H - y) + "px 0)";
-    jaw.style.clipPath = "inset(" + y + "px 0 0 0)";
-    stage.style.setProperty("--jaw-gap", Math.round(rh * 0.035) + "px");
+    var rw = w * scale, rh = h * scale;
+    var left = (W - rw) / 2, top = (H - rh) / 2;
+    if (usingDrawing()) {
+      jaw.style.clipPath = "";
+      mouth.hidden = true;
+    } else {
+      var y = Math.round(top + rh * (state.jaw / 100));
+      var poly = "polygon(0px " + y + "px, " + W + "px " + y + "px, " + W + "px " + H + "px, 0px " + H + "px)";
+      jaw.style.clipPath = poly;
+      mouth.style.clipPath = poly;
+      mouth.hidden = false;
+    }
+    stage.style.setProperty("--jaw-gap", Math.round(rh * (usingDrawing() ? 0.045 : 0.035)) + "px");
+    jawField.hidden = usingDrawing();
   }
   dog.addEventListener("load", layoutJaw);
   window.addEventListener("resize", layoutJaw);
@@ -453,9 +471,6 @@
     var line = pickLine();
     bubble.textContent = line;
     bubble.classList.add("show");
-    dog.classList.remove("talk");
-    void dog.offsetWidth;
-    dog.classList.add("talk");
     if ("speechSynthesis" in window) {
       speechSynthesis.cancel();
       var u = new SpeechSynthesisUtterance(line);
