@@ -150,6 +150,7 @@
       var(--stage);
   }
   .empty[hidden], .dog[hidden], .trace[hidden] { display: none; }
+  .empty[hidden], .dog[hidden], .trace[hidden] { display: none; }
   .empty svg { width: 58%; max-width: 220px; height: auto; color: var(--ink); }
   .empty p {
     margin: 0;
@@ -355,12 +356,17 @@
     "I smell bacon.",
     "Bork bork!"
   ];
-  // Starting jaw outline for the built-in drawing (fractions of the image).
-  // "Set jaw" lets the owner redraw it by tapping around the jaw.
+  // Jaw outline of the built-in drawing, traced from the owner's red line
+  // (fractions of the image). "Set jaw" lets the owner redraw it.
   var DRAWING_JAW = [
-    [445, 672], [525, 632], [765, 722], [790, 780], [850, 803], [950, 792], [968, 772],
-    [1015, 798], [1080, 822], [1080, 1060], [660, 1060], [550, 870], [550, 770], [445, 705]
-  ].map(function (p) { return [p[0] / 1170, p[1] / 1170]; });
+    [0.4224, 0.6506], [0.4255, 0.6454], [0.4502, 0.6485], [0.4779, 0.6711], [0.4995, 0.6598], [0.5026, 0.6393],
+    [0.5118, 0.6362], [0.5889, 0.6876], [0.6105, 0.6917], [0.6166, 0.702], [0.6413, 0.7174], [0.6629, 0.7246],
+    [0.6845, 0.7379], [0.7122, 0.7359], [0.7338, 0.7246], [0.74, 0.7163], [0.7585, 0.7091], [0.8078, 0.7081],
+    [0.8325, 0.702], [0.8386, 0.704], [0.8417, 0.7091], [0.8541, 0.7585], [0.8541, 0.8016], [0.851, 0.8099],
+    [0.8448, 0.814], [0.7677, 0.851], [0.7585, 0.8602], [0.7369, 0.8726], [0.7153, 0.8798], [0.6906, 0.8777],
+    [0.6475, 0.8623], [0.6136, 0.8438], [0.5519, 0.7821], [0.5365, 0.7811], [0.5087, 0.7616], [0.5026, 0.741],
+    [0.4841, 0.7246], [0.4687, 0.7287], [0.4502, 0.7235], [0.4255, 0.7071], [0.4224, 0.6927]
+  ];
 
   var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", jawPts: null, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
