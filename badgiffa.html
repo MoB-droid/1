@@ -124,16 +124,14 @@
     from { transform: translateY(0); }
     to   { transform: translateY(var(--jaw-gap, 14px)); }
   }
-  .field[hidden] { display: none; }
-  .field .range-row { display: flex; align-items: center; gap: 10px; }
-  .field input[type="range"] { padding: 0; border: 0; background: transparent; }
-  .field output { min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
-  .mouth {
-    position: absolute;
-    inset: 0;
-    background: #1b1412;
-    pointer-events: none;
-  }
+  .stage.editing { cursor: crosshair; }
+  .stage.editing .jaw { opacity: .55; }
+  .trace { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .trace polygon { fill: rgba(224, 83, 44, .18); stroke: #e0532c; stroke-width: 3; stroke-linejoin: round; }
+  .trace polyline { fill: none; stroke: #e0532c; stroke-width: 3; stroke-dasharray: 8 6; }
+  .trace circle { fill: #fff; stroke: #e0532c; stroke-width: 3; pointer-events: all; cursor: grab; touch-action: none; }
+  .trace circle.first { fill: #e0532c; }
+  .toolbar[hidden] { display: none; }
 
   /* Empty state: a doodle placeholder until a photo is added */
   .empty {
@@ -151,6 +149,7 @@
       radial-gradient(circle at 50% 40%, var(--paper-2) 0, transparent 60%),
       var(--stage);
   }
+  .empty[hidden], .dog[hidden], .trace[hidden] { display: none; }
   .empty svg { width: 58%; max-width: 220px; height: auto; color: var(--ink); }
   .empty p {
     margin: 0;
@@ -283,8 +282,8 @@
 
 <div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
-  <div class="mouth" id="mouth" hidden></div>
   <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
+  <svg class="trace" id="trace" aria-hidden="true" hidden></svg>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M60 78c-4-22 10-40 40-40s44 18 40 40c6 8 8 22 2 34-8 16-30 24-42 24s-34-8-42-24c-6-12-4-26 2-34z"/>
@@ -303,11 +302,18 @@
   <div class="bubble" id="bubble" aria-live="polite"></div>
 </div>
 
-<div class="toolbar">
+<div class="toolbar" id="mainBar">
   <label class="btn primary" for="file" id="fileBtn">Add photo</label>
   <input class="file-input" type="file" id="file" accept="image/*">
+  <button class="btn" type="button" id="jawBtn">Set jaw</button>
   <button class="btn" type="button" id="fitBtn">Fit whole drawing</button>
   <button class="btn" type="button" id="settingsBtn">Lines &amp; voice</button>
+</div>
+<div class="toolbar" id="editBar" hidden>
+  <button class="btn" type="button" id="undoBtn">Undo point</button>
+  <button class="btn" type="button" id="clearBtn">Clear</button>
+  <button class="btn" type="button" id="cancelEditBtn">Cancel</button>
+  <button class="btn primary" type="button" id="doneBtn">Done</button>
 </div>
 <p class="status" id="status"></p>
 
@@ -321,13 +327,6 @@
     <div class="field">
       <label for="lines">What it says (one line each)</label>
       <textarea id="lines"></textarea>
-    </div>
-    <div class="field" id="jawField">
-      <label for="jawLine">Jaw line (where the mouth splits)</label>
-      <div class="range-row">
-        <input id="jawLine" type="range" min="25" max="85" step="1" value="57">
-        <output id="jawOut" for="jawLine">57%</output>
-      </div>
     </div>
     <div class="field">
       <label for="pitch">Voice</label>
@@ -356,83 +355,154 @@
     "I smell bacon.",
     "Bork bork!"
   ];
-  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", jaw: 57, photoId: null, photoData: null };
+  // Starting jaw outline for the built-in drawing (fractions of the image).
+  // "Set jaw" lets the owner redraw it by tapping around the jaw.
+  var DRAWING_JAW = [
+    [445, 672], [525, 632], [765, 722], [790, 780], [850, 803], [950, 792], [968, 772],
+    [1015, 798], [1080, 822], [1080, 1060], [660, 1060], [550, 870], [550, 770], [445, 705]
+  ].map(function (p) { return [p[0] / 1170, p[1] / 1170]; });
+
+  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", jawPts: null, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
   var lastIndex = -1;
 
   var stage = document.getElementById("stage");
   var dog = document.getElementById("dog");
   var jaw = document.getElementById("jaw");
-  var mouth = document.getElementById("mouth");
-  var jawField = document.getElementById("jawField");
-  var jawLine = document.getElementById("jawLine");
-  var jawOut = document.getElementById("jawOut");
+  var trace = document.getElementById("trace");
   var empty = document.getElementById("empty");
   var bubble = document.getElementById("bubble");
   var fileInput = document.getElementById("file");
   var fitBtn = document.getElementById("fitBtn");
   var status = document.getElementById("status");
+  var mainBar = document.getElementById("mainBar");
+  var editBar = document.getElementById("editBar");
   var settings = document.getElementById("settings");
   var nameInput = document.getElementById("name");
   var linesInput = document.getElementById("lines");
   var pitchInput = document.getElementById("pitch");
+  var hint = document.getElementById("hint");
 
   function say(msg) { status.textContent = msg || ""; }
+  function usingDrawing() { return !state.photoId && !state.photoData; }
+  function currentSrc() { return state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg"); }
+  function jawPts() {
+    if (state.jawPts && state.jawPts.length >= 3) return state.jawPts;
+    return usingDrawing() ? DRAWING_JAW : [[0, 0.57], [1, 0.57], [1, 1], [0, 1]];
+  }
+
+  /* ---------- source image and the two cut layers ---------- */
+  var source = null;        // decoded source image
+  var sourceSrc = null;
+  var interior = null;      // Uint8Array: 1 where the pixel belongs to the drawing (not outside white)
+  var urls = [];
+
+  function loadSource(src) {
+    if (sourceSrc === src && source) { buildLayers(); return; }
+    var img = new Image();
+    img.onload = function () {
+      source = img; sourceSrc = src; interior = null;
+      buildLayers();
+    };
+    img.onerror = function () { say("Couldn't load the picture."); };
+    img.src = src;
+  }
+
+  // Flood-fill near-white from the border so white paper around the drawing
+  // is never part of the jaw, but white inside the drawing still is.
+  function computeInterior(ctx, w, h) {
+    var data = ctx.getImageData(0, 0, w, h).data;
+    var seen = new Uint8Array(w * h);
+    var stack = [];
+    function white(i) { return data[i * 4] > 222 && data[i * 4 + 1] > 222 && data[i * 4 + 2] > 222; }
+    function push(i) { if (!seen[i] && white(i)) { seen[i] = 1; stack.push(i); } }
+    for (var x = 0; x < w; x++) { push(x); push((h - 1) * w + x); }
+    for (var y = 0; y < h; y++) { push(y * w); push(y * w + w - 1); }
+    while (stack.length) {
+      var i = stack.pop(), px = i % w, py = (i - px) / w;
+      if (px > 0) push(i - 1);
+      if (px < w - 1) push(i + 1);
+      if (py > 0) push(i - w);
+      if (py < h - 1) push(i + w);
+    }
+    var inside = new Uint8Array(w * h);
+    for (var k = 0; k < inside.length; k++) inside[k] = seen[k] ? 0 : 1;
+    return inside;
+  }
+
+  function buildLayers() {
+    if (!source) return;
+    var w = source.naturalWidth, h = source.naturalHeight;
+    var base = document.createElement("canvas"); base.width = w; base.height = h;
+    var bctx = base.getContext("2d", { willReadFrequently: true });
+    bctx.drawImage(source, 0, 0);
+    if (!interior) {
+      try { interior = computeInterior(bctx, w, h); }
+      catch (e) { interior = new Uint8Array(w * h).fill(1); }
+    }
+
+    var pts = jawPts();
+    var maskC = document.createElement("canvas"); maskC.width = w; maskC.height = h;
+    var mctx = maskC.getContext("2d", { willReadFrequently: true });
+    mctx.fillStyle = "#fff";
+    mctx.beginPath();
+    pts.forEach(function (p, i) { mctx[i ? "lineTo" : "moveTo"](p[0] * w, p[1] * h); });
+    mctx.closePath(); mctx.fill();
+    var m = mctx.getImageData(0, 0, w, h);
+    for (var i = 0; i < w * h; i++) { if (!interior[i]) m.data[i * 4 + 3] = 0; }
+    mctx.putImageData(m, 0, 0);
+
+    var jawC = document.createElement("canvas"); jawC.width = w; jawC.height = h;
+    var jctx = jawC.getContext("2d");
+    jctx.drawImage(source, 0, 0);
+    jctx.globalCompositeOperation = "destination-in";
+    jctx.drawImage(maskC, 0, 0);
+
+    var headC = document.createElement("canvas"); headC.width = w; headC.height = h;
+    var hctx = headC.getContext("2d");
+    hctx.drawImage(source, 0, 0);
+    hctx.globalCompositeOperation = "source-atop";
+    var dark = document.createElement("canvas"); dark.width = w; dark.height = h;
+    var dctx = dark.getContext("2d");
+    dctx.drawImage(maskC, 0, 0);
+    dctx.globalCompositeOperation = "source-in";
+    dctx.fillStyle = "#1b1412"; dctx.fillRect(0, 0, w, h);
+    hctx.globalCompositeOperation = "source-over";
+    hctx.drawImage(dark, 0, 0);
+
+    urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
+    headC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); dog.src = u; }, "image/png");
+    jawC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); jaw.src = u; }, "image/png");
+    layoutJaw();
+  }
 
   function render() {
     stage.dataset.fit = state.fit;
     fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
-    var src = state.photoId ? "/_blob/" + state.photoId : (state.photoData || "head.png");
-    var jawSrc = usingDrawing() ? "jaw.png" : src;
-    if (src) {
-      if (dog.getAttribute("src") !== src) dog.src = src;
-      if (jaw.getAttribute("src") !== jawSrc) jaw.src = jawSrc;
-      dog.hidden = false;
-      jaw.hidden = false;
-      mouth.hidden = false;
-      empty.hidden = true;
-      layoutJaw();
-      stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
-    } else {
-      dog.hidden = true;
-      jaw.hidden = true;
-      mouth.hidden = true;
-      empty.hidden = false;
-    }
-    document.getElementById("hint").textContent = src ? "Tap " + state.name + " to make it talk" : "Add a photo of your drawing";
+    dog.hidden = false; jaw.hidden = false; empty.hidden = true;
+    stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
+    hint.textContent = editing ? "Tap around the jaw, then Done" : "Tap " + state.name + " to make it talk";
+    loadSource(currentSrc());
   }
 
-  /* ---------- jaw layers: top of the drawing stays, bottom moves ---------- */
-  // The built-in drawing ships as two pre-cut layers: head.png (with the
-  // mouth interior darkened) and jaw.png (only the lower jaw, transparent
-  // elsewhere). A photo the user adds is split along a horizontal line.
-  function usingDrawing() { return !state.photoId && !state.photoData; }
-
-  function layoutJaw() {
-    if (!dog.naturalWidth) return;
+  /* ---------- geometry: where the picture sits inside the stage ---------- */
+  function imageRect() {
     var W = stage.clientWidth, H = stage.clientHeight;
-    var w = dog.naturalWidth, h = dog.naturalHeight;
+    var w = source ? source.naturalWidth : W, h = source ? source.naturalHeight : H;
     var scale = state.fit === "fit" ? Math.min(W / w, H / h) : Math.max(W / w, H / h);
     var rw = w * scale, rh = h * scale;
-    var left = (W - rw) / 2, top = (H - rh) / 2;
-    if (usingDrawing()) {
-      jaw.style.clipPath = "";
-      mouth.hidden = true;
-    } else {
-      var y = Math.round(top + rh * (state.jaw / 100));
-      var poly = "polygon(0px " + y + "px, " + W + "px " + y + "px, " + W + "px " + H + "px, 0px " + H + "px)";
-      jaw.style.clipPath = poly;
-      mouth.style.clipPath = poly;
-      mouth.hidden = false;
-    }
-    stage.style.setProperty("--jaw-gap", Math.round(rh * (usingDrawing() ? 0.045 : 0.035)) + "px");
-    jawField.hidden = usingDrawing();
+    return { left: (W - rw) / 2, top: (H - rh) / 2, w: rw, h: rh, W: W, H: H };
   }
-  dog.addEventListener("load", layoutJaw);
+  function layoutJaw() {
+    var r = imageRect();
+    stage.style.setProperty("--jaw-gap", Math.round(r.h * 0.045) + "px");
+    drawTrace();
+  }
   window.addEventListener("resize", layoutJaw);
 
   var chompTimer = null;
   function startChomp(ms) {
+    if (editing) return;
     jaw.classList.add("chomp");
     clearTimeout(chompTimer);
     chompTimer = setTimeout(stopChomp, ms);
@@ -441,6 +511,77 @@
     clearTimeout(chompTimer);
     jaw.classList.remove("chomp");
   }
+
+  /* ---------- jaw editor: tap points around the jaw ---------- */
+  var editing = false, draft = [];
+  var SVG = "http://www.w3.org/2000/svg";
+
+  function drawTrace() {
+    if (!editing) { trace.hidden = true; return; }
+    var r = imageRect();
+    trace.hidden = false;
+    trace.setAttribute("viewBox", "0 0 " + r.W + " " + r.H);
+    while (trace.firstChild) trace.removeChild(trace.firstChild);
+    var px = draft.map(function (p) { return [r.left + p[0] * r.w, r.top + p[1] * r.h]; });
+    var str = px.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ");
+    if (px.length >= 3) {
+      var poly = document.createElementNS(SVG, "polygon"); poly.setAttribute("points", str); trace.appendChild(poly);
+    } else if (px.length === 2) {
+      var line = document.createElementNS(SVG, "polyline"); line.setAttribute("points", str); trace.appendChild(line);
+    }
+    px.forEach(function (p, i) {
+      var c = document.createElementNS(SVG, "circle");
+      c.setAttribute("cx", p[0]); c.setAttribute("cy", p[1]); c.setAttribute("r", 9);
+      if (i === 0) c.setAttribute("class", "first");
+      c.addEventListener("pointerdown", function (e) { startDrag(e, i); });
+      trace.appendChild(c);
+    });
+  }
+  function toFraction(clientX, clientY) {
+    var b = stage.getBoundingClientRect(), r = imageRect();
+    return [(clientX - b.left - r.left) / r.w, (clientY - b.top - r.top) / r.h];
+  }
+  function startDrag(e, i) {
+    e.stopPropagation(); e.preventDefault();
+    var moved = false;
+    function move(ev) { moved = true; draft[i] = toFraction(ev.clientX, ev.clientY); drawTrace(); }
+    function up() {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      dragging = moved;
+      setTimeout(function () { dragging = false; }, 0);
+    }
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+  }
+  var dragging = false;
+
+  function enterEdit() {
+    editing = true; draft = jawPts().map(function (p) { return p.slice(); });
+    stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel();
+    bubble.classList.remove("show");
+    stage.classList.add("editing"); mainBar.hidden = true; editBar.hidden = false;
+    hint.textContent = "Tap around the jaw, then Done";
+    say("Orange area = the part that moves. Drag dots to adjust, tap to add.");
+    drawTrace();
+  }
+  function exitEdit() {
+    editing = false; stage.classList.remove("editing"); mainBar.hidden = false; editBar.hidden = true;
+    say(""); drawTrace(); render();
+  }
+  document.getElementById("jawBtn").addEventListener("click", enterEdit);
+  document.getElementById("undoBtn").addEventListener("click", function () { draft.pop(); drawTrace(); });
+  document.getElementById("clearBtn").addEventListener("click", function () { draft = []; drawTrace(); say("Tap around the jaw: 3 or more points."); });
+  document.getElementById("cancelEditBtn").addEventListener("click", exitEdit);
+  document.getElementById("doneBtn").addEventListener("click", function () {
+    if (draft.length < 3) { say("Need at least 3 points."); return; }
+    state.jawPts = draft.map(function (p) { return [Math.round(p[0] * 1000) / 1000, Math.round(p[1] * 1000) / 1000]; });
+    exitEdit();
+    persist();
+    setTimeout(function () { startChomp(1200); }, 300);
+  });
 
   /* ---------- talking ---------- */
   function pickLine() {
@@ -488,12 +629,18 @@
     bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, showFor);
   }
 
-  stage.addEventListener("click", function () {
+  stage.addEventListener("click", function (e) {
+    if (editing) {
+      if (dragging || (e.target && e.target.tagName === "circle")) return;
+      draft.push(toFraction(e.clientX, e.clientY));
+      drawTrace();
+      return;
+    }
     if (!empty.hidden) { fileInput.click(); return; }
     talk();
   });
   stage.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); stage.click(); }
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!editing) talk(); }
   });
 
   /* ---------- photo ---------- */
@@ -533,6 +680,7 @@
     try {
       var blob = await resizeToPhone(file);
       var oldId = state.photoId;
+      state.jawPts = null;
       if (assets && docRef) {
         say("Saving…");
         var up = await assets.upload(blob, { type: "image/jpeg" });
@@ -540,12 +688,12 @@
         state.photoData = null;
         await persist();
         if (oldId && oldId !== up.id) { try { await assets.delete(oldId); } catch (e) {} }
-        say("Saved. Tap " + state.name + "!");
+        say("Saved. Use Set jaw to mark the part that moves.");
       } else {
         state.photoData = await blobToDataUrl(blob);
         state.photoId = null;
         persistLocal();
-        say("Saved on this device. Tap " + state.name + "!");
+        say("Saved on this device. Use Set jaw to mark the part that moves.");
       }
       render();
     } catch (err) {
@@ -556,15 +704,10 @@
 
   fitBtn.addEventListener("click", function () {
     state.fit = state.fit === "cover" ? "fit" : "cover";
-    render();
-    persist();
-  });
-
-  jawLine.addEventListener("input", function () {
-    jawOut.textContent = jawLine.value + "%";
-    state.jaw = parseInt(jawLine.value, 10);
+    stage.dataset.fit = state.fit;
+    fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
     layoutJaw();
-    startChomp(900);
+    persist();
   });
 
   /* ---------- settings ---------- */
@@ -572,8 +715,6 @@
     nameInput.value = state.name;
     linesInput.value = state.lines.join("\n");
     pitchInput.value = String(state.pitch);
-    jawLine.value = String(state.jaw);
-    jawOut.textContent = state.jaw + "%";
     settings.showModal();
   });
   document.getElementById("cancelBtn").addEventListener("click", function () { settings.close(); });
@@ -582,36 +723,39 @@
     state.lines = linesInput.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
     if (!state.lines.length) state.lines = DEFAULT_LINES.slice();
     state.pitch = parseFloat(pitchInput.value) || 1.2;
-    state.jaw = parseInt(jawLine.value, 10) || 57;
-    render();
+    hint.textContent = "Tap " + state.name + " to make it talk";
     persist();
   });
 
   /* ---------- persistence ---------- */
+  function snapshot() {
+    return { name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jawPts: state.jawPts, photoId: state.photoId };
+  }
   function persistLocal() {
     try {
-      localStorage.setItem("badgiffa", JSON.stringify({
-        name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jaw: state.jaw, photoData: state.photoData
-      }));
+      var s = snapshot(); s.photoData = state.photoData;
+      localStorage.setItem("badgiffa", JSON.stringify(s));
     } catch (e) {}
   }
   async function persist() {
     persistLocal();
     if (!docRef) return;
-    try {
-      await docRef.set({ name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jaw: state.jaw, photoId: state.photoId });
-    } catch (e) { say("Couldn't save online. Kept on this device."); }
+    try { await docRef.set(snapshot()); }
+    catch (e) { say("Couldn't save online. Kept on this device."); }
+  }
+  function applySaved(s) {
+    if (s.name) state.name = s.name;
+    if (Array.isArray(s.lines) && s.lines.length) state.lines = s.lines;
+    if (s.pitch) state.pitch = s.pitch;
+    if (s.fit) state.fit = s.fit;
+    if (Array.isArray(s.jawPts) && s.jawPts.length >= 3) state.jawPts = s.jawPts;
   }
   function loadLocal() {
     try {
       var raw = localStorage.getItem("badgiffa");
       if (!raw) return;
       var s = JSON.parse(raw);
-      if (s.name) state.name = s.name;
-      if (Array.isArray(s.lines) && s.lines.length) state.lines = s.lines;
-      if (s.pitch) state.pitch = s.pitch;
-      if (s.fit) state.fit = s.fit;
-      if (s.jaw) state.jaw = s.jaw;
+      applySaved(s);
       if (s.photoData) state.photoData = s.photoData;
     } catch (e) {}
   }
@@ -625,14 +769,11 @@
       if (!db) return;
       docRef = db.doc("badgiffa/dog");
       docRef.onSnapshot(function (snap) {
-        if (!snap.exists) return;
+        if (!snap.exists || editing) return;
         var d = snap.data();
-        if (d.name) state.name = d.name;
-        if (Array.isArray(d.lines) && d.lines.length) state.lines = d.lines;
-        if (d.pitch) state.pitch = d.pitch;
-        if (d.fit) state.fit = d.fit;
-        if (d.jaw) state.jaw = d.jaw;
+        applySaved(d);
         if (d.photoId) { state.photoId = d.photoId; state.photoData = null; }
+        if (d.jawPts === null) state.jawPts = null;
         render();
       }, function () {});
     });
