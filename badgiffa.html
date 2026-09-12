@@ -12,6 +12,7 @@
     --bubble: #ffffff;
     --bubble-ink: #22211f;
     --stage: #ffffff;
+    --field: #ffffff;
     --shadow: rgba(43, 42, 39, .18);
     --focus: #2f6fd6;
   }
@@ -27,6 +28,7 @@
       --bubble: #f4f2ea;
       --bubble-ink: #22211f;
       --stage: #ffffff;
+      --field: #141715;
       --shadow: rgba(0, 0, 0, .5);
       --focus: #7fb0ff;
     }
@@ -42,6 +44,7 @@
     --bubble: #f4f2ea;
     --bubble-ink: #22211f;
     --stage: #ffffff;
+    --field: #141715;
     --shadow: rgba(0, 0, 0, .5);
     --focus: #7fb0ff;
   }
@@ -115,6 +118,15 @@
     will-change: transform;
   }
   .stage[data-fit="fit"] .dog { object-fit: contain; }
+  .jaw { transform-origin: 50% 0; }
+  .jaw.chomp { animation: chomp .22s ease-in-out infinite alternate; }
+  @keyframes chomp {
+    from { transform: translateY(0); }
+    to   { transform: translateY(var(--jaw-gap, 14px)); }
+  }
+  .field .range-row { display: flex; align-items: center; gap: 10px; }
+  .field input[type="range"] { padding: 0; border: 0; background: transparent; }
+  .field output { min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
   .dog.talk { animation: wag .55s cubic-bezier(.34, 1.56, .64, 1) 1; }
   @keyframes wag {
     0%   { transform: scale(1) rotate(0); }
@@ -248,8 +260,9 @@
   .field input, .field textarea, .field select {
     font: inherit;
     color: var(--ink);
-    background: var(--stage);
+    background: var(--field);
     border: 1px solid var(--line);
+    color-scheme: light dark;
     border-radius: 10px;
     padding: 9px 11px;
     width: 100%;
@@ -260,6 +273,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .dog.talk { animation: none; }
+    .jaw.chomp { animation-duration: .5s; }
     .bubble { transition: opacity .15s ease; transform: translate(-50%, 0) scale(1); }
   }
 </style>
@@ -271,6 +285,7 @@
 
 <div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
+  <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M60 78c-4-22 10-40 40-40s44 18 40 40c6 8 8 22 2 34-8 16-30 24-42 24s-34-8-42-24c-6-12-4-26 2-34z"/>
@@ -309,6 +324,13 @@
       <textarea id="lines"></textarea>
     </div>
     <div class="field">
+      <label for="jawLine">Jaw line (where the mouth splits)</label>
+      <div class="range-row">
+        <input id="jawLine" type="range" min="25" max="85" step="1" value="57">
+        <output id="jawOut" for="jawLine">57%</output>
+      </div>
+    </div>
+    <div class="field">
       <label for="pitch">Voice</label>
       <select id="pitch">
         <option value="1.6">Small dog (high)</option>
@@ -335,12 +357,15 @@
     "I smell bacon.",
     "Bork bork!"
   ];
-  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", photoId: null, photoData: null };
+  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", jaw: 57, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
   var lastIndex = -1;
 
   var stage = document.getElementById("stage");
   var dog = document.getElementById("dog");
+  var jaw = document.getElementById("jaw");
+  var jawLine = document.getElementById("jawLine");
+  var jawOut = document.getElementById("jawOut");
   var empty = document.getElementById("empty");
   var bubble = document.getElementById("bubble");
   var fileInput = document.getElementById("file");
@@ -358,15 +383,45 @@
     fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
     var src = state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg");
     if (src) {
-      if (dog.getAttribute("src") !== src) dog.src = src;
+      if (dog.getAttribute("src") !== src) { dog.src = src; jaw.src = src; }
       dog.hidden = false;
+      jaw.hidden = false;
       empty.hidden = true;
+      layoutJaw();
       stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
     } else {
       dog.hidden = true;
+      jaw.hidden = true;
       empty.hidden = false;
     }
     document.getElementById("hint").textContent = src ? "Tap " + state.name + " to make it talk" : "Add a photo of your drawing";
+  }
+
+  /* ---------- jaw layers: top of the drawing stays, bottom moves ---------- */
+  function layoutJaw() {
+    if (!dog.naturalWidth) return;
+    var W = stage.clientWidth, H = stage.clientHeight;
+    var w = dog.naturalWidth, h = dog.naturalHeight;
+    var scale = state.fit === "fit" ? Math.min(W / w, H / h) : Math.max(W / w, H / h);
+    var rh = h * scale, top = (H - rh) / 2;
+    var y = Math.round(top + rh * (state.jaw / 100));
+    y = Math.max(0, Math.min(H, y));
+    dog.style.clipPath = "inset(0 0 " + (H - y) + "px 0)";
+    jaw.style.clipPath = "inset(" + y + "px 0 0 0)";
+    stage.style.setProperty("--jaw-gap", Math.round(rh * 0.035) + "px");
+  }
+  dog.addEventListener("load", layoutJaw);
+  window.addEventListener("resize", layoutJaw);
+
+  var chompTimer = null;
+  function startChomp(ms) {
+    jaw.classList.add("chomp");
+    clearTimeout(chompTimer);
+    chompTimer = setTimeout(stopChomp, ms);
+  }
+  function stopChomp() {
+    clearTimeout(chompTimer);
+    jaw.classList.remove("chomp");
   }
 
   /* ---------- talking ---------- */
@@ -408,10 +463,14 @@
       if (voice) u.voice = voice;
       u.pitch = state.pitch;
       u.rate = 1.05;
+      u.onend = stopChomp;
+      u.onerror = stopChomp;
       speechSynthesis.speak(u);
     }
+    var showFor = Math.max(1800, line.length * 90);
+    startChomp(showFor);
     clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, Math.max(1800, line.length * 90));
+    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, showFor);
   }
 
   stage.addEventListener("click", function () {
@@ -486,11 +545,20 @@
     persist();
   });
 
+  jawLine.addEventListener("input", function () {
+    jawOut.textContent = jawLine.value + "%";
+    state.jaw = parseInt(jawLine.value, 10);
+    layoutJaw();
+    startChomp(900);
+  });
+
   /* ---------- settings ---------- */
   document.getElementById("settingsBtn").addEventListener("click", function () {
     nameInput.value = state.name;
     linesInput.value = state.lines.join("\n");
     pitchInput.value = String(state.pitch);
+    jawLine.value = String(state.jaw);
+    jawOut.textContent = state.jaw + "%";
     settings.showModal();
   });
   document.getElementById("cancelBtn").addEventListener("click", function () { settings.close(); });
@@ -499,6 +567,7 @@
     state.lines = linesInput.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
     if (!state.lines.length) state.lines = DEFAULT_LINES.slice();
     state.pitch = parseFloat(pitchInput.value) || 1.2;
+    state.jaw = parseInt(jawLine.value, 10) || 57;
     render();
     persist();
   });
@@ -507,7 +576,7 @@
   function persistLocal() {
     try {
       localStorage.setItem("badgiffa", JSON.stringify({
-        name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, photoData: state.photoData
+        name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jaw: state.jaw, photoData: state.photoData
       }));
     } catch (e) {}
   }
@@ -515,7 +584,7 @@
     persistLocal();
     if (!docRef) return;
     try {
-      await docRef.set({ name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, photoId: state.photoId });
+      await docRef.set({ name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jaw: state.jaw, photoId: state.photoId });
     } catch (e) { say("Couldn't save online. Kept on this device."); }
   }
   function loadLocal() {
@@ -527,6 +596,7 @@
       if (Array.isArray(s.lines) && s.lines.length) state.lines = s.lines;
       if (s.pitch) state.pitch = s.pitch;
       if (s.fit) state.fit = s.fit;
+      if (s.jaw) state.jaw = s.jaw;
       if (s.photoData) state.photoData = s.photoData;
     } catch (e) {}
   }
@@ -546,6 +616,7 @@
         if (Array.isArray(d.lines) && d.lines.length) state.lines = d.lines;
         if (d.pitch) state.pitch = d.pitch;
         if (d.fit) state.fit = d.fit;
+        if (d.jaw) state.jaw = d.jaw;
         if (d.photoId) { state.photoId = d.photoId; state.photoData = null; }
         render();
       }, function () {});
