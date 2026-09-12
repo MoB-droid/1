@@ -1,0 +1,555 @@
+<title>Badgiffa</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@500;700;800&display=swap">
+<style>
+  :root {
+    --paper: #f3f1ea;
+    --paper-2: #e9e6dc;
+    --ink: #2b2a27;
+    --ink-soft: #6b6862;
+    --line: #cfcbbf;
+    --crayon: #e0532c;
+    --crayon-ink: #ffffff;
+    --bubble: #ffffff;
+    --bubble-ink: #22211f;
+    --stage: #ffffff;
+    --shadow: rgba(43, 42, 39, .18);
+    --focus: #2f6fd6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1d201e;
+      --paper-2: #262a27;
+      --ink: #ecebe4;
+      --ink-soft: #a6a59c;
+      --line: #3b403c;
+      --crayon: #f0673f;
+      --crayon-ink: #1a1a18;
+      --bubble: #f4f2ea;
+      --bubble-ink: #22211f;
+      --stage: #101211;
+      --shadow: rgba(0, 0, 0, .5);
+      --focus: #7fb0ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1d201e;
+    --paper-2: #262a27;
+    --ink: #ecebe4;
+    --ink-soft: #a6a59c;
+    --line: #3b403c;
+    --crayon: #f0673f;
+    --crayon-ink: #1a1a18;
+    --bubble: #f4f2ea;
+    --bubble-ink: #22211f;
+    --stage: #101211;
+    --shadow: rgba(0, 0, 0, .5);
+    --focus: #7fb0ff;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Nunito", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-inline: 16px;
+    padding-block: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  header {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  h1 {
+    margin: 0;
+    font-family: "Caveat", "Segoe Print", cursive;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: .01em;
+  }
+  .hint {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: .85rem;
+    text-align: right;
+  }
+
+  /* The phone-sized stage: iPhone portrait screen ratio */
+  .stage {
+    position: relative;
+    width: min(100%, 430px, calc((100dvh - 150px) * 9 / 19.5));
+    aspect-ratio: 9 / 19.5;
+    max-width: 100%;
+    border-radius: 42px;
+    background: var(--stage);
+    box-shadow: 0 18px 40px -18px var(--shadow), 0 0 0 1px var(--line);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+  .dog {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform-origin: 50% 85%;
+    will-change: transform;
+  }
+  .stage[data-fit="fit"] .dog { object-fit: contain; }
+  .dog.talk { animation: wag .55s cubic-bezier(.34, 1.56, .64, 1) 1; }
+  @keyframes wag {
+    0%   { transform: scale(1) rotate(0); }
+    25%  { transform: scale(1.04, .96) rotate(-2deg); }
+    50%  { transform: scale(.97, 1.05) rotate(2deg); }
+    75%  { transform: scale(1.02, .98) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  /* Empty state: a doodle placeholder until a photo is added */
+  .empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    text-align: center;
+    color: var(--ink-soft);
+    background:
+      radial-gradient(circle at 50% 40%, var(--paper-2) 0, transparent 60%),
+      var(--stage);
+  }
+  .empty svg { width: 58%; max-width: 220px; height: auto; color: var(--ink); }
+  .empty p {
+    margin: 0;
+    font-family: "Caveat", "Segoe Print", cursive;
+    font-size: 1.6rem;
+    line-height: 1.1;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  .empty small { font-size: .85rem; }
+
+  /* Speech bubble */
+  .bubble {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    transform: translate(-50%, 0) scale(.6);
+    max-width: 78%;
+    padding: 12px 18px 14px;
+    background: var(--bubble);
+    color: var(--bubble-ink);
+    border-radius: 22px;
+    font-family: "Caveat", "Segoe Print", cursive;
+    font-weight: 700;
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
+    line-height: 1.05;
+    text-align: center;
+    box-shadow: 0 10px 26px -10px var(--shadow), 0 0 0 2px var(--bubble-ink);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .28s cubic-bezier(.34, 1.56, .64, 1);
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    width: 18px;
+    height: 18px;
+    background: var(--bubble);
+    border-right: 2px solid var(--bubble-ink);
+    border-bottom: 2px solid var(--bubble-ink);
+    transform: translateX(-50%) rotate(45deg);
+    border-radius: 0 0 4px 0;
+  }
+  .bubble.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+  .toolbar {
+    width: 100%;
+    max-width: 460px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .btn {
+    appearance: none;
+    border: 2px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 800;
+    font-size: .9rem;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .btn.primary { background: var(--crayon); border-color: var(--crayon); color: var(--crayon-ink); }
+  .btn:active { transform: translateY(1px); }
+  .status {
+    width: 100%;
+    max-width: 460px;
+    min-height: 1.2em;
+    margin: 0;
+    text-align: center;
+    font-size: .85rem;
+    color: var(--ink-soft);
+  }
+
+  /* Settings sheet */
+  dialog {
+    border: 0;
+    border-radius: 22px;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 20px;
+    width: min(92vw, 420px);
+    box-shadow: 0 24px 60px -20px var(--shadow), 0 0 0 1px var(--line);
+  }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h2 {
+    margin: 0 0 12px;
+    font-family: "Caveat", "Segoe Print", cursive;
+    font-size: 1.8rem;
+    line-height: 1;
+  }
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field label {
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .field input, .field textarea, .field select {
+    font: inherit;
+    color: var(--ink);
+    background: var(--stage);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 11px;
+    width: 100%;
+  }
+  .field textarea { min-height: 130px; resize: vertical; line-height: 1.4; }
+  .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dog.talk { animation: none; }
+    .bubble { transition: opacity .15s ease; transform: translate(-50%, 0) scale(1); }
+  }
+</style>
+
+<header>
+  <h1>Badgiffa</h1>
+  <p class="hint" id="hint">Tap the dog to make it talk</p>
+</header>
+
+<div class="stage" id="stage" data-fit="cover" role="button" tabindex="0" aria-label="Tap to make the dog talk">
+  <img class="dog" id="dog" alt="Your dog drawing" hidden>
+  <div class="empty" id="empty">
+    <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M60 78c-4-22 10-40 40-40s44 18 40 40c6 8 8 22 2 34-8 16-30 24-42 24s-34-8-42-24c-6-12-4-26 2-34z"/>
+      <path d="M62 76c-14-6-30-4-38 6 8 14 24 20 36 14"/>
+      <path d="M138 76c14-6 30-4 38 6-8 14-24 20-36 14"/>
+      <circle cx="84" cy="88" r="3" fill="currentColor"/>
+      <circle cx="116" cy="88" r="3" fill="currentColor"/>
+      <path d="M92 106c4-4 12-4 16 0-2 6-6 8-8 8s-6-2-8-8z" fill="currentColor"/>
+      <path d="M100 114v8m0 0c-6 6-12 4-14 0m14 0c6 6 12 4 14 0"/>
+      <path d="M70 52c-6-14 2-26 10-28 2 10 6 16 12 20"/>
+      <path d="M130 52c6-14-2-26-10-28-2 10-6 16-12 20"/>
+    </svg>
+    <p>Add your dog drawing</p>
+    <small>Tap here to pick a photo</small>
+  </div>
+  <div class="bubble" id="bubble" aria-live="polite"></div>
+</div>
+
+<div class="toolbar">
+  <label class="btn primary" for="file" id="fileBtn">Add photo</label>
+  <input class="file-input" type="file" id="file" accept="image/*">
+  <button class="btn" type="button" id="fitBtn">Fit whole drawing</button>
+  <button class="btn" type="button" id="settingsBtn">Lines &amp; voice</button>
+</div>
+<p class="status" id="status"></p>
+
+<dialog id="settings">
+  <h2>Lines &amp; voice</h2>
+  <form method="dialog" id="settingsForm">
+    <div class="field">
+      <label for="name">Dog's name</label>
+      <input id="name" type="text" maxlength="30" placeholder="Badgiffa">
+    </div>
+    <div class="field">
+      <label for="lines">What it says (one line each)</label>
+      <textarea id="lines"></textarea>
+    </div>
+    <div class="field">
+      <label for="pitch">Voice</label>
+      <select id="pitch">
+        <option value="1.6">Small dog (high)</option>
+        <option value="1.2" selected>Medium dog</option>
+        <option value="0.7">Big dog (low)</option>
+      </select>
+    </div>
+    <div class="row">
+      <button class="btn" type="button" id="cancelBtn">Cancel</button>
+      <button class="btn primary" type="submit" id="saveBtn">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+(function () {
+  var DEFAULT_LINES = [
+    "Woof!",
+    "Did you say walk?",
+    "I drew myself. Nice, right?",
+    "Scratch behind the ears, please.",
+    "Who's a good dog? Me.",
+    "Treat. Now. Please.",
+    "I smell bacon.",
+    "Bork bork!"
+  ];
+  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "cover", photoId: null, photoData: null };
+  var db = null, assets = null, docRef = null;
+  var lastIndex = -1;
+
+  var stage = document.getElementById("stage");
+  var dog = document.getElementById("dog");
+  var empty = document.getElementById("empty");
+  var bubble = document.getElementById("bubble");
+  var fileInput = document.getElementById("file");
+  var fitBtn = document.getElementById("fitBtn");
+  var status = document.getElementById("status");
+  var settings = document.getElementById("settings");
+  var nameInput = document.getElementById("name");
+  var linesInput = document.getElementById("lines");
+  var pitchInput = document.getElementById("pitch");
+
+  function say(msg) { status.textContent = msg || ""; }
+
+  function render() {
+    stage.dataset.fit = state.fit;
+    fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
+    var src = state.photoId ? "/_blob/" + state.photoId : state.photoData;
+    if (src) {
+      if (dog.getAttribute("src") !== src) dog.src = src;
+      dog.hidden = false;
+      empty.hidden = true;
+      stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
+    } else {
+      dog.hidden = true;
+      empty.hidden = false;
+    }
+    document.getElementById("hint").textContent = src ? "Tap " + state.name + " to make it talk" : "Add a photo of your drawing";
+  }
+
+  /* ---------- talking ---------- */
+  function pickLine() {
+    var lines = state.lines.length ? state.lines : DEFAULT_LINES;
+    if (lines.length === 1) return lines[0];
+    var i;
+    do { i = Math.floor(Math.random() * lines.length); } while (i === lastIndex);
+    lastIndex = i;
+    return lines[i];
+  }
+
+  var voice = null;
+  function findVoice() {
+    if (!("speechSynthesis" in window)) return null;
+    var voices = speechSynthesis.getVoices();
+    if (!voices.length) return null;
+    var en = voices.filter(function (v) { return /^en/i.test(v.lang); });
+    var pool = en.length ? en : voices;
+    var pref = pool.filter(function (v) { return /samantha|daniel|karen|google us english/i.test(v.name); });
+    return (pref[0] || pool[0]);
+  }
+  if ("speechSynthesis" in window) {
+    speechSynthesis.onvoiceschanged = function () { voice = findVoice(); };
+  }
+
+  var bubbleTimer = null;
+  function talk() {
+    var line = pickLine();
+    bubble.textContent = line;
+    bubble.classList.add("show");
+    dog.classList.remove("talk");
+    void dog.offsetWidth;
+    dog.classList.add("talk");
+    if ("speechSynthesis" in window) {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(line);
+      if (!voice) voice = findVoice();
+      if (voice) u.voice = voice;
+      u.pitch = state.pitch;
+      u.rate = 1.05;
+      speechSynthesis.speak(u);
+    }
+    clearTimeout(bubbleTimer);
+    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, Math.max(1800, line.length * 90));
+  }
+
+  stage.addEventListener("click", function () {
+    if (!state.photoId && !state.photoData) { fileInput.click(); return; }
+    talk();
+  });
+  stage.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); stage.click(); }
+  });
+
+  /* ---------- photo ---------- */
+  var IPHONE_W = 1170, IPHONE_H = 2532;
+  function resizeToPhone(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var scale = Math.min(1, IPHONE_W / img.naturalWidth, IPHONE_H / img.naturalHeight);
+        var w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+        var c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        var ctx = c.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        c.toBlob(function (blob) { blob ? resolve(blob) : reject(new Error("encode")); }, "image/jpeg", 0.86);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("decode")); };
+      img.src = url;
+    });
+  }
+  function blobToDataUrl(blob) {
+    return new Promise(function (resolve) {
+      var r = new FileReader();
+      r.onload = function () { resolve(r.result); };
+      r.readAsDataURL(blob);
+    });
+  }
+
+  fileInput.addEventListener("change", async function () {
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    say("Sizing the photo for iPhone…");
+    try {
+      var blob = await resizeToPhone(file);
+      var oldId = state.photoId;
+      if (assets && docRef) {
+        say("Saving…");
+        var up = await assets.upload(blob, { type: "image/jpeg" });
+        state.photoId = up.id;
+        state.photoData = null;
+        await persist();
+        if (oldId && oldId !== up.id) { try { await assets.delete(oldId); } catch (e) {} }
+        say("Saved. Tap " + state.name + "!");
+      } else {
+        state.photoData = await blobToDataUrl(blob);
+        state.photoId = null;
+        persistLocal();
+        say("Saved on this device. Tap " + state.name + "!");
+      }
+      render();
+    } catch (err) {
+      say("Couldn't use that photo. Try another one.");
+    }
+    fileInput.value = "";
+  });
+
+  fitBtn.addEventListener("click", function () {
+    state.fit = state.fit === "cover" ? "fit" : "cover";
+    render();
+    persist();
+  });
+
+  /* ---------- settings ---------- */
+  document.getElementById("settingsBtn").addEventListener("click", function () {
+    nameInput.value = state.name;
+    linesInput.value = state.lines.join("\n");
+    pitchInput.value = String(state.pitch);
+    settings.showModal();
+  });
+  document.getElementById("cancelBtn").addEventListener("click", function () { settings.close(); });
+  document.getElementById("settingsForm").addEventListener("submit", function () {
+    state.name = nameInput.value.trim() || "Badgiffa";
+    state.lines = linesInput.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
+    if (!state.lines.length) state.lines = DEFAULT_LINES.slice();
+    state.pitch = parseFloat(pitchInput.value) || 1.2;
+    render();
+    persist();
+  });
+
+  /* ---------- persistence ---------- */
+  function persistLocal() {
+    try {
+      localStorage.setItem("badgiffa", JSON.stringify({
+        name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, photoData: state.photoData
+      }));
+    } catch (e) {}
+  }
+  async function persist() {
+    persistLocal();
+    if (!docRef) return;
+    try {
+      await docRef.set({ name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, photoId: state.photoId });
+    } catch (e) { say("Couldn't save online. Kept on this device."); }
+  }
+  function loadLocal() {
+    try {
+      var raw = localStorage.getItem("badgiffa");
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s.name) state.name = s.name;
+      if (Array.isArray(s.lines) && s.lines.length) state.lines = s.lines;
+      if (s.pitch) state.pitch = s.pitch;
+      if (s.fit) state.fit = s.fit;
+      if (s.photoData) state.photoData = s.photoData;
+    } catch (e) {}
+  }
+
+  loadLocal();
+  render();
+
+  if (window.claude && window.claude.use) {
+    Promise.all([claude.use("db"), claude.use("assets")]).then(function (r) {
+      db = r[0]; assets = r[1];
+      if (!db) return;
+      docRef = db.doc("badgiffa/dog");
+      docRef.onSnapshot(function (snap) {
+        if (!snap.exists) return;
+        var d = snap.data();
+        if (d.name) state.name = d.name;
+        if (Array.isArray(d.lines) && d.lines.length) state.lines = d.lines;
+        if (d.pitch) state.pitch = d.pitch;
+        if (d.fit) state.fit = d.fit;
+        if (d.photoId) { state.photoId = d.photoId; state.photoData = null; }
+        render();
+      }, function () {});
+    });
+  }
+})();
+</script>
