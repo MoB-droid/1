@@ -26,7 +26,7 @@
       --crayon-ink: #1a1a18;
       --bubble: #f4f2ea;
       --bubble-ink: #22211f;
-      --stage: #101211;
+      --stage: #ffffff;
       --shadow: rgba(0, 0, 0, .5);
       --focus: #7fb0ff;
     }
@@ -41,7 +41,7 @@
     --crayon-ink: #1a1a18;
     --bubble: #f4f2ea;
     --bubble-ink: #22211f;
-    --stage: #101211;
+    --stage: #ffffff;
     --shadow: rgba(0, 0, 0, .5);
     --focus: #7fb0ff;
   }
@@ -269,7 +269,7 @@
   <p class="hint" id="hint">Tap the dog to make it talk</p>
 </header>
 
-<div class="stage" id="stage" data-fit="cover" role="button" tabindex="0" aria-label="Tap to make the dog talk">
+<div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -335,7 +335,7 @@
     "I smell bacon.",
     "Bork bork!"
   ];
-  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "cover", photoId: null, photoData: null };
+  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
   var lastIndex = -1;
 
@@ -356,7 +356,7 @@
   function render() {
     stage.dataset.fit = state.fit;
     fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
-    var src = state.photoId ? "/_blob/" + state.photoId : state.photoData;
+    var src = state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg");
     if (src) {
       if (dog.getAttribute("src") !== src) dog.src = src;
       dog.hidden = false;
@@ -415,7 +415,7 @@
   }
 
   stage.addEventListener("click", function () {
-    if (!state.photoId && !state.photoData) { fileInput.click(); return; }
+    if (!empty.hidden) { fileInput.click(); return; }
     talk();
   });
   stage.addEventListener("keydown", function (e) {
