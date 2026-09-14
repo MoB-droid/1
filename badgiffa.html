@@ -135,11 +135,11 @@
   .ear.wiggle { animation: wiggle .75s ease-in-out 1; }
   @keyframes wiggle {
     0%   { transform: rotate(0); }
-    15%  { transform: rotate(-9deg); }
-    35%  { transform: rotate(8deg); }
-    55%  { transform: rotate(-6deg); }
-    75%  { transform: rotate(4deg); }
-    90%  { transform: rotate(-2deg); }
+    15%  { transform: rotate(-6deg); }
+    35%  { transform: rotate(5deg); }
+    55%  { transform: rotate(-4deg); }
+    75%  { transform: rotate(2.5deg); }
+    90%  { transform: rotate(-1.2deg); }
     100% { transform: rotate(0); }
   }
   .jaw.chomp { animation: chomp .22s ease-in-out infinite alternate; }
@@ -407,15 +407,16 @@
     [0.4841, 0.7246], [0.4687, 0.7287], [0.4502, 0.7235], [0.4255, 0.7071], [0.4224, 0.6927]
   ];
 
-  // Ears of the built-in drawing (fractions of the image), each with the
-  // hinge point where it meets the head. Tap an ear and it wiggles.
+  // Ears of the built-in drawing (fractions of the image), each with its
+  // hinge at the joint where the ear meets the yellow stalk. Tap an ear and
+  // it swings about that joint.
   var DRAWING_EARS = [
-    { pivot: [0.308, 0.470], pts: [
+    { pivot: [0.314, 0.462], pts: [
       [0.087, 0.198], [0.107, 0.201], [0.137, 0.244], [0.167, 0.256], [0.192, 0.274], [0.218, 0.308],
       [0.239, 0.342], [0.274, 0.380], [0.295, 0.423], [0.308, 0.453], [0.316, 0.474], [0.292, 0.488],
       [0.262, 0.488], [0.200, 0.480], [0.156, 0.458], [0.128, 0.427], [0.098, 0.385], [0.077, 0.320],
       [0.073, 0.256], [0.077, 0.222] ] },
-    { pivot: [0.684, 0.380], pts: [
+    { pivot: [0.658, 0.378], pts: [
       [0.872, 0.085], [0.838, 0.094], [0.804, 0.111], [0.778, 0.115], [0.752, 0.132], [0.726, 0.167],
       [0.701, 0.184], [0.684, 0.197], [0.667, 0.226], [0.645, 0.269], [0.637, 0.295], [0.650, 0.325],
       [0.667, 0.350], [0.684, 0.376], [0.710, 0.390], [0.727, 0.385], [0.761, 0.359], [0.786, 0.325],
@@ -1009,8 +1010,8 @@
   }
   function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x); }
 
-  // Mains hum of old light bulbs: 60 Hz fundamental with its harmonics, a
-  // faint filament crackle, a slow flicker, fading out as the bulbs go dark.
+  // Old light bulbs humming: a 60 Hz mains drone with its harmonics and a
+  // faint filament sizzle, swelling as the bulbs come on and dying with them.
   var humNodes = null;
   function bulbHum(seconds) {
     try {
@@ -1018,41 +1019,49 @@
       if (!AC) return;
       if (!actx) actx = new AC();
       if (actx.state === "suspended") actx.resume();
-      if (humNodes) { humNodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); humNodes = null; }
-      var t = actx.currentTime, end = t + seconds, nodes = [];
-      var master = actx.createGain();
-      master.gain.setValueAtTime(0, t);
-      master.gain.linearRampToValueAtTime(0.09, t + 0.25);
-      master.gain.setValueAtTime(0.09, end - 0.7);
-      master.gain.linearRampToValueAtTime(0, end);
-      var lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
-      lp.connect(master); master.connect(actx.destination);
-      // flicker: slow wobble on the hum level
-      var flick = actx.createGain(); flick.gain.value = 0.85;
-      var lfo = actx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 7;
-      var lfoAmt = actx.createGain(); lfoAmt.gain.value = 0.15;
-      lfo.connect(lfoAmt); lfoAmt.connect(flick.gain); lfo.start(t); lfo.stop(end + 0.1); nodes.push(lfo);
-      flick.connect(lp);
-      [[60, "sine", 1], [120, "sine", 0.55], [180, "triangle", 0.3], [240, "sawtooth", 0.12]].forEach(function (d) {
-        var o = actx.createOscillator(); o.type = d[1]; o.frequency.value = d[0];
-        var g = actx.createGain(); g.gain.value = d[2];
-        o.connect(g); g.connect(flick); o.start(t); o.stop(end + 0.1); nodes.push(o);
+      stopHum();
+      var t = actx.currentTime, oscs = [];
+      var out = actx.createGain();
+      out.gain.setValueAtTime(0, t);
+      out.gain.linearRampToValueAtTime(1, t + 0.45);
+      out.gain.setValueAtTime(1, t + seconds - 0.7);
+      out.gain.linearRampToValueAtTime(0, t + seconds);
+      out.connect(actx.destination);
+      [[60, 0.05, "sine"], [120, 0.035, "sine"], [180, 0.02, "triangle"], [240, 0.012, "sine"]].forEach(function (d) {
+        var o = actx.createOscillator(); o.type = d[2]; o.frequency.value = d[0];
+        var g = actx.createGain(); g.gain.value = d[1];
+        o.connect(g); g.connect(out); o.start(t); o.stop(t + seconds + 0.1); oscs.push(o);
       });
-      // filament crackle: quiet band-passed noise
-      var len = Math.ceil(actx.sampleRate * seconds), buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
-      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.15);
+      // slow wobble on the hum, like a loose fixture
+      var lfo = actx.createOscillator(); lfo.frequency.value = 5.5;
+      var lfoG = actx.createGain(); lfoG.gain.value = 0.25;
+      lfo.connect(lfoG); lfoG.connect(out.gain); lfo.start(t); lfo.stop(t + seconds + 0.1); oscs.push(lfo);
+      // filament sizzle: quiet noise through a narrow high band
+      var len = Math.ceil(actx.sampleRate * (seconds + 0.2));
+      var buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.25);
       var noise = actx.createBufferSource(); noise.buffer = buf;
-      var bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 1.5;
-      var ng = actx.createGain(); ng.gain.value = 0.06;
-      noise.connect(bp); bp.connect(ng); ng.connect(master); noise.start(t); nodes.push(noise);
-      humNodes = nodes;
+      var bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3800; bp.Q.value = 2.5;
+      var ng = actx.createGain(); ng.gain.value = 0.012;
+      noise.connect(bp); bp.connect(ng); ng.connect(out); noise.start(t); noise.stop(t + seconds + 0.1);
+      humNodes = { out: out, oscs: oscs.concat([noise]) };
+      setTimeout(function () { if (humNodes && humNodes.out === out) humNodes = null; }, (seconds + 0.3) * 1000);
     } catch (e) {}
+  }
+  function stopHum() {
+    if (!humNodes || !actx) return;
+    var n = humNodes; humNodes = null;
+    var t = actx.currentTime;
+    n.out.gain.cancelScheduledValues(t);
+    n.out.gain.setValueAtTime(n.out.gain.value, t);
+    n.out.gain.linearRampToValueAtTime(0, t + 0.1);
+    n.oscs.forEach(function (o) { try { o.stop(t + 0.12); } catch (e) {} });
   }
 
   // Hair: every tip glows on in a scatter, flickers like a filament, then fades.
   function lightBulbs(tips) {
-    bulbHum(2.7);
     var order = tips.map(function (p, i) { return { p: p, delay: Math.random() * 0.5, seed: i * 7.3 }; });
+    bulbHum(0.5 + 1.5 + 0.7);   // last bulb's delay + hold + fade
     addEffect({ draw: function (ctx, r, t) {
       var alive = false, R = r.w * 0.032;
       order.forEach(function (b) {
@@ -1168,11 +1177,36 @@
     }
     return inside;
   }
+  // Floppy dog-ear flaps: one soft leathery slap per swing of the wiggle
+  // (timed to its keyframes), each a low thump plus a puff of filtered noise.
+  function earFlapSound() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      var t0 = actx.currentTime;
+      var len = Math.ceil(actx.sampleRate * 0.12), buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2);
+      [[0.11, 1], [0.26, 0.85], [0.41, 0.7], [0.56, 0.5], [0.68, 0.3]].forEach(function (f) {
+        var t = t0 + f[0], v = f[1];
+        var n = actx.createBufferSource(); n.buffer = buf; n.playbackRate.value = 0.9 + Math.random() * 0.25;
+        var lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1800; lp.Q.value = 0.7;
+        var ng = actx.createGain(); ng.gain.value = 0.18 * v;
+        n.connect(lp); lp.connect(ng); ng.connect(actx.destination); n.start(t);
+        var o = actx.createOscillator(); o.type = "sine";
+        o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.09);
+        var g = actx.createGain(); g.gain.setValueAtTime(0.14 * v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + 0.12);
+      });
+    } catch (e) {}
+  }
   function wiggleEar(i) {
     var img = ears[i];
     img.classList.remove("wiggle");
     void img.offsetWidth;   // restart the animation on a quick second tap
     img.classList.add("wiggle");
+    earFlapSound();
   }
   ears.forEach(function (img) { img.addEventListener("animationend", function () { img.classList.remove("wiggle"); }); });
 
