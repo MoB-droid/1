@@ -385,6 +385,7 @@
 
 <script>
 (function () {
+  // Cyber Buff on school: short, sharp, and true.
   var DEFAULT_LINES = [
     "Homework first. Then fetch.",
     "Read it twice. Understand it once.",
@@ -393,8 +394,16 @@
     "Sleep is part of studying.",
     "Math is just patterns. Sniff them out.",
     "Take notes by hand. It sticks.",
-    "Teach it to a friend. Then you know it."
+    "Teach it to a friend. Then you know it.",
+    "Raise your paw before you speak.",
+    "The dog did not eat your homework. Back it up.",
+    "Sit. Stay. Focus. Good student.",
+    "Plants eat sunlight. That is photosynthesis. I eat lunch.",
+    "Practice beats talent when talent skips practice.",
+    "Be kind in class. Kindness is smart."
   ];
+  // The pre-rendered clips (voice/N.wav) are rendered for these same lines.
+  var CLIP_LINES = DEFAULT_LINES;
   // Jaw outline of the built-in drawing, traced from the owner's red line
   // (fractions of the image). "Set jaw" lets the owner redraw it.
   var DRAWING_JAW = [
@@ -934,7 +943,7 @@
   // through ring modulation and comb delays. Used only while the in-page
   // engine is still loading.
   var CLIPS = {};
-  DEFAULT_LINES.forEach(function (l, i) { CLIPS[l] = "voice/" + i + ".wav"; });
+  CLIP_LINES.forEach(function (l, i) { CLIPS[l] = "voice/" + i + ".wav"; });
   var clipEl = null;
   function playClip(line, onDone) {
     var src = CLIPS[line];
