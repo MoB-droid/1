@@ -545,7 +545,8 @@
       ctx.drawImage(maskC, 0, 0);
       return c;
     }
-    // Paint the masked area of the head layer one flat colour.
+    // Paint the masked area of the head layer one flat colour, grown by a
+    // pixel so no fringe of the original pixels shows when the part moves.
     function fillHole(hctx, maskC, color) {
       var fill = document.createElement("canvas"); fill.width = w; fill.height = h;
       var fctx = fill.getContext("2d");
@@ -553,7 +554,7 @@
       fctx.globalCompositeOperation = "source-in";
       fctx.fillStyle = color; fctx.fillRect(0, 0, w, h);
       hctx.globalCompositeOperation = "source-over";
-      hctx.drawImage(fill, 0, 0);
+      for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) hctx.drawImage(fill, dx, dy);
     }
 
     var jawMask = polyMask(jawPts());
@@ -564,8 +565,9 @@
     var headC = document.createElement("canvas"); headC.width = w; headC.height = h;
     var hctx = headC.getContext("2d");
     hctx.drawImage(source, 0, 0);
-    fillHole(hctx, jawMask, "#1b1412");            // dark mouth gap behind the jaw
-    earMasks.forEach(function (m) { fillHole(hctx, m, "#ffffff"); }); // paper behind the ears
+    // Paper white behind every moving part, so the spot it leaves stays blank.
+    fillHole(hctx, jawMask, "#ffffff");
+    earMasks.forEach(function (m) { fillHole(hctx, m, "#ffffff"); });
 
     urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
     headC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); dog.src = u; }, "image/png");
