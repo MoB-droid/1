@@ -1009,8 +1009,49 @@
   }
   function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x); }
 
+  // Mains hum of old light bulbs: 60 Hz fundamental with its harmonics, a
+  // faint filament crackle, a slow flicker, fading out as the bulbs go dark.
+  var humNodes = null;
+  function bulbHum(seconds) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      if (humNodes) { humNodes.forEach(function (n) { try { n.stop(); } catch (e) {} }); humNodes = null; }
+      var t = actx.currentTime, end = t + seconds, nodes = [];
+      var master = actx.createGain();
+      master.gain.setValueAtTime(0, t);
+      master.gain.linearRampToValueAtTime(0.09, t + 0.25);
+      master.gain.setValueAtTime(0.09, end - 0.7);
+      master.gain.linearRampToValueAtTime(0, end);
+      var lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 1400;
+      lp.connect(master); master.connect(actx.destination);
+      // flicker: slow wobble on the hum level
+      var flick = actx.createGain(); flick.gain.value = 0.85;
+      var lfo = actx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 7;
+      var lfoAmt = actx.createGain(); lfoAmt.gain.value = 0.15;
+      lfo.connect(lfoAmt); lfoAmt.connect(flick.gain); lfo.start(t); lfo.stop(end + 0.1); nodes.push(lfo);
+      flick.connect(lp);
+      [[60, "sine", 1], [120, "sine", 0.55], [180, "triangle", 0.3], [240, "sawtooth", 0.12]].forEach(function (d) {
+        var o = actx.createOscillator(); o.type = d[1]; o.frequency.value = d[0];
+        var g = actx.createGain(); g.gain.value = d[2];
+        o.connect(g); g.connect(flick); o.start(t); o.stop(end + 0.1); nodes.push(o);
+      });
+      // filament crackle: quiet band-passed noise
+      var len = Math.ceil(actx.sampleRate * seconds), buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.15);
+      var noise = actx.createBufferSource(); noise.buffer = buf;
+      var bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2600; bp.Q.value = 1.5;
+      var ng = actx.createGain(); ng.gain.value = 0.06;
+      noise.connect(bp); bp.connect(ng); ng.connect(master); noise.start(t); nodes.push(noise);
+      humNodes = nodes;
+    } catch (e) {}
+  }
+
   // Hair: every tip glows on in a scatter, flickers like a filament, then fades.
   function lightBulbs(tips) {
+    bulbHum(2.7);
     var order = tips.map(function (p, i) { return { p: p, delay: Math.random() * 0.5, seed: i * 7.3 }; });
     addEffect({ draw: function (ctx, r, t) {
       var alive = false, R = r.w * 0.032;
