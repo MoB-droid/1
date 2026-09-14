@@ -135,6 +135,16 @@
     from { transform: translateY(0); }
     to   { transform: translateY(var(--jaw-gap, 14px)); }
   }
+  .ear { transform-origin: 50% 50%; }
+  .ear.wiggle { animation: wiggle .7s ease-in-out 1; }
+  @keyframes wiggle {
+    0%   { transform: rotate(0); }
+    20%  { transform: rotate(-7deg); }
+    40%  { transform: rotate(6deg); }
+    60%  { transform: rotate(-4deg); }
+    80%  { transform: rotate(3deg); }
+    100% { transform: rotate(0); }
+  }
   .stage.editing { cursor: crosshair; }
   .stage.editing .jaw { opacity: .55; }
   .trace { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -298,6 +308,8 @@
   <h1 class="title" id="title">Cyber Buff</h1>
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
   <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
+  <img class="dog ear" id="earL" alt="" aria-hidden="true" hidden>
+  <img class="dog ear" id="earR" alt="" aria-hidden="true" hidden>
   <svg class="trace" id="trace" aria-hidden="true" hidden></svg>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -383,11 +395,20 @@
     [0.4841, 0.7246], [0.4687, 0.7287], [0.4502, 0.7235], [0.4255, 0.7071], [0.4224, 0.6927]
   ];
 
+  // Ears of the built-in drawing (fractions of the image) and the point each
+  // one pivots around when it wiggles.
+  var DRAWING_EARS = {
+    left:  { poly: [[0.0855, 0.1923], [0.1368, 0.1624], [0.2051, 0.2051], [0.2564, 0.2821], [0.3077, 0.3761], [0.3205, 0.4359], [0.3077, 0.4701], [0.2564, 0.4786], [0.1880, 0.4829], [0.1282, 0.4658], [0.0769, 0.4017], [0.0598, 0.3077], [0.0641, 0.2308]], base: [0.2906, 0.4615] },
+    right: { poly: [[0.6239, 0.0940], [0.7009, 0.0769], [0.8034, 0.0684], [0.8761, 0.0812], [0.8675, 0.1282], [0.8291, 0.2051], [0.8034, 0.2906], [0.7863, 0.3590], [0.7436, 0.3846], [0.6838, 0.3889], [0.6709, 0.3829], [0.6513, 0.3504], [0.6453, 0.2906], [0.6239, 0.2222], [0.6154, 0.1538]], base: [0.6581, 0.3761] }
+  };
+
   var VOICES = {
-    robot:  { pitch: 0.45, rate: 0.92, staccato: true,  pref: /zarvox|trinoids|fred|robot|cellos|bahh|albert|whisper/i },
-    small:  { pitch: 1.6,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
-    medium: { pitch: 1.2,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
-    big:    { pitch: 0.7,  rate: 1.0,  staccato: false, pref: /samantha|daniel|karen|google us english/i }
+    // Vocoder-style: flat, very low pitch, one word per utterance, with a
+    // synthesized carrier buzz gated under each word (Web Audio).
+    robot:  { pitch: 0.1,  rate: 0.88, staccato: true,  buzz: true,  pref: /zarvox|trinoids|cellos|bad news|bells|boing|bubbles|fred|albert|whisper|robot/i },
+    small:  { pitch: 1.6,  rate: 1.05, staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i },
+    medium: { pitch: 1.2,  rate: 1.05, staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i },
+    big:    { pitch: 0.7,  rate: 1.0,  staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i }
   };
   var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), voiceStyle: "robot", fit: "fit", jawPts: null, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
@@ -396,6 +417,8 @@
   var stage = document.getElementById("stage");
   var dog = document.getElementById("dog");
   var jaw = document.getElementById("jaw");
+  var earL = document.getElementById("earL");
+  var earR = document.getElementById("earR");
   var trace = document.getElementById("trace");
   var empty = document.getElementById("empty");
   var bubble = document.getElementById("bubble");
@@ -469,38 +492,62 @@
       catch (e) { interior = new Uint8Array(w * h).fill(1); }
     }
 
-    var pts = jawPts();
-    var maskC = document.createElement("canvas"); maskC.width = w; maskC.height = h;
-    var mctx = maskC.getContext("2d", { willReadFrequently: true });
-    mctx.fillStyle = "#fff";
-    mctx.beginPath();
-    pts.forEach(function (p, i) { mctx[i ? "lineTo" : "moveTo"](p[0] * w, p[1] * h); });
-    mctx.closePath(); mctx.fill();
-    var m = mctx.getImageData(0, 0, w, h);
-    for (var i = 0; i < w * h; i++) { if (!interior[i]) m.data[i * 4 + 3] = 0; }
-    mctx.putImageData(m, 0, 0);
-
-    var jawC = document.createElement("canvas"); jawC.width = w; jawC.height = h;
-    var jctx = jawC.getContext("2d");
-    jctx.drawImage(source, 0, 0);
-    jctx.globalCompositeOperation = "destination-in";
-    jctx.drawImage(maskC, 0, 0);
+    // polygon (fractions) -> mask canvas limited to the drawing's own pixels
+    function makeMask(pts) {
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      var ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      pts.forEach(function (p, i) { ctx[i ? "lineTo" : "moveTo"](p[0] * w, p[1] * h); });
+      ctx.closePath(); ctx.fill();
+      var m = ctx.getImageData(0, 0, w, h);
+      for (var i = 0; i < w * h; i++) { if (!interior[i]) m.data[i * 4 + 3] = 0; }
+      ctx.putImageData(m, 0, 0);
+      return c;
+    }
+    // the source image, kept only where the mask is
+    function cutLayer(maskC) {
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      var ctx = c.getContext("2d");
+      ctx.drawImage(source, 0, 0);
+      ctx.globalCompositeOperation = "destination-in";
+      ctx.drawImage(maskC, 0, 0);
+      return c;
+    }
+    // paint a flat color into the head where the mask is
+    function paintInto(hctx, maskC, color) {
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      var ctx = c.getContext("2d");
+      ctx.drawImage(maskC, 0, 0);
+      ctx.globalCompositeOperation = "source-in";
+      ctx.fillStyle = color; ctx.fillRect(0, 0, w, h);
+      hctx.drawImage(c, 0, 0);
+    }
+    function show(canvas, img) {
+      canvas.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); img.src = u; }, "image/png");
+    }
 
     var headC = document.createElement("canvas"); headC.width = w; headC.height = h;
     var hctx = headC.getContext("2d");
     hctx.drawImage(source, 0, 0);
-    hctx.globalCompositeOperation = "source-atop";
-    var dark = document.createElement("canvas"); dark.width = w; dark.height = h;
-    var dctx = dark.getContext("2d");
-    dctx.drawImage(maskC, 0, 0);
-    dctx.globalCompositeOperation = "source-in";
-    dctx.fillStyle = "#1b1412"; dctx.fillRect(0, 0, w, h);
-    hctx.globalCompositeOperation = "source-over";
-    hctx.drawImage(dark, 0, 0);
+
+    var jawMask = makeMask(jawPts());
+    var jawC = cutLayer(jawMask);
+    paintInto(hctx, jawMask, "#1b1412");   // mouth interior shows when the jaw drops
 
     urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
-    headC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); dog.src = u; }, "image/png");
-    jawC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); jaw.src = u; }, "image/png");
+    if (usingDrawing()) {
+      var lMask = makeMask(DRAWING_EARS.left.poly), rMask = makeMask(DRAWING_EARS.right.poly);
+      var lC = cutLayer(lMask), rC = cutLayer(rMask);
+      paintInto(hctx, lMask, "#ffffff");   // ears live on their own layers
+      paintInto(hctx, rMask, "#ffffff");
+      show(lC, earL); show(rC, earR);
+      earL.hidden = false; earR.hidden = false;
+    } else {
+      earL.hidden = true; earR.hidden = true;
+    }
+    show(headC, dog);
+    show(jawC, jaw);
     layoutJaw();
   }
 
@@ -524,6 +571,9 @@
   function layoutJaw() {
     var r = imageRect();
     stage.style.setProperty("--jaw-gap", Math.round(r.h * 0.045) + "px");
+    [[earL, DRAWING_EARS.left.base], [earR, DRAWING_EARS.right.base]].forEach(function (pair) {
+      pair[0].style.transformOrigin = Math.round(r.left + pair[1][0] * r.w) + "px " + Math.round(r.top + pair[1][1] * r.h) + "px";
+    });
     // White band above the drawing: centre the title in it, bubble right under.
     var band = Math.max(0, r.top), titleH = title.offsetHeight || 48;
     var titleTop = band > titleH * 2.2 ? Math.round(band * 0.38 - titleH / 2) : Math.round(r.H * 0.05);
@@ -640,13 +690,42 @@
   if ("speechSynthesis" in window) {
     speechSynthesis.onvoiceschanged = function () { findVoice(); };
   }
-  // Robot mode: flat low pitch, and every word is its own utterance so the
-  // gaps between them give the clipped, machine-like cadence.
+  // Vocoder-style carrier: two detuned oscillators through a band-pass with
+  // fast amplitude modulation, gated on while each word is spoken. Speech
+  // audio itself can't be processed, so this buzz rides underneath it.
+  var audio = null, buzzGain = null;
+  function ensureAudio() {
+    if (audio) { if (audio.state === "suspended") audio.resume(); return; }
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    audio = new AC();
+    var o1 = audio.createOscillator(), o2 = audio.createOscillator(), lfo = audio.createOscillator();
+    o1.type = "sawtooth"; o1.frequency.value = 92;
+    o2.type = "square";   o2.frequency.value = 138; o2.detune.value = 12;
+    var bp = audio.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1100; bp.Q.value = 3;
+    var am = audio.createGain(); am.gain.value = 0.5;
+    lfo.type = "square"; lfo.frequency.value = 28;
+    var lfoGain = audio.createGain(); lfoGain.gain.value = 0.5;
+    lfo.connect(lfoGain); lfoGain.connect(am.gain);
+    buzzGain = audio.createGain(); buzzGain.gain.value = 0;
+    o1.connect(bp); o2.connect(bp); bp.connect(am); am.connect(buzzGain); buzzGain.connect(audio.destination);
+    o1.start(); o2.start(); lfo.start();
+  }
+  function buzz(on) {
+    if (!audio || !buzzGain) return;
+    var t = audio.currentTime;
+    buzzGain.gain.cancelScheduledValues(t);
+    buzzGain.gain.setTargetAtTime(on ? 0.11 : 0, t, on ? 0.01 : 0.03);
+  }
+
+  // Robot mode: flat low pitch, every word its own utterance so the gaps
+  // give the clipped, machine-like cadence, with the carrier buzz under each.
   function speak(line, onDone) {
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     var st = voiceStyle();
     var v = findVoice();
+    if (st.buzz) ensureAudio();
     var parts = st.staccato ? line.split(/\s+/).filter(Boolean) : [line];
     parts.forEach(function (part, i) {
       var u = new SpeechSynthesisUtterance(part);
@@ -654,9 +733,35 @@
       u.pitch = st.pitch;
       u.rate = st.rate;
       u.volume = 1;
-      if (i === parts.length - 1) { u.onend = onDone; u.onerror = onDone; }
+      if (st.buzz) { u.onstart = function () { buzz(true); }; u.onend = function () { buzz(false); }; u.onerror = function () { buzz(false); }; }
+      if (i === parts.length - 1) {
+        var done = function () { buzz(false); onDone(); };
+        u.onend = done; u.onerror = done;
+      }
       speechSynthesis.speak(u);
     });
+  }
+
+  function inPoly(pt, poly) {
+    var inside = false;
+    for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+      var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function wiggle(ear) {
+    ear.classList.remove("wiggle");
+    void ear.offsetWidth;
+    ear.classList.add("wiggle");
+    if (navigator.vibrate) navigator.vibrate(8);
+  }
+  function earAt(clientX, clientY) {
+    if (!usingDrawing() || earL.hidden) return null;
+    var f = toFraction(clientX, clientY);
+    if (inPoly(f, DRAWING_EARS.left.poly)) return earL;
+    if (inPoly(f, DRAWING_EARS.right.poly)) return earR;
+    return null;
   }
 
   var bubbleTimer = null;
@@ -665,6 +770,7 @@
     bubble.textContent = line;
     bubble.classList.add("show");
     speak(line, stopChomp);
+    if (voiceStyle().buzz && !("speechSynthesis" in window)) { ensureAudio(); buzz(true); setTimeout(function () { buzz(false); }, 900); }
     var showFor = Math.max(1800, line.length * (voiceStyle().staccato ? 130 : 90));
     startChomp(showFor);
     clearTimeout(bubbleTimer);
@@ -699,6 +805,8 @@
       return;
     }
     if (!empty.hidden) { fileInput.click(); return; }
+    var ear = earAt(e.clientX, e.clientY);
+    if (ear) { wiggle(ear); return; }
     talk();
   });
   stage.addEventListener("keydown", function (e) {
