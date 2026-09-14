@@ -73,24 +73,35 @@
     width: 100%;
     max-width: 460px;
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  h1 {
-    margin: 0;
-    font-family: "Caveat", "Segoe Print", cursive;
-    font-weight: 700;
-    font-size: 2rem;
-    line-height: 1;
-    letter-spacing: .01em;
+    justify-content: center;
   }
   .hint {
     margin: 0;
     color: var(--ink-soft);
     font-size: .85rem;
-    text-align: right;
+    text-align: center;
   }
+  /* Title sits inside the stage, centered in the white band above the drawing.
+     The stage is always white, so the ink is fixed rather than themed. */
+  .title {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: var(--title-top, 5%);
+    margin: 0;
+    padding-inline: 24px;
+    text-align: center;
+    font-family: "Caveat", "Segoe Print", cursive;
+    font-weight: 700;
+    font-size: clamp(2.2rem, 11vw, 3.2rem);
+    line-height: 1;
+    letter-spacing: .01em;
+    color: #22211f;
+    text-wrap: balance;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .stage.editing .title { opacity: .35; }
 
   /* The phone-sized stage: iPhone portrait screen ratio */
   .stage {
@@ -150,7 +161,6 @@
       var(--stage);
   }
   .empty[hidden], .dog[hidden], .trace[hidden] { display: none; }
-  .empty[hidden], .dog[hidden], .trace[hidden] { display: none; }
   .empty svg { width: 58%; max-width: 220px; height: auto; color: var(--ink); }
   .empty p {
     margin: 0;
@@ -166,7 +176,7 @@
   .bubble {
     position: absolute;
     left: 50%;
-    top: 12%;
+    top: var(--bubble-top, 14%);
     transform: translate(-50%, 0) scale(.6);
     max-width: 78%;
     padding: 12px 18px 14px;
@@ -258,14 +268,18 @@
   }
   .field input, .field textarea, .field select {
     font: inherit;
-    color: var(--ink);
-    background: var(--field);
+    color: #22211f;
+    -webkit-text-fill-color: #22211f;
+    caret-color: #22211f;
+    background: #ffffff;
     border: 1px solid var(--line);
-    color-scheme: light dark;
+    color-scheme: light;
     border-radius: 10px;
     padding: 9px 11px;
     width: 100%;
   }
+  .field input::placeholder, .field textarea::placeholder { color: #8a877f; -webkit-text-fill-color: #8a877f; }
+  .field select option { color: #22211f; background: #ffffff; }
   .field textarea { min-height: 130px; resize: vertical; line-height: 1.4; }
   .row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
   .file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
@@ -277,11 +291,11 @@
 </style>
 
 <header>
-  <h1>Badgiffa</h1>
   <p class="hint" id="hint">Tap the dog to make it talk</p>
 </header>
 
 <div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
+  <h1 class="title" id="title">Cyber Buff</h1>
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
   <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
   <svg class="trace" id="trace" aria-hidden="true" hidden></svg>
@@ -330,11 +344,12 @@
       <textarea id="lines"></textarea>
     </div>
     <div class="field">
-      <label for="pitch">Voice</label>
-      <select id="pitch">
-        <option value="1.6">Small dog (high)</option>
-        <option value="1.2" selected>Medium dog</option>
-        <option value="0.7">Big dog (low)</option>
+      <label for="voiceStyle">Voice</label>
+      <select id="voiceStyle">
+        <option value="robot" selected>Robot</option>
+        <option value="small">Small dog (high)</option>
+        <option value="medium">Medium dog</option>
+        <option value="big">Big dog (low)</option>
       </select>
     </div>
     <div class="row">
@@ -368,7 +383,13 @@
     [0.4841, 0.7246], [0.4687, 0.7287], [0.4502, 0.7235], [0.4255, 0.7071], [0.4224, 0.6927]
   ];
 
-  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), pitch: 1.2, fit: "fit", jawPts: null, photoId: null, photoData: null };
+  var VOICES = {
+    robot:  { pitch: 0.45, rate: 0.92, staccato: true,  pref: /zarvox|trinoids|fred|robot|cellos|bahh|albert|whisper/i },
+    small:  { pitch: 1.6,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
+    medium: { pitch: 1.2,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
+    big:    { pitch: 0.7,  rate: 1.0,  staccato: false, pref: /samantha|daniel|karen|google us english/i }
+  };
+  var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), voiceStyle: "robot", fit: "fit", jawPts: null, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
   var lastIndex = -1;
 
@@ -386,8 +407,9 @@
   var settings = document.getElementById("settings");
   var nameInput = document.getElementById("name");
   var linesInput = document.getElementById("lines");
-  var pitchInput = document.getElementById("pitch");
+  var voiceInput = document.getElementById("voiceStyle");
   var hint = document.getElementById("hint");
+  var title = document.getElementById("title");
 
   function say(msg) { status.textContent = msg || ""; }
   function usingDrawing() { return !state.photoId && !state.photoData; }
@@ -502,9 +524,15 @@
   function layoutJaw() {
     var r = imageRect();
     stage.style.setProperty("--jaw-gap", Math.round(r.h * 0.045) + "px");
+    // White band above the drawing: centre the title in it, bubble right under.
+    var band = Math.max(0, r.top), titleH = title.offsetHeight || 48;
+    var titleTop = band > titleH * 2.2 ? Math.round(band * 0.38 - titleH / 2) : Math.round(r.H * 0.05);
+    stage.style.setProperty("--title-top", Math.max(Math.round(r.H * 0.04), titleTop) + "px");
+    stage.style.setProperty("--bubble-top", (Math.max(Math.round(r.H * 0.04), titleTop) + titleH + 10) + "px");
     drawTrace();
   }
   window.addEventListener("resize", layoutJaw);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutJaw);
 
   var chompTimer = null;
   function startChomp(ms) {
@@ -599,18 +627,36 @@
     return lines[i];
   }
 
-  var voice = null;
+  function voiceStyle() { return VOICES[state.voiceStyle] || VOICES.robot; }
   function findVoice() {
     if (!("speechSynthesis" in window)) return null;
     var voices = speechSynthesis.getVoices();
     if (!voices.length) return null;
     var en = voices.filter(function (v) { return /^en/i.test(v.lang); });
     var pool = en.length ? en : voices;
-    var pref = pool.filter(function (v) { return /samantha|daniel|karen|google us english/i.test(v.name); });
+    var pref = pool.filter(function (v) { return voiceStyle().pref.test(v.name); });
     return (pref[0] || pool[0]);
   }
   if ("speechSynthesis" in window) {
-    speechSynthesis.onvoiceschanged = function () { voice = findVoice(); };
+    speechSynthesis.onvoiceschanged = function () { findVoice(); };
+  }
+  // Robot mode: flat low pitch, and every word is its own utterance so the
+  // gaps between them give the clipped, machine-like cadence.
+  function speak(line, onDone) {
+    if (!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    var st = voiceStyle();
+    var v = findVoice();
+    var parts = st.staccato ? line.split(/\s+/).filter(Boolean) : [line];
+    parts.forEach(function (part, i) {
+      var u = new SpeechSynthesisUtterance(part);
+      if (v) u.voice = v;
+      u.pitch = st.pitch;
+      u.rate = st.rate;
+      u.volume = 1;
+      if (i === parts.length - 1) { u.onend = onDone; u.onerror = onDone; }
+      speechSynthesis.speak(u);
+    });
   }
 
   var bubbleTimer = null;
@@ -618,18 +664,8 @@
     var line = pickLine();
     bubble.textContent = line;
     bubble.classList.add("show");
-    if ("speechSynthesis" in window) {
-      speechSynthesis.cancel();
-      var u = new SpeechSynthesisUtterance(line);
-      if (!voice) voice = findVoice();
-      if (voice) u.voice = voice;
-      u.pitch = state.pitch;
-      u.rate = 1.05;
-      u.onend = stopChomp;
-      u.onerror = stopChomp;
-      speechSynthesis.speak(u);
-    }
-    var showFor = Math.max(1800, line.length * 90);
+    speak(line, stopChomp);
+    var showFor = Math.max(1800, line.length * (voiceStyle().staccato ? 130 : 90));
     startChomp(showFor);
     clearTimeout(bubbleTimer);
     bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, showFor);
@@ -720,7 +756,7 @@
   document.getElementById("settingsBtn").addEventListener("click", function () {
     nameInput.value = state.name;
     linesInput.value = state.lines.join("\n");
-    pitchInput.value = String(state.pitch);
+    voiceInput.value = state.voiceStyle;
     settings.showModal();
   });
   document.getElementById("cancelBtn").addEventListener("click", function () { settings.close(); });
@@ -728,14 +764,14 @@
     state.name = nameInput.value.trim() || "Badgiffa";
     state.lines = linesInput.value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
     if (!state.lines.length) state.lines = DEFAULT_LINES.slice();
-    state.pitch = parseFloat(pitchInput.value) || 1.2;
+    state.voiceStyle = VOICES[voiceInput.value] ? voiceInput.value : "robot";
     hint.textContent = "Tap " + state.name + " to make it talk";
     persist();
   });
 
   /* ---------- persistence ---------- */
   function snapshot() {
-    return { name: state.name, lines: state.lines, pitch: state.pitch, fit: state.fit, jawPts: state.jawPts, photoId: state.photoId };
+    return { name: state.name, lines: state.lines, voiceStyle: state.voiceStyle, fit: state.fit, jawPts: state.jawPts, photoId: state.photoId };
   }
   function persistLocal() {
     try {
@@ -752,7 +788,7 @@
   function applySaved(s) {
     if (s.name) state.name = s.name;
     if (Array.isArray(s.lines) && s.lines.length) state.lines = s.lines;
-    if (s.pitch) state.pitch = s.pitch;
+    if (s.voiceStyle && VOICES[s.voiceStyle]) state.voiceStyle = s.voiceStyle;
     if (s.fit) state.fit = s.fit;
     if (Array.isArray(s.jawPts) && s.jawPts.length >= 3) state.jawPts = s.jawPts;
   }
