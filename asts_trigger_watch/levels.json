@@ -1,0 +1,12 @@
+{
+  "ticker": "ASTS",
+  "stamp": "14 Sep 2026 · 10:00 ET intraday · re-scored 10:40 ET",
+  "updated": "2026-09-14T15:05:00Z",
+  "mode": "limit",
+  "buy": 58.00,
+  "sell": null,
+  "stop": 52.50,
+  "size": 12,
+  "position": "flat",
+  "note": "first half of the Fed-week swing lot; a touch of 58.00 is the fill (limit). Sell target 67.00 only once holding."
+}
