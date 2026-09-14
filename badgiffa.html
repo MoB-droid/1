@@ -143,6 +143,19 @@
   .trace circle { fill: #fff; stroke: #e0532c; stroke-width: 3; pointer-events: all; cursor: grab; touch-action: none; }
   .trace circle.first { fill: #e0532c; }
   .toolbar[hidden] { display: none; }
+  .tiny {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    font: inherit;
+    font-size: .8rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 6px 10px;
+    cursor: pointer;
+    opacity: .7;
+  }
 
   /* Empty state: a doodle placeholder until a photo is added */
   .empty {
@@ -317,7 +330,8 @@
   <div class="bubble" id="bubble" aria-live="polite"></div>
 </div>
 
-<div class="toolbar" id="mainBar">
+<button class="tiny" type="button" id="moreBtn" aria-expanded="false" aria-controls="mainBar">Settings</button>
+<div class="toolbar" id="mainBar" hidden>
   <label class="btn primary" for="file" id="fileBtn">Add photo</label>
   <input class="file-input" type="file" id="file" accept="image/*">
   <button class="btn" type="button" id="jawBtn">Set jaw</button>
@@ -403,6 +417,12 @@
   var fitBtn = document.getElementById("fitBtn");
   var status = document.getElementById("status");
   var mainBar = document.getElementById("mainBar");
+  var moreBtn = document.getElementById("moreBtn");
+  moreBtn.addEventListener("click", function () {
+    mainBar.hidden = !mainBar.hidden;
+    moreBtn.setAttribute("aria-expanded", String(!mainBar.hidden));
+    moreBtn.textContent = mainBar.hidden ? "Settings" : "Hide settings";
+  });
   var editBar = document.getElementById("editBar");
   var settings = document.getElementById("settings");
   var nameInput = document.getElementById("name");
@@ -596,13 +616,14 @@
     editing = true; draft = jawPts().map(function (p) { return p.slice(); });
     stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel();
     bubble.classList.remove("show");
-    stage.classList.add("editing"); mainBar.hidden = true; editBar.hidden = false;
+    stage.classList.add("editing"); mainBar.hidden = true; moreBtn.hidden = true; editBar.hidden = false;
     hint.textContent = "Tap around the jaw, then Done";
     say("Orange area = the part that moves. Drag dots to adjust, tap to add.");
     drawTrace();
   }
   function exitEdit() {
-    editing = false; stage.classList.remove("editing"); mainBar.hidden = false; editBar.hidden = true;
+    editing = false; stage.classList.remove("editing"); editBar.hidden = true; moreBtn.hidden = false;
+    moreBtn.textContent = "Settings"; moreBtn.setAttribute("aria-expanded", "false");
     say(""); drawTrace(); render();
   }
   document.getElementById("jawBtn").addEventListener("click", enterEdit);
