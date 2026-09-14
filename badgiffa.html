@@ -370,7 +370,7 @@
     <div class="field">
       <label for="voiceStyle">Voice</label>
       <select id="voiceStyle">
-        <option value="robot" selected>Robot</option>
+        <option value="robot" selected>Robot (Soundwave)</option>
         <option value="small">Small dog (high)</option>
         <option value="medium">Medium dog</option>
         <option value="big">Big dog (low)</option>
@@ -441,7 +441,7 @@
   var VOICES = {
     // Intergalactic-style: the old MacinTalk "Fred" voice where it exists (iOS/macOS),
     // flat low pitch, word-by-word delivery, plus a vocoder-like buzz under it.
-    robot:  { pitch: 0.35, rate: 0.88, staccato: true,  buzz: true, pref: /^fred$|^fred |zarvox|trinoids|robot|cellos|bahh|albert|eddy|whisper/i },
+    robot:  { vocoder: true, pitch: 0.35, rate: 0.88, staccato: true,  buzz: true, pref: /^fred$|^fred |zarvox|trinoids|robot|cellos|bahh|albert|eddy|whisper/i },
     small:  { pitch: 1.6,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
     medium: { pitch: 1.2,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
     big:    { pitch: 0.7,  rate: 1.0,  staccato: false, pref: /samantha|daniel|karen|google us english/i }
@@ -715,7 +715,7 @@
 
   function enterEdit() {
     editing = true; draft = jawPts().map(function (p) { return p.slice(); });
-    stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel(); stopBuzz();
+    stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel(); stopBuzz(); stopVocoder();
     bubble.classList.remove("show");
     stage.classList.add("editing"); mainBar.hidden = true; editBar.hidden = false;
     hint.textContent = "Tap around the jaw, then Done";
@@ -797,9 +797,113 @@
     n.osc.forEach(function (o) { try { o.stop(t + 0.1); } catch (e) {} });
   }
 
-  // Robot mode: flat low pitch, and every word is its own utterance so the
-  // gaps between them give the clipped, machine-like cadence.
-  function speak(line, onDone) {
+  /* ---------- Soundwave voice: eSpeak in the page, run through a vocoder ----------
+     voice.js bundles the meSpeak/eSpeak engine (GPL) with its English voice, so
+     the words are synthesised here as audio and can be pushed through Web Audio:
+     16 band-pass channels of the speech drive the same 16 bands of a fixed-pitch
+     sawtooth carrier. Flat pitch, metallic, every syllable buzzed: Soundwave. */
+  var engineState = 0;   // 0 not loaded, 1 loading, 2 ready, 3 failed
+  function loadEngine() {
+    if (engineState) return;
+    engineState = 1;
+    var el = document.createElement("script");
+    el.src = "voice.js"; el.async = true;
+    el.onload = function () { engineState = (window.meSpeak && meSpeak.isConfigLoaded()) ? 2 : 3; };
+    el.onerror = function () { engineState = 3; };
+    document.head.appendChild(el);
+  }
+  window.addEventListener("load", function () { setTimeout(loadEngine, 600); });
+  stage.addEventListener("pointerdown", loadEngine, { once: true });
+
+  var vox = null, absCurve = null;
+  function stopVocoder() {
+    if (!vox) return;
+    var v = vox; vox = null;
+    try { v.src.onended = null; v.src.stop(); } catch (e) {}
+    v.oscs.forEach(function (o) { try { o.stop(); } catch (e) {} });
+    try { v.master.disconnect(); } catch (e) {}
+  }
+  function bandpass(f, q) { var b = actx.createBiquadFilter(); b.type = "bandpass"; b.frequency.value = f; b.Q.value = q; return b; }
+  function playVocoded(buffer, onEnd) {
+    stopVocoder();
+    var t = actx.currentTime, oscs = [];
+    if (!absCurve) { absCurve = new Float32Array(1025); for (var k = 0; k <= 1024; k++) absCurve[k] = Math.abs(k / 512 - 1); }
+    var src = actx.createBufferSource(); src.buffer = buffer;
+    var sum = actx.createGain(); sum.gain.value = 1;
+    var comp = actx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 8; comp.attack.value = 0.003; comp.release.value = 0.12;
+    var master = actx.createGain(); master.gain.value = 1.6;
+    sum.connect(comp); comp.connect(master); master.connect(actx.destination);
+
+    // carrier: two slightly detuned saws and a sub square, one fixed low note
+    var car = actx.createGain(); car.gain.value = 0.5;
+    [["sawtooth", 92, 1], ["sawtooth", 92.7, 0.8], ["square", 46, 0.3]].forEach(function (d) {
+      var o = actx.createOscillator(); o.type = d[0]; o.frequency.value = d[1];
+      var g = actx.createGain(); g.gain.value = d[2];
+      o.connect(g); g.connect(car); o.start(t); oscs.push(o);
+    });
+
+    // 16 channels: speech band -> envelope -> opens the same band of the carrier
+    var N = 16, f0 = 150, f1 = 5000;
+    for (var i = 0; i < N; i++) {
+      var f = f0 * Math.pow(f1 / f0, i / (N - 1));
+      var mb = bandpass(f, 6); src.connect(mb);
+      var ws = actx.createWaveShaper(); ws.curve = absCurve; mb.connect(ws);
+      var lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 55; ws.connect(lp);
+      var mk = actx.createGain(); mk.gain.value = 14; lp.connect(mk);
+      var cb = bandpass(f, 6); car.connect(cb);
+      var vca = actx.createGain(); vca.gain.value = 0; mk.connect(vca.gain);
+      cb.connect(vca); vca.connect(sum);
+    }
+    // consonant hiss passes straight through so the words stay clear
+    var hp = actx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 5000;
+    var hg = actx.createGain(); hg.gain.value = 0.45; src.connect(hp); hp.connect(hg); hg.connect(sum);
+    // a whisper of the dry voice
+    var dry = actx.createGain(); dry.gain.value = 0.07; src.connect(dry); dry.connect(sum);
+    // short feedback delay: the tinny metal ring
+    var dl = actx.createDelay(0.05); dl.delayTime.value = 0.0064;
+    var fb = actx.createGain(); fb.gain.value = 0.45;
+    var wet = actx.createGain(); wet.gain.value = 0.5;
+    sum.connect(dl); dl.connect(fb); fb.connect(dl); dl.connect(wet); wet.connect(comp);
+
+    src.onended = function () { setTimeout(stopVocoder, 120); onEnd(); };
+    src.start(t);
+    vox = { src: src, oscs: oscs, master: master };
+  }
+  function vocoderSpeak(line, onDone, onStart) {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC || engineState !== 2) return false;
+    try {
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      var wav = meSpeak.speak(line, { rawdata: true, pitch: 30, speed: 150, wordgap: 2, amplitude: 110 });
+      if (!wav) return false;
+    } catch (e) { return false; }
+    var done = false;
+    function finish() { if (done) return; done = true; stopVocoder(); onDone(); }
+    function fail() { if (done) return; done = true; systemSpeak(line, onDone); }
+    function got(buffer) {
+      if (done) return;
+      if (onStart) onStart(Math.round(buffer.duration * 1000));
+      playVocoded(buffer, finish);
+    }
+    try {
+      var p = actx.decodeAudioData(wav.slice(0), got, fail);
+      if (p && p.catch) p.catch(fail);
+    } catch (e) { fail(); }
+    return true;
+  }
+
+  function speak(line, onDone, onStart) {
+    stopBuzz(); stopVocoder();
+    if ("speechSynthesis" in window) speechSynthesis.cancel();
+    if (voiceStyle().vocoder && vocoderSpeak(line, onDone, onStart)) return;
+    if (playClip(line, onDone)) return;
+    systemSpeak(line, onDone);
+  }
+
+  // System voice fallback. Robot mode: flat low pitch, every word its own
+  // utterance so the gaps give the clipped cadence, buzz underneath.
+  function systemSpeak(line, onDone) {
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     stopBuzz();
@@ -821,9 +925,9 @@
     if (st.buzz) { startBuzz(); setTimeout(function () { if (!speechSynthesis.speaking && !speechSynthesis.pending) finish(); }, 400); }
   }
 
-  // Pre-rendered Soundwave-style clips for the built-in lines: a formant
-  // synth voice run through ring modulation and comb delays. Lines the owner
-  // types get the live robot synth instead.
+  // Pre-rendered clips for the built-in lines: a formant synth voice run
+  // through ring modulation and comb delays. Used only while the in-page
+  // engine is still loading.
   var CLIPS = {};
   DEFAULT_LINES.forEach(function (l, i) { CLIPS[l] = "voice/" + i + ".wav"; });
   var clipEl = null;
@@ -834,10 +938,10 @@
       if (window.speechSynthesis) speechSynthesis.cancel();
       stopBuzz();
       if (!clipEl) { clipEl = new Audio(); clipEl.preload = "auto"; }
-      clipEl.onended = onDone; clipEl.onerror = function () { speak(line, onDone); };
+      clipEl.onended = onDone; clipEl.onerror = function () { systemSpeak(line, onDone); };
       clipEl.src = src;
       var pr = clipEl.play();
-      if (pr && pr.catch) pr.catch(function () { speak(line, onDone); });
+      if (pr && pr.catch) pr.catch(function () { systemSpeak(line, onDone); });
       return true;
     } catch (e) { return false; }
   }
@@ -847,11 +951,18 @@
     var line = pickLine();
     bubble.textContent = line;
     bubble.classList.add("show");
-    if (!playClip(line, stopChomp)) speak(line, stopChomp);
     var showFor = Math.max(1800, line.length * (voiceStyle().staccato ? 130 : 90));
+    function hide() { bubble.classList.remove("show"); }
+    function hold(ms) {           // real speech length, once the audio is known
+      showFor = Math.max(showFor, ms + 300);
+      startChomp(ms);
+      clearTimeout(bubbleTimer);
+      bubbleTimer = setTimeout(hide, showFor);
+    }
+    speak(line, stopChomp, hold);
     startChomp(showFor);
     clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(function () { bubble.classList.remove("show"); }, showFor);
+    bubbleTimer = setTimeout(hide, showFor);
   }
 
   var holdTimer = null, held = false;
