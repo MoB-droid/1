@@ -779,12 +779,33 @@
     if (st.buzz) { startBuzz(); setTimeout(function () { if (!speechSynthesis.speaking && !speechSynthesis.pending) finish(); }, 400); }
   }
 
+  // Pre-rendered Soundwave-style clips for the built-in lines: a formant
+  // synth voice run through ring modulation and comb delays. Lines the owner
+  // types get the live robot synth instead.
+  var CLIPS = {};
+  DEFAULT_LINES.forEach(function (l, i) { CLIPS[l] = "voice/" + i + ".wav"; });
+  var clipEl = null;
+  function playClip(line, onDone) {
+    var src = CLIPS[line];
+    if (!src || !voiceStyle().buzz) return false;
+    try {
+      if (window.speechSynthesis) speechSynthesis.cancel();
+      stopBuzz();
+      if (!clipEl) { clipEl = new Audio(); clipEl.preload = "auto"; }
+      clipEl.onended = onDone; clipEl.onerror = function () { speak(line, onDone); };
+      clipEl.src = src;
+      var pr = clipEl.play();
+      if (pr && pr.catch) pr.catch(function () { speak(line, onDone); });
+      return true;
+    } catch (e) { return false; }
+  }
+
   var bubbleTimer = null;
   function talk() {
     var line = pickLine();
     bubble.textContent = line;
     bubble.classList.add("show");
-    speak(line, stopChomp);
+    if (!playClip(line, stopChomp)) speak(line, stopChomp);
     var showFor = Math.max(1800, line.length * (voiceStyle().staccato ? 130 : 90));
     startChomp(showFor);
     clearTimeout(bubbleTimer);
