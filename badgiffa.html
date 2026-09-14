@@ -1085,6 +1085,42 @@
     } });
   }
 
+  // Thick goo: slow wet glorps, one per drop, each a pitch-sagging blip with
+  // a bubbly wobble and a low-passed squelch of noise underneath.
+  function gooSound(times) {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      var t0 = actx.currentTime;
+      var len = Math.ceil(actx.sampleRate * 0.35), buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 1.5);
+      times.forEach(function (d, k) {
+        var t = t0 + d, v = 1 - k * 0.2;
+        // the glorp: a sine that sags in pitch with a quick wobble
+        var o = actx.createOscillator(); o.type = "sine";
+        o.frequency.setValueAtTime(260 + Math.random() * 60, t);
+        o.frequency.exponentialRampToValueAtTime(90, t + 0.28);
+        var wob = actx.createOscillator(); wob.frequency.value = 22 + Math.random() * 8;
+        var wobG = actx.createGain(); wobG.gain.value = 35;
+        wob.connect(wobG); wobG.connect(o.frequency);
+        var g = actx.createGain();
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.22 * v, t + 0.04);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+        var lp = actx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 900; lp.Q.value = 4;
+        o.connect(lp); lp.connect(g); g.connect(actx.destination);
+        o.start(t); o.stop(t + 0.36); wob.start(t); wob.stop(t + 0.36);
+        // the squelch: dark noise, swept low-pass
+        var n = actx.createBufferSource(); n.buffer = buf;
+        var nf = actx.createBiquadFilter(); nf.type = "lowpass"; nf.Q.value = 6;
+        nf.frequency.setValueAtTime(1200, t); nf.frequency.exponentialRampToValueAtTime(200, t + 0.3);
+        var ng = actx.createGain(); ng.gain.value = 0.16 * v;
+        n.connect(nf); nf.connect(ng); ng.connect(actx.destination); n.start(t);
+      });
+    } catch (e) {}
+  }
+
   // Nose: a few black drops run down from the nostrils and thin out. Not a flood.
   function noseDrips(nostrils) {
     var drops = [];
@@ -1093,6 +1129,7 @@
       drops.push({ x: n[0] + (Math.random() - 0.5) * 0.012, y0: n[1], delay: i * 0.28 + Math.random() * 0.2,
                    speed: 0.10 + Math.random() * 0.05, len: 0.16 + Math.random() * 0.12, w: 0.006 + Math.random() * 0.003 });
     }
+    gooSound(drops.map(function (d) { return d.delay; }));
     addEffect({ draw: function (ctx, r, t) {
       var alive = false;
       drops.forEach(function (d) {
