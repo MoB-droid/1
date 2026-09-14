@@ -130,20 +130,21 @@
   }
   .stage[data-fit="fit"] .dog { object-fit: contain; }
   .jaw { transform-origin: 50% 0; }
+  .ear { pointer-events: none; }
+  .ear.wiggle { animation: wiggle .75s ease-in-out 1; }
+  @keyframes wiggle {
+    0%   { transform: rotate(0); }
+    15%  { transform: rotate(-9deg); }
+    35%  { transform: rotate(8deg); }
+    55%  { transform: rotate(-6deg); }
+    75%  { transform: rotate(4deg); }
+    90%  { transform: rotate(-2deg); }
+    100% { transform: rotate(0); }
+  }
   .jaw.chomp { animation: chomp .22s ease-in-out infinite alternate; }
   @keyframes chomp {
     from { transform: translateY(0); }
     to   { transform: translateY(var(--jaw-gap, 14px)); }
-  }
-  .ear { transform-origin: 50% 50%; }
-  .ear.wiggle { animation: wiggle .7s ease-in-out 1; }
-  @keyframes wiggle {
-    0%   { transform: rotate(0); }
-    20%  { transform: rotate(-7deg); }
-    40%  { transform: rotate(6deg); }
-    60%  { transform: rotate(-4deg); }
-    80%  { transform: rotate(3deg); }
-    100% { transform: rotate(0); }
   }
   .stage.editing { cursor: crosshair; }
   .stage.editing .jaw { opacity: .55; }
@@ -296,6 +297,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .jaw.chomp { animation-duration: .5s; }
+    .ear.wiggle { animation-duration: 1.2s; }
     .bubble { transition: opacity .15s ease; transform: translate(-50%, 0) scale(1); }
   }
 </style>
@@ -307,9 +309,9 @@
 <div class="stage" id="stage" data-fit="fit" role="button" tabindex="0" aria-label="Tap to make the dog talk">
   <h1 class="title" id="title">Cyber Buff</h1>
   <img class="dog" id="dog" alt="Your dog drawing" hidden>
-  <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
   <img class="dog ear" id="earL" alt="" aria-hidden="true" hidden>
   <img class="dog ear" id="earR" alt="" aria-hidden="true" hidden>
+  <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
   <svg class="trace" id="trace" aria-hidden="true" hidden></svg>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -395,20 +397,27 @@
     [0.4841, 0.7246], [0.4687, 0.7287], [0.4502, 0.7235], [0.4255, 0.7071], [0.4224, 0.6927]
   ];
 
-  // Ears of the built-in drawing (fractions of the image) and the point each
-  // one pivots around when it wiggles.
-  var DRAWING_EARS = {
-    left:  { poly: [[0.0855, 0.1923], [0.1368, 0.1624], [0.2051, 0.2051], [0.2564, 0.2821], [0.3077, 0.3761], [0.3205, 0.4359], [0.3077, 0.4701], [0.2564, 0.4786], [0.1880, 0.4829], [0.1282, 0.4658], [0.0769, 0.4017], [0.0598, 0.3077], [0.0641, 0.2308]], base: [0.2906, 0.4615] },
-    right: { poly: [[0.6239, 0.0940], [0.7009, 0.0769], [0.8034, 0.0684], [0.8761, 0.0812], [0.8675, 0.1282], [0.8291, 0.2051], [0.8034, 0.2906], [0.7863, 0.3590], [0.7436, 0.3846], [0.6838, 0.3889], [0.6709, 0.3829], [0.6513, 0.3504], [0.6453, 0.2906], [0.6239, 0.2222], [0.6154, 0.1538]], base: [0.6581, 0.3761] }
-  };
-
+  // Ears of the built-in drawing (fractions of the image), each with the
+  // hinge point where it meets the head. Tap an ear and it wiggles.
+  var DRAWING_EARS = [
+    { pivot: [0.308, 0.470], pts: [
+      [0.087, 0.198], [0.107, 0.201], [0.137, 0.244], [0.167, 0.256], [0.192, 0.274], [0.218, 0.308],
+      [0.239, 0.342], [0.274, 0.380], [0.295, 0.423], [0.308, 0.453], [0.316, 0.474], [0.292, 0.488],
+      [0.262, 0.488], [0.200, 0.480], [0.156, 0.458], [0.128, 0.427], [0.098, 0.385], [0.077, 0.320],
+      [0.073, 0.256], [0.077, 0.222] ] },
+    { pivot: [0.684, 0.380], pts: [
+      [0.872, 0.085], [0.838, 0.094], [0.804, 0.111], [0.778, 0.115], [0.752, 0.132], [0.726, 0.167],
+      [0.701, 0.184], [0.684, 0.197], [0.667, 0.226], [0.645, 0.269], [0.637, 0.295], [0.650, 0.325],
+      [0.667, 0.350], [0.684, 0.376], [0.710, 0.390], [0.727, 0.385], [0.761, 0.359], [0.786, 0.325],
+      [0.799, 0.282], [0.812, 0.239], [0.829, 0.197], [0.855, 0.154], [0.872, 0.120], [0.881, 0.094] ] }
+  ];
   var VOICES = {
-    // Vocoder-style: flat, very low pitch, one word per utterance, with a
-    // synthesized carrier buzz gated under each word (Web Audio).
-    robot:  { pitch: 0.1,  rate: 0.88, staccato: true,  buzz: true,  pref: /zarvox|trinoids|cellos|bad news|bells|boing|bubbles|fred|albert|whisper|robot/i },
-    small:  { pitch: 1.6,  rate: 1.05, staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i },
-    medium: { pitch: 1.2,  rate: 1.05, staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i },
-    big:    { pitch: 0.7,  rate: 1.0,  staccato: false, buzz: false, pref: /samantha|daniel|karen|google us english/i }
+    // Intergalactic-style: the old MacinTalk "Fred" voice where it exists (iOS/macOS),
+    // flat low pitch, word-by-word delivery, plus a vocoder-like buzz under it.
+    robot:  { pitch: 0.35, rate: 0.88, staccato: true,  buzz: true, pref: /^fred$|^fred |zarvox|trinoids|robot|cellos|bahh|albert|eddy|whisper/i },
+    small:  { pitch: 1.6,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
+    medium: { pitch: 1.2,  rate: 1.05, staccato: false, pref: /samantha|daniel|karen|google us english/i },
+    big:    { pitch: 0.7,  rate: 1.0,  staccato: false, pref: /samantha|daniel|karen|google us english/i }
   };
   var state = { name: "Badgiffa", lines: DEFAULT_LINES.slice(), voiceStyle: "robot", fit: "fit", jawPts: null, photoId: null, photoData: null };
   var db = null, assets = null, docRef = null;
@@ -417,8 +426,7 @@
   var stage = document.getElementById("stage");
   var dog = document.getElementById("dog");
   var jaw = document.getElementById("jaw");
-  var earL = document.getElementById("earL");
-  var earR = document.getElementById("earR");
+  var ears = [document.getElementById("earL"), document.getElementById("earR")];
   var trace = document.getElementById("trace");
   var empty = document.getElementById("empty");
   var bubble = document.getElementById("bubble");
@@ -437,6 +445,7 @@
   function say(msg) { status.textContent = msg || ""; }
   function usingDrawing() { return !state.photoId && !state.photoData; }
   function currentSrc() { return state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg"); }
+  function earDefs() { return usingDrawing() ? DRAWING_EARS : []; }
   function jawPts() {
     if (state.jawPts && state.jawPts.length >= 3) return state.jawPts;
     return usingDrawing() ? DRAWING_JAW : [[0, 0.57], [1, 0.57], [1, 1], [0, 1]];
@@ -492,20 +501,20 @@
       catch (e) { interior = new Uint8Array(w * h).fill(1); }
     }
 
-    // polygon (fractions) -> mask canvas limited to the drawing's own pixels
-    function makeMask(pts) {
-      var c = document.createElement("canvas"); c.width = w; c.height = h;
-      var ctx = c.getContext("2d", { willReadFrequently: true });
-      ctx.fillStyle = "#fff";
-      ctx.beginPath();
-      pts.forEach(function (p, i) { ctx[i ? "lineTo" : "moveTo"](p[0] * w, p[1] * h); });
-      ctx.closePath(); ctx.fill();
-      var m = ctx.getImageData(0, 0, w, h);
+    // Mask of one polygon, limited to the drawing's own pixels.
+    function polyMask(pts) {
+      var maskC = document.createElement("canvas"); maskC.width = w; maskC.height = h;
+      var mctx = maskC.getContext("2d", { willReadFrequently: true });
+      mctx.fillStyle = "#fff";
+      mctx.beginPath();
+      pts.forEach(function (p, i) { mctx[i ? "lineTo" : "moveTo"](p[0] * w, p[1] * h); });
+      mctx.closePath(); mctx.fill();
+      var m = mctx.getImageData(0, 0, w, h);
       for (var i = 0; i < w * h; i++) { if (!interior[i]) m.data[i * 4 + 3] = 0; }
-      ctx.putImageData(m, 0, 0);
-      return c;
+      mctx.putImageData(m, 0, 0);
+      return maskC;
     }
-    // the source image, kept only where the mask is
+    // The source, kept only where the mask is.
     function cutLayer(maskC) {
       var c = document.createElement("canvas"); c.width = w; c.height = h;
       var ctx = c.getContext("2d");
@@ -514,40 +523,36 @@
       ctx.drawImage(maskC, 0, 0);
       return c;
     }
-    // paint a flat color into the head where the mask is
-    function paintInto(hctx, maskC, color) {
-      var c = document.createElement("canvas"); c.width = w; c.height = h;
-      var ctx = c.getContext("2d");
-      ctx.drawImage(maskC, 0, 0);
-      ctx.globalCompositeOperation = "source-in";
-      ctx.fillStyle = color; ctx.fillRect(0, 0, w, h);
-      hctx.drawImage(c, 0, 0);
+    // Paint the masked area of the head layer one flat colour.
+    function fillHole(hctx, maskC, color) {
+      var fill = document.createElement("canvas"); fill.width = w; fill.height = h;
+      var fctx = fill.getContext("2d");
+      fctx.drawImage(maskC, 0, 0);
+      fctx.globalCompositeOperation = "source-in";
+      fctx.fillStyle = color; fctx.fillRect(0, 0, w, h);
+      hctx.globalCompositeOperation = "source-over";
+      hctx.drawImage(fill, 0, 0);
     }
-    function show(canvas, img) {
-      canvas.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); img.src = u; }, "image/png");
-    }
+
+    var jawMask = polyMask(jawPts());
+    var jawC = cutLayer(jawMask);
+    var earMasks = earDefs().map(function (e) { return polyMask(e.pts); });
+    var earCs = earMasks.map(cutLayer);
 
     var headC = document.createElement("canvas"); headC.width = w; headC.height = h;
     var hctx = headC.getContext("2d");
     hctx.drawImage(source, 0, 0);
-
-    var jawMask = makeMask(jawPts());
-    var jawC = cutLayer(jawMask);
-    paintInto(hctx, jawMask, "#1b1412");   // mouth interior shows when the jaw drops
+    fillHole(hctx, jawMask, "#1b1412");            // dark mouth gap behind the jaw
+    earMasks.forEach(function (m) { fillHole(hctx, m, "#ffffff"); }); // paper behind the ears
 
     urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
-    if (usingDrawing()) {
-      var lMask = makeMask(DRAWING_EARS.left.poly), rMask = makeMask(DRAWING_EARS.right.poly);
-      var lC = cutLayer(lMask), rC = cutLayer(rMask);
-      paintInto(hctx, lMask, "#ffffff");   // ears live on their own layers
-      paintInto(hctx, rMask, "#ffffff");
-      show(lC, earL); show(rC, earR);
-      earL.hidden = false; earR.hidden = false;
-    } else {
-      earL.hidden = true; earR.hidden = true;
-    }
-    show(headC, dog);
-    show(jawC, jaw);
+    headC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); dog.src = u; }, "image/png");
+    jawC.toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); jaw.src = u; }, "image/png");
+    ears.forEach(function (img, i) {
+      if (!earCs[i]) { img.hidden = true; img.removeAttribute("src"); return; }
+      img.hidden = false;
+      earCs[i].toBlob(function (b) { var u = URL.createObjectURL(b); urls.push(u); img.src = u; }, "image/png");
+    });
     layoutJaw();
   }
 
@@ -571,8 +576,8 @@
   function layoutJaw() {
     var r = imageRect();
     stage.style.setProperty("--jaw-gap", Math.round(r.h * 0.045) + "px");
-    [[earL, DRAWING_EARS.left.base], [earR, DRAWING_EARS.right.base]].forEach(function (pair) {
-      pair[0].style.transformOrigin = Math.round(r.left + pair[1][0] * r.w) + "px " + Math.round(r.top + pair[1][1] * r.h) + "px";
+    earDefs().forEach(function (e, i) {
+      ears[i].style.transformOrigin = (r.left + e.pivot[0] * r.w) + "px " + (r.top + e.pivot[1] * r.h) + "px";
     });
     // White band above the drawing: centre the title in it, bubble right under.
     var band = Math.max(0, r.top), titleH = title.offsetHeight || 48;
@@ -644,7 +649,7 @@
 
   function enterEdit() {
     editing = true; draft = jawPts().map(function (p) { return p.slice(); });
-    stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel();
+    stopChomp(); if (window.speechSynthesis) speechSynthesis.cancel(); stopBuzz();
     bubble.classList.remove("show");
     stage.classList.add("editing"); mainBar.hidden = true; editBar.hidden = false;
     hint.textContent = "Tap around the jaw, then Done";
@@ -690,78 +695,64 @@
   if ("speechSynthesis" in window) {
     speechSynthesis.onvoiceschanged = function () { findVoice(); };
   }
-  // Vocoder-style carrier: two detuned oscillators through a band-pass with
-  // fast amplitude modulation, gated on while each word is spoken. Speech
-  // audio itself can't be processed, so this buzz rides underneath it.
-  var audio = null, buzzGain = null;
-  function ensureAudio() {
-    if (audio) { if (audio.state === "suspended") audio.resume(); return; }
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    audio = new AC();
-    var o1 = audio.createOscillator(), o2 = audio.createOscillator(), lfo = audio.createOscillator();
-    o1.type = "sawtooth"; o1.frequency.value = 92;
-    o2.type = "square";   o2.frequency.value = 138; o2.detune.value = 12;
-    var bp = audio.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1100; bp.Q.value = 3;
-    var am = audio.createGain(); am.gain.value = 0.5;
-    lfo.type = "square"; lfo.frequency.value = 28;
-    var lfoGain = audio.createGain(); lfoGain.gain.value = 0.5;
-    lfo.connect(lfoGain); lfoGain.connect(am.gain);
-    buzzGain = audio.createGain(); buzzGain.gain.value = 0;
-    o1.connect(bp); o2.connect(bp); bp.connect(am); am.connect(buzzGain); buzzGain.connect(audio.destination);
-    o1.start(); o2.start(); lfo.start();
+  // Vocoder-style buzz: a sawtooth carrier, ring-modulated by a fast LFO and
+  // band-passed, that runs only while the robot is speaking. Speech output
+  // can't be routed through Web Audio, so this layer sits under the voice.
+  var actx = null, buzzNodes = null;
+  function startBuzz() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      stopBuzz();
+      var t = actx.currentTime;
+      var carrier = actx.createOscillator(); carrier.type = "sawtooth"; carrier.frequency.value = 98;
+      var sub = actx.createOscillator(); sub.type = "square"; sub.frequency.value = 49;
+      var lfo = actx.createOscillator(); lfo.type = "square"; lfo.frequency.value = 27;
+      var ring = actx.createGain(); ring.gain.value = 0;
+      var lfoAmt = actx.createGain(); lfoAmt.gain.value = 1;
+      var band = actx.createBiquadFilter(); band.type = "bandpass"; band.frequency.value = 900; band.Q.value = 1.2;
+      var out = actx.createGain(); out.gain.setValueAtTime(0, t); out.gain.linearRampToValueAtTime(0.07, t + 0.05);
+      lfo.connect(lfoAmt); lfoAmt.connect(ring.gain);
+      carrier.connect(ring); sub.connect(ring);
+      ring.connect(band); band.connect(out); out.connect(actx.destination);
+      carrier.start(t); sub.start(t); lfo.start(t);
+      buzzNodes = { osc: [carrier, sub, lfo], out: out };
+    } catch (e) {}
   }
-  function buzz(on) {
-    if (!audio || !buzzGain) return;
-    var t = audio.currentTime;
-    buzzGain.gain.cancelScheduledValues(t);
-    buzzGain.gain.setTargetAtTime(on ? 0.11 : 0, t, on ? 0.01 : 0.03);
+  function stopBuzz() {
+    if (!buzzNodes || !actx) return;
+    var n = buzzNodes; buzzNodes = null;
+    var t = actx.currentTime;
+    n.out.gain.cancelScheduledValues(t);
+    n.out.gain.setValueAtTime(n.out.gain.value, t);
+    n.out.gain.linearRampToValueAtTime(0, t + 0.08);
+    n.osc.forEach(function (o) { try { o.stop(t + 0.1); } catch (e) {} });
   }
 
-  // Robot mode: flat low pitch, every word its own utterance so the gaps
-  // give the clipped, machine-like cadence, with the carrier buzz under each.
+  // Robot mode: flat low pitch, and every word is its own utterance so the
+  // gaps between them give the clipped, machine-like cadence.
   function speak(line, onDone) {
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
+    stopBuzz();
     var st = voiceStyle();
     var v = findVoice();
-    if (st.buzz) ensureAudio();
     var parts = st.staccato ? line.split(/\s+/).filter(Boolean) : [line];
+    var done = false;
+    function finish() { if (done) return; done = true; stopBuzz(); onDone(); }
     parts.forEach(function (part, i) {
       var u = new SpeechSynthesisUtterance(part);
       if (v) u.voice = v;
       u.pitch = st.pitch;
       u.rate = st.rate;
       u.volume = 1;
-      if (st.buzz) { u.onstart = function () { buzz(true); }; u.onend = function () { buzz(false); }; u.onerror = function () { buzz(false); }; }
-      if (i === parts.length - 1) {
-        var done = function () { buzz(false); onDone(); };
-        u.onend = done; u.onerror = done;
-      }
+      if (i === 0 && st.buzz) u.onstart = startBuzz;
+      if (i === parts.length - 1) { u.onend = finish; u.onerror = finish; }
       speechSynthesis.speak(u);
     });
-  }
-
-  function inPoly(pt, poly) {
-    var inside = false;
-    for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-      var xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
-      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) inside = !inside;
-    }
-    return inside;
-  }
-  function wiggle(ear) {
-    ear.classList.remove("wiggle");
-    void ear.offsetWidth;
-    ear.classList.add("wiggle");
-    if (navigator.vibrate) navigator.vibrate(8);
-  }
-  function earAt(clientX, clientY) {
-    if (!usingDrawing() || earL.hidden) return null;
-    var f = toFraction(clientX, clientY);
-    if (inPoly(f, DRAWING_EARS.left.poly)) return earL;
-    if (inPoly(f, DRAWING_EARS.right.poly)) return earR;
-    return null;
+    if (st.buzz) { startBuzz(); setTimeout(function () { if (!speechSynthesis.speaking && !speechSynthesis.pending) finish(); }, 400); }
   }
 
   var bubbleTimer = null;
@@ -770,7 +761,6 @@
     bubble.textContent = line;
     bubble.classList.add("show");
     speak(line, stopChomp);
-    if (voiceStyle().buzz && !("speechSynthesis" in window)) { ensureAudio(); buzz(true); setTimeout(function () { buzz(false); }, 900); }
     var showFor = Math.max(1800, line.length * (voiceStyle().staccato ? 130 : 90));
     startChomp(showFor);
     clearTimeout(bubbleTimer);
@@ -796,8 +786,30 @@
     stage.addEventListener(t, function () { clearTimeout(holdTimer); });
   });
   stage.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  function inPoly(pt, pts) {
+    var inside = false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var xi = pts[i][0], yi = pts[i][1], xj = pts[j][0], yj = pts[j][1];
+      if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function wiggleEar(i) {
+    var img = ears[i];
+    img.classList.remove("wiggle");
+    void img.offsetWidth;   // restart the animation on a quick second tap
+    img.classList.add("wiggle");
+  }
+  ears.forEach(function (img) { img.addEventListener("animationend", function () { img.classList.remove("wiggle"); }); });
+
   stage.addEventListener("click", function (e) {
     if (held) { held = false; return; }
+    if (!editing && empty.hidden) {
+      var f = toFraction(e.clientX, e.clientY), defs = earDefs();
+      for (var k = 0; k < defs.length; k++) {
+        if (inPoly(f, defs[k].pts)) { wiggleEar(k); return; }
+      }
+    }
     if (editing) {
       if (dragging || (e.target && e.target.tagName === "circle")) return;
       draft.push(toFraction(e.clientX, e.clientY));
@@ -805,8 +817,6 @@
       return;
     }
     if (!empty.hidden) { fileInput.click(); return; }
-    var ear = earAt(e.clientX, e.clientY);
-    if (ear) { wiggle(ear); return; }
     talk();
   });
   stage.addEventListener("keydown", function (e) {
