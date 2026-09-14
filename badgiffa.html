@@ -146,53 +146,10 @@
     from { transform: translateY(0); }
     to   { transform: translateY(var(--jaw-gap, 14px)); }
   }
-  /* tap effects: drawn on an SVG overlay above the layers */
-  .fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: visible; }
-  .fx * { transform-box: fill-box; }
-  .fx .bulb { transform-origin: center; animation: bulb 1.6s ease-out forwards; }
-  .fx .bulb-core { transform-origin: center; animation: bulbcore 1.6s ease-out forwards; }
-  @keyframes bulb {
-    0%   { opacity: 0; transform: scale(.3); }
-    12%  { opacity: 1; transform: scale(1.15); }
-    30%  { opacity: .85; transform: scale(1); }
-    70%  { opacity: .9; transform: scale(1.05); }
-    100% { opacity: 0; transform: scale(.6); }
-  }
-  @keyframes bulbcore {
-    0%   { opacity: 0; }
-    12%  { opacity: 1; }
-    80%  { opacity: .9; }
-    100% { opacity: 0; }
-  }
-  .fx .ooze { transform-origin: top; animation: ooze 2.6s ease-in forwards; }
-  @keyframes ooze {
-    0%   { transform: scaleY(0); opacity: 1; }
-    55%  { transform: scaleY(1); opacity: 1; }
-    85%  { transform: scaleY(1); opacity: 1; }
-    100% { transform: scaleY(1); opacity: 0; }
-  }
-  .fx .drop { animation: drop 1.1s ease-in 1.2s forwards; opacity: 0; }
-  @keyframes drop {
-    0%   { transform: translateY(0); opacity: 1; }
-    80%  { opacity: 1; }
-    100% { transform: translateY(var(--fall, 60px)); opacity: 0; }
-  }
-  .fx .beam { transform-origin: left center; animation: beam .7s ease-out forwards; }
-  @keyframes beam {
-    0%   { transform: scaleX(0); opacity: 1; }
-    18%  { transform: scaleX(1); opacity: 1; }
-    60%  { opacity: .9; }
-    100% { transform: scaleX(1); opacity: 0; }
-  }
-  .fx .flash { transform-origin: center; animation: flash .5s ease-out forwards; }
-  @keyframes flash {
-    0%   { opacity: 1; transform: scale(.4); }
-    40%  { opacity: 1; transform: scale(1.3); }
-    100% { opacity: 0; transform: scale(1.6); }
-  }
   .stage.editing { cursor: crosshair; }
   .stage.editing .jaw { opacity: .55; }
   .trace { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
   .trace polygon { fill: rgba(224, 83, 44, .18); stroke: #e0532c; stroke-width: 3; stroke-linejoin: round; }
   .trace polyline { fill: none; stroke: #e0532c; stroke-width: 3; stroke-dasharray: 8 6; }
   .trace circle { fill: #fff; stroke: #e0532c; stroke-width: 3; pointer-events: all; cursor: grab; touch-action: none; }
@@ -261,6 +218,7 @@
     transform: translateX(-50%) rotate(45deg);
     border-radius: 0 0 4px 0;
   }
+  .bubble { z-index: 3; }
   .bubble.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
 
   .toolbar {
@@ -356,17 +314,8 @@
   <img class="dog ear" id="earL" alt="" aria-hidden="true" hidden>
   <img class="dog ear" id="earR" alt="" aria-hidden="true" hidden>
   <img class="dog jaw" id="jaw" alt="" aria-hidden="true" hidden>
-  <svg class="fx" id="fx" aria-hidden="true">
-    <defs>
-      <radialGradient id="bulbGrad">
-        <stop offset="0" stop-color="#fffbe6" stop-opacity="1"/>
-        <stop offset="35%" stop-color="#ffe066" stop-opacity=".95"/>
-        <stop offset="100%" stop-color="#ffb300" stop-opacity="0"/>
-      </radialGradient>
-      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
-    </defs>
-  </svg>
   <svg class="trace" id="trace" aria-hidden="true" hidden></svg>
+  <canvas class="fx" id="fx" aria-hidden="true"></canvas>
   <div class="empty" id="empty">
     <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M60 78c-4-22 10-40 40-40s44 18 40 40c6 8 8 22 2 34-8 16-30 24-42 24s-34-8-42-24c-6-12-4-26 2-34z"/>
@@ -465,24 +414,23 @@
       [0.667, 0.350], [0.684, 0.376], [0.710, 0.390], [0.727, 0.385], [0.761, 0.359], [0.786, 0.325],
       [0.799, 0.282], [0.812, 0.239], [0.829, 0.197], [0.855, 0.154], [0.872, 0.120], [0.881, 0.094] ] }
   ];
-  // Hot spots of the built-in drawing (fractions of the image): the hair
-  // tips (centre + radius), eye centres, nostril bottoms and the snout.
-  var DRAWING_FX = {
-    tips: [
-      [0.5845, 0.1067, 0.0093], [0.5045, 0.1085, 0.008], [0.4516, 0.1059, 0.0042], [0.3951, 0.1148, 0.0062],
-      [0.6145, 0.12, 0.0105], [0.5548, 0.1192, 0.0061], [0.6631, 0.1205, 0.0054], [0.4797, 0.1384, 0.0093],
-      [0.6262, 0.1402, 0.0051], [0.5354, 0.1455, 0.0063], [0.4185, 0.1553, 0.0062], [0.6357, 0.1818, 0.0068],
-      [0.3645, 0.1926, 0.0064], [0.4394, 0.2012, 0.0045], [0.4925, 0.2208, 0.0042], [0.3945, 0.2486, 0.0051],
-      [0.4326, 0.2497, 0.0063], [0.3085, 0.2783, 0.0061], [0.4853, 0.2956, 0.0041], [0.6016, 0.3053, 0.0043],
-      [0.3498, 0.3123, 0.0047]
+  // Touch spots of the built-in drawing (fractions of the image).
+  var DRAWING_SPOTS = {
+    // ends of the wiry hairs: each lights up like a little bulb
+    hairTips: [
+      [0.308, 0.278], [0.350, 0.315], [0.364, 0.192], [0.395, 0.249], [0.395, 0.115], [0.418, 0.155],
+      [0.433, 0.250], [0.439, 0.201], [0.480, 0.139], [0.485, 0.296], [0.492, 0.221], [0.504, 0.109],
+      [0.536, 0.145], [0.555, 0.119], [0.585, 0.107], [0.614, 0.120], [0.626, 0.140], [0.636, 0.182],
+      [0.666, 0.120], [0.680, 0.152]
     ],
-    eyes: [[0.6192, 0.3316], [0.4967, 0.3798]],
-    eyeR: 0.05,
-    nostrils: [[0.7265, 0.6624], [0.7821, 0.6154]],
-    nose: { c: [0.735, 0.59], r: 0.115 },
-    hair: [0.27, 0.08, 0.68, 0.32]
+    hair: [[0.285, 0.085], [0.705, 0.085], [0.705, 0.215], [0.640, 0.250], [0.560, 0.290], [0.470, 0.330], [0.360, 0.345], [0.285, 0.320]],
+    // the two red pupils; the lenses face right, so the beams go that way
+    eyes: [[0.497, 0.380], [0.619, 0.332]],
+    eyeRadius: 0.075,
+    laserDir: [1, -0.12],
+    nose: [[0.640, 0.520], [0.720, 0.490], [0.820, 0.500], [0.850, 0.580], [0.830, 0.680], [0.740, 0.700], [0.650, 0.660]],
+    nostrils: [[0.727, 0.615], [0.765, 0.665]]
   };
-
   var VOICES = {
     // Intergalactic-style: the old MacinTalk "Fred" voice where it exists (iOS/macOS),
     // flat low pitch, word-by-word delivery, plus a vocoder-like buzz under it.
@@ -519,6 +467,7 @@
   function usingDrawing() { return !state.photoId && !state.photoData; }
   function currentSrc() { return state.photoId ? "/_blob/" + state.photoId : (state.photoData || "dog.jpg"); }
   function earDefs() { return usingDrawing() ? DRAWING_EARS : []; }
+  function spots() { return usingDrawing() ? DRAWING_SPOTS : null; }
   function jawPts() {
     if (state.jawPts && state.jawPts.length >= 3) return state.jawPts;
     return usingDrawing() ? DRAWING_JAW : [[0, 0.57], [1, 0.57], [1, 1], [0, 1]];
@@ -634,7 +583,7 @@
     fitBtn.textContent = state.fit === "cover" ? "Fit whole drawing" : "Fill the screen";
     dog.hidden = false; jaw.hidden = false; empty.hidden = true;
     stage.setAttribute("aria-label", "Tap to make " + state.name + " talk");
-    hint.textContent = editing ? "Tap around the jaw, then Done" : "Tap " + state.name + " to make it talk. Hold for tools.";
+    hint.textContent = editing ? "Tap around the jaw, then Done" : "Tap " + state.name + " to make it talk. Try the ears, eyes, nose and hair. Hold for tools.";
     loadSource(currentSrc());
   }
 
@@ -652,7 +601,6 @@
     earDefs().forEach(function (e, i) {
       ears[i].style.transformOrigin = (r.left + e.pivot[0] * r.w) + "px " + (r.top + e.pivot[1] * r.h) + "px";
     });
-    fx.setAttribute("viewBox", "0 0 " + r.W + " " + r.H);
     // White band above the drawing: centre the title in it, bubble right under.
     var band = Math.max(0, r.top), titleH = title.offsetHeight || 48;
     var titleTop = band > titleH * 2.2 ? Math.round(band * 0.38 - titleH / 2) : Math.round(r.H * 0.05);
@@ -860,6 +808,141 @@
     stage.addEventListener(t, function () { clearTimeout(holdTimer); });
   });
   stage.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  /* ---------- touch effects: bulbs, drips, lasers ---------- */
+  var effects = [], fxRaf = null;
+  function fxSize() {
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var w = Math.round(stage.clientWidth * dpr), h = Math.round(stage.clientHeight * dpr);
+    if (fx.width !== w || fx.height !== h) { fx.width = w; fx.height = h; }
+    return dpr;
+  }
+  function toStage(r, p) { return [r.left + p[0] * r.w, r.top + p[1] * r.h]; }
+  function addEffect(e) {
+    e.t0 = performance.now();
+    effects.push(e);
+    if (!fxRaf) fxRaf = requestAnimationFrame(fxFrame);
+  }
+  function fxFrame(now) {
+    var dpr = fxSize(), ctx = fx.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, stage.clientWidth, stage.clientHeight);
+    var r = imageRect();
+    effects = effects.filter(function (e) { return e.draw(ctx, r, (now - e.t0) / 1000); });
+    fxRaf = effects.length ? requestAnimationFrame(fxFrame) : null;
+    if (!effects.length) ctx.clearRect(0, 0, stage.clientWidth, stage.clientHeight);
+  }
+  function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x); }
+
+  // Hair: every tip glows on in a scatter, flickers like a filament, then fades.
+  function lightBulbs(tips) {
+    var order = tips.map(function (p, i) { return { p: p, delay: Math.random() * 0.5, seed: i * 7.3 }; });
+    addEffect({ draw: function (ctx, r, t) {
+      var alive = false, R = r.w * 0.032;
+      order.forEach(function (b) {
+        var lt = t - b.delay;
+        if (lt < 0) { alive = true; return; }
+        var on = ease(lt / 0.15) * (1 - ease((lt - 1.5) / 0.7));
+        if (on <= 0.001) return;
+        alive = true;
+        var flick = 0.85 + 0.15 * Math.sin(lt * 37 + b.seed) * Math.sin(lt * 11 + b.seed);
+        var a = on * flick, c = toStage(r, b.p);
+        var g = ctx.createRadialGradient(c[0], c[1], 0, c[0], c[1], R);
+        g.addColorStop(0, "rgba(255, 244, 190, " + (0.95 * a) + ")");
+        g.addColorStop(0.35, "rgba(255, 208, 90, " + (0.55 * a) + ")");
+        g.addColorStop(1, "rgba(255, 180, 40, 0)");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(c[0], c[1], R, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "rgba(255, 255, 235, " + a + ")";
+        ctx.beginPath(); ctx.arc(c[0], c[1], R * 0.28, 0, Math.PI * 2); ctx.fill();
+      });
+      return alive;
+    } });
+  }
+
+  // Nose: a few black drops run down from the nostrils and thin out. Not a flood.
+  function noseDrips(nostrils) {
+    var drops = [];
+    for (var i = 0; i < 3; i++) {
+      var n = nostrils[i % nostrils.length];
+      drops.push({ x: n[0] + (Math.random() - 0.5) * 0.012, y0: n[1], delay: i * 0.28 + Math.random() * 0.2,
+                   speed: 0.10 + Math.random() * 0.05, len: 0.16 + Math.random() * 0.12, w: 0.006 + Math.random() * 0.003 });
+    }
+    addEffect({ draw: function (ctx, r, t) {
+      var alive = false;
+      drops.forEach(function (d) {
+        var lt = t - d.delay;
+        if (lt < 0) { alive = true; return; }
+        var fall = Math.min(d.len, d.speed * lt + 0.5 * 0.12 * lt * lt);
+        var fade = 1 - ease((lt - 2.4) / 0.9);
+        if (fade <= 0.001) return;
+        alive = true;
+        var top = toStage(r, [d.x, d.y0]), tip = toStage(r, [d.x, d.y0 + fall]);
+        var w = d.w * r.w;
+        ctx.strokeStyle = "rgba(20, 14, 12, " + (0.95 * fade) + ")";
+        ctx.lineCap = "round";
+        ctx.lineWidth = w * 0.55;
+        ctx.beginPath(); ctx.moveTo(top[0], top[1]); ctx.lineTo(tip[0], tip[1]); ctx.stroke();
+        ctx.fillStyle = "rgba(20, 14, 12, " + (0.98 * fade) + ")";
+        ctx.beginPath(); ctx.ellipse(tip[0], tip[1] - w * 0.6, w * 0.9, w * 1.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "rgba(255, 255, 255, " + (0.35 * fade) + ")";
+        ctx.beginPath(); ctx.arc(tip[0] - w * 0.3, tip[1] - w * 1.1, w * 0.25, 0, Math.PI * 2); ctx.fill();
+      });
+      return alive;
+    } });
+  }
+
+  // Eyes: both pupils fire a red beam out of the picture, with a flash at the eye.
+  function shootLasers(eyes, dir) {
+    var L = Math.hypot(dir[0], dir[1]), ux = dir[0] / L, uy = dir[1] / L;
+    laserSound();
+    addEffect({ draw: function (ctx, r, t) {
+      var life = 0.55;
+      if (t > life) return false;
+      var grow = ease(t / 0.08), fade = 1 - ease((t - 0.3) / 0.25);
+      var reach = Math.hypot(r.W, r.H) * grow;
+      eyes.forEach(function (e) {
+        var a = toStage(r, e), b = [a[0] + ux * reach, a[1] + uy * reach];
+        ctx.lineCap = "round";
+        ctx.shadowColor = "rgba(255, 40, 40, " + fade + ")"; ctx.shadowBlur = r.w * 0.03;
+        ctx.strokeStyle = "rgba(255, 40, 40, " + (0.85 * fade) + ")"; ctx.lineWidth = r.w * 0.022;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = "rgba(255, 235, 235, " + fade + ")"; ctx.lineWidth = r.w * 0.007;
+        ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke();
+        var g = ctx.createRadialGradient(a[0], a[1], 0, a[0], a[1], r.w * 0.06);
+        g.addColorStop(0, "rgba(255, 255, 255, " + fade + ")");
+        g.addColorStop(0.4, "rgba(255, 80, 60, " + (0.7 * fade) + ")");
+        g.addColorStop(1, "rgba(255, 40, 40, 0)");
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(a[0], a[1], r.w * 0.06, 0, Math.PI * 2); ctx.fill();
+      });
+      return true;
+    } });
+  }
+  function laserSound() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === "suspended") actx.resume();
+      var t = actx.currentTime;
+      var o = actx.createOscillator(); o.type = "sawtooth";
+      o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(180, t + 0.3);
+      var g = actx.createGain(); g.gain.setValueAtTime(0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + 0.35);
+    } catch (e) {}
+  }
+  function hitSpot(f) {
+    var sp = spots();
+    if (!sp) return false;
+    for (var i = 0; i < sp.eyes.length; i++) {
+      if (Math.hypot(f[0] - sp.eyes[i][0], f[1] - sp.eyes[i][1]) < sp.eyeRadius) { shootLasers(sp.eyes, sp.laserDir); return true; }
+    }
+    if (inPoly(f, sp.nose)) { noseDrips(sp.nostrils); return true; }
+    if (inPoly(f, sp.hair)) { lightBulbs(sp.hairTips); return true; }
+    return false;
+  }
+
   function inPoly(pt, pts) {
     var inside = false;
     for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
@@ -876,82 +959,6 @@
   }
   ears.forEach(function (img) { img.addEventListener("animationend", function () { img.classList.remove("wiggle"); }); });
 
-  /* ---------- tap effects: hair bulbs, nose drips, eye lasers ---------- */
-  function svgEl(tag, attrs, cls) {
-    var el = document.createElementNS(SVG, tag);
-    Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
-    if (cls) el.setAttribute("class", cls);
-    fx.appendChild(el);
-    return el;
-  }
-  function expire(els, ms) { setTimeout(function () { els.forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); }, ms); }
-  function toPx(f) { var r = imageRect(); return [r.left + f[0] * r.w, r.top + f[1] * r.h]; }
-
-  function lightHair() {
-    var r = imageRect(), made = [];
-    DRAWING_FX.tips.forEach(function (t, i) {
-      var p = toPx(t), rad = Math.max(6, t[2] * r.w * 2.6);
-      var g = svgEl("circle", { cx: p[0], cy: p[1], r: rad, fill: "url(#bulbGrad)" }, "bulb");
-      var c = svgEl("circle", { cx: p[0], cy: p[1], r: Math.max(2, rad * 0.22), fill: "#fffdf0" }, "bulb-core");
-      var delay = (i * 37 % 260) + "ms";
-      g.style.animationDelay = delay; c.style.animationDelay = delay;
-      made.push(g, c);
-    });
-    expire(made, 2000);
-    tone(880, 1320, 0.25, "sine", 0.05);
-  }
-
-  function dripNose() {
-    var r = imageRect(), made = [];
-    DRAWING_FX.nostrils.forEach(function (n, i) {
-      var p = toPx(n), w = Math.max(3, r.w * 0.012), h = r.h * (0.09 + i * 0.03);
-      var streak = svgEl("rect", { x: p[0] - w / 2, y: p[1], width: w, height: h, rx: w / 2, fill: "#111" }, "ooze");
-      var drop = svgEl("circle", { cx: p[0], cy: p[1] + h, r: w * 0.9, fill: "#111" }, "drop");
-      drop.style.setProperty("--fall", Math.round(r.h * 0.12) + "px");
-      streak.style.animationDelay = (i * 150) + "ms";
-      drop.style.animationDelay = (1200 + i * 150) + "ms";
-      made.push(streak, drop);
-    });
-    expire(made, 3000);
-  }
-
-  function shootLasers() {
-    var r = imageRect(), made = [];
-    DRAWING_FX.eyes.forEach(function (e) {
-      var p = toPx(e), x2 = r.W + 40, y2 = p[1] + (x2 - p[0]) * 0.06;
-      made.push(svgEl("line", { x1: p[0], y1: p[1], x2: x2, y2: y2, stroke: "rgba(255,60,40,.55)", "stroke-width": r.w * 0.02, "stroke-linecap": "round", filter: "url(#glow)" }, "beam"));
-      made.push(svgEl("line", { x1: p[0], y1: p[1], x2: x2, y2: y2, stroke: "#ff2a1a", "stroke-width": r.w * 0.006, "stroke-linecap": "round" }, "beam"));
-      made.push(svgEl("circle", { cx: p[0], cy: p[1], r: r.w * 0.035, fill: "#fff1e8", filter: "url(#glow)" }, "flash"));
-    });
-    expire(made, 900);
-    tone(1500, 160, 0.3, "sawtooth", 0.12);
-  }
-
-  // Small synthesized sound effects, sharing the Web Audio context.
-  function tone(f0, f1, dur, type, vol) {
-    try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      if (!actx) actx = new AC();
-      if (actx.state === "suspended") actx.resume();
-      var t = actx.currentTime;
-      var o = actx.createOscillator(), g = actx.createGain();
-      o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-      g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + 0.05);
-    } catch (e) {}
-  }
-
-  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1]); }
-  function hotSpot(f) {
-    if (!usingDrawing()) return null;
-    var X = DRAWING_FX;
-    for (var i = 0; i < X.eyes.length; i++) { if (dist(f, X.eyes[i]) < X.eyeR) return "eyes"; }
-    if (dist(f, X.nose.c) < X.nose.r) return "nose";
-    if (f[0] > X.hair[0] && f[1] > X.hair[1] && f[0] < X.hair[2] && f[1] < X.hair[3]) return "hair";
-    return null;
-  }
-
   stage.addEventListener("click", function (e) {
     if (held) { held = false; return; }
     if (!editing && empty.hidden) {
@@ -959,10 +966,7 @@
       for (var k = 0; k < defs.length; k++) {
         if (inPoly(f, defs[k].pts)) { wiggleEar(k); return; }
       }
-      var spot = hotSpot(f);
-      if (spot === "eyes") { shootLasers(); return; }
-      if (spot === "nose") { dripNose(); return; }
-      if (spot === "hair") { lightHair(); return; }
+      if (hitSpot(f)) return;
     }
     if (editing) {
       if (dragging || (e.target && e.target.tagName === "circle")) return;
