@@ -1,5 +1,5 @@
 <title>Badgiffa</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Nunito:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap">
 <style>
   :root {
     --paper: #f3f1ea;
@@ -54,7 +54,7 @@
     margin: 0;
     background: var(--paper);
     color: var(--ink);
-    font-family: "Nunito", "Segoe UI", system-ui, sans-serif;
+    font-family: "Share Tech Mono", "Courier New", monospace;
     font-size: 15px;
     min-height: 100vh;
     min-height: 100dvh;
@@ -91,11 +91,12 @@
     margin: 0;
     padding-inline: 24px;
     text-align: center;
-    font-family: "Caveat", "Segoe Print", cursive;
+    font-family: "Orbitron", "Eurostile", "Share Tech Mono", monospace;
     font-weight: 700;
-    font-size: clamp(2.2rem, 11vw, 3.2rem);
-    line-height: 1;
-    letter-spacing: .01em;
+    font-size: clamp(1.7rem, 8.5vw, 2.5rem);
+    line-height: 1.05;
+    letter-spacing: .12em;
+    text-transform: uppercase;
     color: #22211f;
     text-wrap: balance;
     pointer-events: none;
@@ -176,7 +177,7 @@
   .empty svg { width: 58%; max-width: 220px; height: auto; color: var(--ink); }
   .empty p {
     margin: 0;
-    font-family: "Caveat", "Segoe Print", cursive;
+    font-family: "Orbitron", "Eurostile", "Share Tech Mono", monospace;
     font-size: 1.6rem;
     line-height: 1.1;
     color: var(--ink);
@@ -195,10 +196,12 @@
     background: var(--bubble);
     color: var(--bubble-ink);
     border-radius: 22px;
-    font-family: "Caveat", "Segoe Print", cursive;
+    font-family: "Orbitron", "Eurostile", "Share Tech Mono", monospace;
     font-weight: 700;
-    font-size: clamp(1.4rem, 6vw, 1.9rem);
-    line-height: 1.05;
+    font-size: clamp(.95rem, 4.2vw, 1.25rem);
+    line-height: 1.25;
+    letter-spacing: .04em;
+    text-transform: uppercase;
     text-align: center;
     box-shadow: 0 10px 26px -10px var(--shadow), 0 0 0 2px var(--bubble-ink);
     opacity: 0;
@@ -235,8 +238,10 @@
     background: transparent;
     color: var(--ink);
     font: inherit;
-    font-weight: 800;
+    font-weight: 700;
     font-size: .9rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
     padding: 9px 16px;
     border-radius: 999px;
     cursor: pointer;
@@ -267,9 +272,11 @@
   dialog::backdrop { background: rgba(0, 0, 0, .45); }
   dialog h2 {
     margin: 0 0 12px;
-    font-family: "Caveat", "Segoe Print", cursive;
-    font-size: 1.8rem;
-    line-height: 1;
+    font-family: "Orbitron", "Eurostile", "Share Tech Mono", monospace;
+    font-size: 1.15rem;
+    line-height: 1.2;
+    letter-spacing: .08em;
+    text-transform: uppercase;
   }
   .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
   .field label {
@@ -559,14 +566,49 @@
 
     var jawMask = polyMask(jawPts());
     var jawC = cutLayer(jawMask);
+
+    // Inside of the mouth: painted where the jaw sits, so the strip the jaw
+    // uncovers when it drops shows a dark throat with a pink tongue, drawn in
+    // the same flat-ink style as the picture.
+    function mouthInterior(maskC) {
+      var mctx = maskC.getContext("2d", { willReadFrequently: true });
+      var a = mctx.getImageData(0, 0, w, h).data;
+      var gap = h * 0.045;
+      var out = document.createElement("canvas"); out.width = w; out.height = h;
+      var octx = out.getContext("2d");
+      var img = octx.createImageData(w, h), d = img.data;
+      for (var x = 0; x < w; x++) {
+        var top = -1;
+        for (var y = 0; y < h; y++) { if (a[(y * w + x) * 4 + 3] > 0) { top = y; break; } }
+        if (top < 0) continue;
+        for (var yy = top; yy < h; yy++) {
+          var f = (yy - top) / gap, i = (yy * w + x) * 4, c;
+          if (f < 0.10) c = [20, 12, 12];                 // ink line along the lip
+          else if (f < 0.42) c = [58, 16, 22];            // throat
+          else if (f < 0.50) c = [20, 12, 12];            // tongue outline
+          else if (f < 1.05) c = [214, 112, 122];         // tongue
+          else if (f < 1.13) c = [20, 12, 12];
+          else c = [58, 16, 22];
+          d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+        }
+      }
+      octx.putImageData(img, 0, 0);
+      var clipped = document.createElement("canvas"); clipped.width = w; clipped.height = h;
+      var cctx = clipped.getContext("2d");
+      cctx.drawImage(maskC, 0, 0);
+      cctx.globalCompositeOperation = "source-in";
+      cctx.drawImage(out, 0, 0);
+      return clipped;
+    }
     var earMasks = earDefs().map(function (e) { return polyMask(e.pts); });
     var earCs = earMasks.map(cutLayer);
 
     var headC = document.createElement("canvas"); headC.width = w; headC.height = h;
     var hctx = headC.getContext("2d");
     hctx.drawImage(source, 0, 0);
-    // Paper white behind every moving part, so the spot it leaves stays blank.
+    // Paper white behind the ears; the inside of the mouth behind the jaw.
     fillHole(hctx, jawMask, "#ffffff");
+    hctx.drawImage(mouthInterior(jawMask), 0, 0);
     earMasks.forEach(function (m) { fillHole(hctx, m, "#ffffff"); });
 
     urls.forEach(function (u) { URL.revokeObjectURL(u); }); urls = [];
