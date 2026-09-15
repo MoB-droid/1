@@ -1023,8 +1023,9 @@
   }
   function ease(x) { return x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x); }
 
-  // Old light bulbs humming: a 60 Hz mains drone with its harmonics and a
-  // faint filament sizzle, swelling as the bulbs come on and dying with them.
+  // Old light bulbs humming: a heavy 60 Hz mains drone with a gritty buzz of
+  // harmonics and a crackling filament sizzle, swelling as the bulbs come on
+  // and dying with them. Loud: it should be felt, not just noticed.
   var humNodes = null;
   function bulbHum(seconds) {
     try {
@@ -1036,26 +1037,32 @@
       var t = actx.currentTime, oscs = [];
       var out = actx.createGain();
       out.gain.setValueAtTime(0, t);
-      out.gain.linearRampToValueAtTime(1, t + 0.45);
+      out.gain.linearRampToValueAtTime(1, t + 0.3);
       out.gain.setValueAtTime(1, t + seconds - 0.7);
       out.gain.linearRampToValueAtTime(0, t + seconds);
-      out.connect(actx.destination);
-      [[60, 0.05, "sine"], [120, 0.035, "sine"], [180, 0.02, "triangle"], [240, 0.012, "sine"]].forEach(function (d) {
+      // limiter so the stacked drone stays loud without clipping
+      var lim = actx.createDynamicsCompressor();
+      lim.threshold.value = -10; lim.knee.value = 4; lim.ratio.value = 12; lim.attack.value = 0.002; lim.release.value = 0.15;
+      var master = actx.createGain(); master.gain.value = 1.8;
+      out.connect(lim); lim.connect(master); master.connect(actx.destination);
+      // the drone: deep fundamental, then a rasp of harmonics for the electric buzz
+      [[60, 0.42, "sine"], [60, 0.10, "sawtooth"], [120, 0.30, "sine"], [120, 0.16, "sawtooth"], [180, 0.16, "triangle"],
+       [240, 0.12, "sawtooth"], [300, 0.07, "square"], [360, 0.06, "sawtooth"], [480, 0.04, "sawtooth"]].forEach(function (d) {
         var o = actx.createOscillator(); o.type = d[2]; o.frequency.value = d[0];
         var g = actx.createGain(); g.gain.value = d[1];
         o.connect(g); g.connect(out); o.start(t); o.stop(t + seconds + 0.1); oscs.push(o);
       });
       // slow wobble on the hum, like a loose fixture
       var lfo = actx.createOscillator(); lfo.frequency.value = 5.5;
-      var lfoG = actx.createGain(); lfoG.gain.value = 0.25;
+      var lfoG = actx.createGain(); lfoG.gain.value = 0.3;
       lfo.connect(lfoG); lfoG.connect(out.gain); lfo.start(t); lfo.stop(t + seconds + 0.1); oscs.push(lfo);
-      // filament sizzle: quiet noise through a narrow high band
+      // filament sizzle: crackling noise through a high band, well up in the mix
       var len = Math.ceil(actx.sampleRate * (seconds + 0.2));
       var buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
-      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (Math.random() < 0.02 ? 1 : 0.25);
+      for (var i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * (Math.random() < 0.03 ? 1 : 0.3);
       var noise = actx.createBufferSource(); noise.buffer = buf;
-      var bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3800; bp.Q.value = 2.5;
-      var ng = actx.createGain(); ng.gain.value = 0.012;
+      var bp = actx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3800; bp.Q.value = 1.8;
+      var ng = actx.createGain(); ng.gain.value = 0.09;
       noise.connect(bp); bp.connect(ng); ng.connect(out); noise.start(t); noise.stop(t + seconds + 0.1);
       humNodes = { out: out, oscs: oscs.concat([noise]) };
       setTimeout(function () { if (humNodes && humNodes.out === out) humNodes = null; }, (seconds + 0.3) * 1000);
