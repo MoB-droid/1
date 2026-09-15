@@ -1,12 +1,1 @@
-{
-  "ticker": "ASTS",
-  "stamp": "15 Sep 2026 · after-hours · re-scored 09:16 Israel after the overnight edition",
-  "updated": "2026-09-15T06:22:00Z",
-  "mode": "limit",
-  "buy": 57.50,
-  "sell": null,
-  "stop": 52.50,
-  "size": 12,
-  "position": "flat",
-  "note": "Fed-week first half; a touch of 57.50 is the fill (limit). Pushed by hand: the map runs did not push."
-}
+{"ticker":"ASTS","stamp":"15 Sep 2026 · pre-market, last print $59.45 (-0.95%) ~05:00 ET · re-scored 12:00 Israel after the early pre-market edition","updated":"2026-09-15T09:25:00Z","mode":"limit","buy":57.50,"sell":null,"stop":52.50,"size":12,"position":"flat","note":"Fed-week first half, before Wednesday's decision; a touch of 57.50 is the fill (limit). Pre-market 59.45, still 1.95 above."}
