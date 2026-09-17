@@ -80,6 +80,7 @@ DEFAULT_RULES = {
     "edgar keep": "8-K,424B,S-3,SC 13D,SC 13G,DEF 14A", "fire on": "off", "fire cmd": "",
     "price on": "on", "price score": "9",
     "price url": "https://raw.githubusercontent.com/MoB-droid/1/asts-levels/asts_trigger_watch/levels.json",
+    "recycled days": "2", "claim memory days": "30",
 }
 PRICE_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{t}?range=1d&interval=1m&includePrePost=true"
 HITS_COLS = 10                         # A..J ; J = price at hit
@@ -216,13 +217,56 @@ def fetch(url):
         return r.read()
 
 def parse_items(xml_bytes):
+    """(title, link, published) - published is a UTC datetime or None."""
     root = ET.fromstring(xml_bytes); A = "{http://www.w3.org/2005/Atom}"; out = []
     for it in root.iter("item"):
-        out.append(((it.findtext("title") or "").strip(), (it.findtext("link") or "").strip()))
+        out.append(((it.findtext("title") or "").strip(), (it.findtext("link") or "").strip(),
+                    parse_date(it.findtext("pubDate") or it.findtext("date") or "")))
     for e in root.iter(A + "entry"):
         ln = e.find(A + "link")
-        out.append(((e.findtext(A + "title") or "").strip(), ln.get("href", "") if ln is not None else ""))
+        out.append(((e.findtext(A + "title") or "").strip(), ln.get("href", "") if ln is not None else "",
+                    parse_date(e.findtext(A + "published") or e.findtext(A + "updated") or "")))
     return out
+
+def parse_date(s):
+    """RSS/Atom date -> aware UTC datetime, or None when absent or unparseable."""
+    s = (s or "").strip()
+    if not s: return None
+    try:
+        from email.utils import parsedate_to_datetime
+        d = parsedate_to_datetime(s)
+    except Exception:
+        try: d = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        except Exception: return None
+    if d is None: return None
+    if d.tzinfo is None: d = d.replace(tzinfo=timezone.utc)
+    return d.astimezone(timezone.utc)
+
+def claim_key(title):
+    """A story's identity, so the same event re-listed by another outlet is one claim."""
+    words = re.findall(r"[a-z0-9]+", title.lower())
+    stop = {"the", "a", "an", "of", "to", "in", "on", "for", "and", "is", "as", "at", "by", "its", "it",
+            "with", "from", "that", "this", "says", "said", "after", "over", "new", "inc", "nasdaq", "stock"}
+    core = [w for w in words if w not in stop and len(w) > 2][:8]
+    return "claim:" + hashlib.sha1(" ".join(core).encode()).hexdigest()[:16]
+
+def recycled_reason(title, published, seen, rules):
+    """Why this item must not score. None means it is genuinely new."""
+    try: max_age = float(rules.get("recycled days", "2"))
+    except ValueError: max_age = 2.0
+    try: memory = float(rules.get("claim memory days", "30"))
+    except ValueError: memory = 30.0
+    if published is not None:
+        age = (datetime.now(timezone.utc) - published).total_seconds() / 86400.0
+        if age > max_age:
+            return f"recycled: first published {published.strftime('%d %b %Y')}, {age:.0f} days old"
+    ck = claim_key(title)
+    first = seen.get(ck)
+    if first and (time.time() - first) <= memory * 86400:
+        when = datetime.fromtimestamp(first, timezone.utc).strftime("%d %b %Y")
+        return f"recycled: same claim already scored {when}"
+    seen[ck] = seen.get(ck) or int(time.time())
+    return None
 
 def edgar_form(title):
     return title.split(" - ")[0].strip().upper()
@@ -403,7 +447,7 @@ def one_pass(cfg, seen, pending, backfill):
         try: items = safe_call(f"fetch:{s['name']}", lambda: parse_items(fetch(s["url"])))
         except Unrecovered: per_source[s["name"]] = "FAIL"; continue
         n_new = 0
-        for title, link in items:
+        for title, link, published in items:
             total += 1
             key = hashlib.sha1((title + "|" + link).encode()).hexdigest()
             if key in seen: continue
@@ -418,6 +462,16 @@ def one_pass(cfg, seen, pending, backfill):
                 if kw < (s.get("min_kw") or kw_thr): continue
             cands += 1
             row = [now_et().strftime("%d %b %Y %H:%M"), s["name"], title[:200], link, kw, "", "", "", "no"]
+            stale = recycled_reason(title, published, seen, rules) if s["type"] != "edgar" else None
+            if stale:                                               # zero Claude calls, can never reach the fire threshold
+                row[5], row[6], row[7], row[8] = 1, "recycled", stale[:120], "recycled"
+                STATE["recycled_today"] = STATE.get("recycled_today", 0) + 1
+                try:
+                    safe_call("write_hit(recycled)", write_hit_verified, row); written += 1; STATE["hits_today"] += 1
+                    log(f"RECYCLED [{kw}] {s['name']} | {title[:80]} | {stale}")
+                except Unrecovered:
+                    pending.append(row)
+                continue
             if STATE["llm_calls"] >= cap:
                 row[7] = "llm daily cap reached"
             else:
