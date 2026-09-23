@@ -1,12 +1,12 @@
 {
   "ticker": "ASTS",
-  "stamp": "23 Sep 2026 · 10:00 ET intraday · re-scored 10:38 ET",
-  "updated": "2026-09-23T14:56:25Z",
+  "stamp": "23 Sep 2026 · 10:00 ET intraday · re-scored 10:38 ET · buy moved to 58.00 by Moran 12:40 ET",
+  "updated": "2026-09-23T16:35:28Z",
   "mode": "limit",
-  "buy": 55.0,
+  "buy": 58.0,
   "sell": null,
   "stop": 54.14,
   "size": 12,
   "position": "6 sh @ 58.00",
-  "note": "second-half tranche (12 sh), unfilled since 16 Sep; buy arms at or under 55.00"
+  "note": "second-half tranche (12 sh); buy arms at or under 58.00 (was 55.00: at least one ATR above the 54.14 stop)"
 }
