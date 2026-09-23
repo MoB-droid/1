@@ -1,1 +1,12 @@
-{"ticker": "ASTS", "stamp": "23 Sep 2026 · pre-market 05:12 ET · re-scored 12:13 Israel after the early pre-market edition", "updated": "2026-09-23T09:21:40Z", "mode": "limit", "buy": 55.0, "sell": null, "stop": 54.14, "size": 12, "position": "holding 6 sh @ 58.00", "note": "Pre-market 63.93 (+0.38%), sector quiet. 6 sh @ 58.00 ride, stop 54.14, 55.00 second-half buy stays unfilled, target 67.00. Trim check 15:50 ET."}
+{
+  "ticker": "ASTS",
+  "stamp": "23 Sep 2026 · pre-market 09:12 ET · re-scored 16:13 Israel after the final pre-market edition",
+  "updated": "2026-09-23T13:24:25Z",
+  "mode": "limit",
+  "buy": 55.0,
+  "sell": null,
+  "stop": 54.14,
+  "size": 12,
+  "position": "6 sh @ 58.00",
+  "note": "second-half tranche (12 sh), unfilled since 16 Sep; buy arms at or under 55.00"
+}
