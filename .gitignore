@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+asts_trigger_watch/*.llm.json
+asts_trigger_watch/*.log
