@@ -1,12 +1,12 @@
 {
   "ticker": "ASTS",
-  "stamp": "24 Sep 2026 · after-hours (23 Sep 16:00 ET close, no pre-market print yet) · re-scored 09:11 Israel after the overnight edition",
-  "updated": "2026-09-24T06:22:04Z",
+  "stamp": "24 Sep 2026 · close · re-scored 16:30 ET",
+  "updated": "2026-09-24T20:47:23Z",
   "mode": "limit",
   "buy": 58.0,
   "sell": null,
   "stop": 54.14,
   "size": 10,
   "position": "6 sh @ 58.00",
-  "note": "second-half tranche (10 sh, 50% of cash); buy arms at or under 58.00, one ATR above the 54.14 stop"
+  "note": "second-half tranche (10 sh, 50% of cash) arms at or under 58.00, $3.06 below the 61.06 close; hold 6 sh, no trim today, stop 54.14"
 }
