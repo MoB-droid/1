@@ -389,6 +389,13 @@ def llm_watchdog(waiting):
     when = datetime.fromtimestamp(last, timezone.utc).strftime("%d %b %Y %H:%M UTC") if last else "never"
     record_failure("llm_score:stale", f"no headline scored since {when}; {waiting} rows waiting unscored", 0)
     log(f"WATCHDOG: no successful score since {when}, {waiting} rows waiting", "ERROR")
+    # and say it where the Trade Map looks: a row at the top of the Hits tab, so a dead scorer
+    # shows up in the morning run instead of only in a log nobody opens.
+    head = f"SCORER DOWN: no headline scored since {when} - {waiting} rows waiting, Trigger Watch is blind"
+    why = "watchdog: the Claude scoring leg is failing (login expired, or the helper changed); headlines are not being scored"
+    row = [now_et().strftime("%d %b %Y %H:%M"), "watchdog", head[:200], "", 0, 0, "down", why[:120], "no"]
+    try: write_hit_verified(row)
+    except Exception as e: log(f"watchdog row write failed: {e}", "WARN")
 
 # ---------------------------------------------------------------- price leg (zero credits)
 def ensure_price_header():
