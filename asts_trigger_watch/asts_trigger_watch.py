@@ -320,14 +320,30 @@ Headlines:
 Return: {{"scores": [{{"n": <headline number>, "score": <1-10>, "direction": "up"|"down"|"mixed", "why": "<= 20 words"}}]}}
 One entry per numbered headline, same numbers, nothing else."""
 
+def fh_claude_call(prompt, leg):
+    """failure_handler.claude_call, whatever its signature is on this machine.
+    Passing a keyword it does not take used to raise TypeError and crash the whole pass."""
+    import inspect
+    try: params = set(inspect.signature(FH.claude_call).parameters)
+    except (TypeError, ValueError): params = set()
+    kw = {k: v for k, v in (("leg", leg), ("tools", ""), ("via_stdin", True)) if k in params}
+    r = FH.claude_call(prompt, **kw)
+    if isinstance(r, tuple):                       # (ok, result, err) or (ok, result)
+        ok = bool(r[0]); result = r[1] if len(r) > 1 else ""; err = r[2] if len(r) > 2 else ""
+        return ok, result, err
+    return bool(r), (r or ""), ""                  # plain text return
+
 def llm_run(prompt, leg):
-    """One Claude leg (SB: Max sub only, never the API). Returns raw text or raises Unrecovered."""
+    """One Claude leg (SB: Max sub only, never the API). Returns raw text or raises Unrecovered.
+    The house helper is tried first; any breakage in it falls through to the plain CLI, so a
+    helper change can never silence scoring again."""
     if FH is not None and hasattr(FH, "claude_call"):
-        ok, result, err = FH.claude_call(prompt, leg=leg, tools="", via_stdin=True)
-        if not ok:
-            STATE["unrecovered"].append("llm_score"); record_failure("llm_score", str(err), 0)
-            raise Unrecovered(f"llm_score: {err}")
-        return result
+        try:
+            ok, result, err = fh_claude_call(prompt, leg)
+            if ok and str(result).strip(): return result
+            log(f"claude_call returned no output ({str(err)[:120]}); falling back to the CLI", "WARN")
+        except Exception as e:
+            log(f"claude_call unusable ({e}); falling back to the CLI", "WARN")
     env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}   # SB hygiene
     exe = "claude.cmd" if os.name == "nt" else "claude"
     def run():
@@ -561,7 +577,8 @@ def one_pass(cfg, seen, pending, backfill):
         batch, queue = queue[:BATCH_MAX], queue[BATCH_MAX:]
         try:
             scored = llm_score_batch(batch)
-        except Unrecovered:                                    # scorer down: hold everything, publish nothing blank
+        except (Unrecovered, Exception) as e:                  # scorer down: hold everything, publish nothing blank
+            if not isinstance(e, Unrecovered): log(f"scoring failed: {e}", "ERROR")
             for q in batch + queue: pending.append(q["row"])
             log(f"llm unrecovered: {len(batch) + len(queue)} rows held in pending, none written", "WARN")
             queue = []
