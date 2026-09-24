@@ -172,6 +172,7 @@ def docs():
     return _svc["docs"]
 
 def read_tab(tab):
+    pace()
     r = sheets().values().get(spreadsheetId=SHEET_ID, range=f"{tab}!A1:Z500").execute()
     rows = r.get("values", [])
     return rows[1:] if rows else []
@@ -196,15 +197,36 @@ def load_config():
         if len(r) >= 2 and r[0].strip(): rules[r[0].strip().lower()] = r[1].strip()
     return src, mp, rules
 
+# Google quota is 60 reads and 60 writes per minute per user. Every Hits row costs several calls,
+# so a backlog used to trip RATE_LIMIT_EXCEEDED and spend the whole pass in backoff.
+API_CALLS = []
+API_PER_MIN = 45
+
+def pace(n=1):
+    """Block until n more Sheets calls fit inside the per-minute quota."""
+    while True:
+        now = time.time()
+        API_CALLS[:] = [t for t in API_CALLS if now - t < 60]
+        if len(API_CALLS) + n <= API_PER_MIN: break
+        time.sleep(min(60 - (now - API_CALLS[0]) + 0.5, 20))
+    API_CALLS.extend([time.time()] * n)
+
+_hits_sid = {}
 def hits_sheet_id():
-    meta = sheets().get(spreadsheetId=SHEET_ID, fields="sheets(properties(sheetId,title))").execute()
-    for s in meta["sheets"]:
-        if s["properties"]["title"] == "Hits": return s["properties"]["sheetId"]
-    raise RuntimeError("Hits tab missing")
+    """Cached: the Hits tab id never changes, and re-reading it per row burned the read quota."""
+    if "id" not in _hits_sid:
+        pace()
+        meta = sheets().get(spreadsheetId=SHEET_ID, fields="sheets(properties(sheetId,title))").execute()
+        for s in meta["sheets"]:
+            if s["properties"]["title"] == "Hits": _hits_sid["id"] = s["properties"]["sheetId"]; break
+        else:
+            raise RuntimeError("Hits tab missing")
+    return _hits_sid["id"]
 
 def write_hit_verified(row):
     """NOT: insert at row 2. WUD: re-read row 2 and confirm the headline is there."""
     sid = hits_sheet_id()
+    pace(3)
     sheets().batchUpdate(spreadsheetId=SHEET_ID, body={"requests": [{"insertDimension": {
         "range": {"sheetId": sid, "dimension": "ROWS", "startIndex": 1, "endIndex": 2}, "inheritFromBefore": False}}]}).execute()
     row = list(row) + [""] * (HITS_COLS - len(row))
@@ -356,6 +378,7 @@ def llm_watchdog(waiting):
 def ensure_price_header():
     """Once per config reload: make sure Hits!J1 says 'price at hit' (adds the column, touches nothing else)."""
     try:
+        pace(1)
         h = sheets().values().get(spreadsheetId=SHEET_ID, range="Hits!A1:J1").execute().get("values", [[]])[0]
         if len(h) < HITS_COLS or not h[HITS_COLS - 1].strip():
             sheets().values().update(spreadsheetId=SHEET_ID, range="Hits!J1", valueInputOption="USER_ENTERED",
