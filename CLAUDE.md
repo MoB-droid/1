@@ -56,3 +56,9 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Trade Map (ALWAYS)
+
+Before building or changing any Trade Map display, read `TRADE_MAP_SPEC.md`
+in this repo and follow it exactly. After any user-approved change, update
+that file (spec + change log), commit and push in the same session.
