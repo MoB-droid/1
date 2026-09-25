@@ -1,12 +1,12 @@
 {
   "ticker": "ASTS",
-  "stamp": "25 Sep 2026 · pre-market, 08:42 ET · re-scored 16:19 Israel after the final pre-market edition",
-  "updated": "2026-09-25T13:56:20Z",
+  "stamp": "25 Sep 2026 · 10:00 ET intraday · re-scored 10:36 ET",
+  "updated": "2026-09-25T14:52:00Z",
   "mode": "limit",
   "buy": 58.0,
   "sell": null,
   "stop": 54.14,
   "size": 10,
   "position": "6 sh @ 58.00",
-  "note": "second-half tranche (10 sh) arms at or under 58.00, $3.89 below the 61.89 pre-market print; hold 6 sh, trim watch 62.64 at close, stop 54.14 unchanged"
+  "note": "second-half buy 58.00 arms 10:45 ET or close, $3.82 below the 61.82 intraday print; hold 6 sh, trim watch 62.64 at close, stop 54.14 unchanged"
 }
