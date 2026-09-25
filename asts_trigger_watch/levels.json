@@ -1,12 +1,12 @@
 {
   "ticker": "ASTS",
-  "stamp": "25 Sep 2026 · 10:00 ET intraday · re-scored 10:36 ET",
-  "updated": "2026-09-25T14:52:00Z",
+  "stamp": "25 Sep 2026 · close · re-scored 16:41 ET",
+  "updated": "2026-09-25T20:56:09Z",
   "mode": "limit",
   "buy": 58.0,
   "sell": null,
   "stop": 54.14,
   "size": 10,
   "position": "6 sh @ 58.00",
-  "note": "second-half buy 58.00 arms 10:45 ET or close, $3.82 below the 61.82 intraday print; hold 6 sh, trim watch 62.64 at close, stop 54.14 unchanged"
+  "note": "second-half buy 58.00 arms Mon 10:45 ET or close, $3.81 below the 61.81 close; hold 6 sh, trim watch 62.64 no trigger today, stop 54.14 unchanged"
 }
