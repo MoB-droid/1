@@ -4,7 +4,7 @@ Read this BEFORE building or editing any Trade Map display. Every time.
 After the user approves a change to the Trade Map, update this file in the
 same session, commit and push. This file is the single source of truth.
 
-Last updated: 2026-09-25
+Last updated: 2026-09-25 (applied to the Trade Map artifact, v116)
 
 ## Structure
 
@@ -35,3 +35,8 @@ Last updated: 2026-09-25
 ## Change log
 
 - 2026-09-25: created from screenshot review; rules 1–4 added.
+- 2026-09-25: applied to Trade Map (https://claude.ai/artifact/PdNcLUaNjsyVrbPGUy4LLe v116): TODAY card now shows Today / Tomorrow / In N days by real ET date; label column capped at 35%; Expect = moves only, scenario rows = actions only, History once.
+
+## Where the Trade Map lives
+
+Artifact: https://claude.ai/artifact/PdNcLUaNjsyVrbPGUy4LLe (MAP data block is rewritten by routines; the renderer below it is what this spec governs). Spec artifact: https://claude.ai/artifact/UfWf3mhmb8KS6NitWjseEr
