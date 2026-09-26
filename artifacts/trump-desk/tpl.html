@@ -1,0 +1,184 @@
+<title>Trump Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --ground:#0a1a2f; --surface:#102843; --surface-2:#0e2138; --line:#22456e;
+  --ink:#dce9fa; --meta:#9ab6da; --muted:#6f92bd;
+  --accent:#5fb3ff; --accent-dim:#4d86c9;
+  --warn:#a8dcff;   /* emphasis: ice blue. orange retired 14 Sep 2026 */
+  --good:#5fd3a6; --bad:#f07a7a;
+  --serif:"Instrument Serif",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:21px;line-height:1.5;padding:0 22px;padding-block:28px 40px}
+.wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:26px;min-height:100vh}
+a{color:var(--accent)}
+b{color:var(--ink);font-weight:600}
+.head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--ink);padding-bottom:18px}
+.head svg{width:84px;height:84px;flex:none}
+h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margin:0;text-wrap:balance}
+.lbl{font-family:var(--mono);font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.head .lbl{margin-top:8px;font-size:14px}
+/* tabs */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tab{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);min-height:40px;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--ground)}
+.tab:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.tab .n{font-weight:600}
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);padding:0;display:flex;flex-direction:column}
+.card>.lbl{padding:16px 20px 12px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.card>.lbl .upd{color:var(--muted);letter-spacing:.08em;font-size:12px;text-transform:none}
+.item{border-top:1px solid var(--line);padding:16px 20px;display:flex;flex-direction:column;gap:8px}
+.item:first-of-type{border-top:0}
+.topic{font-size:18px;line-height:1.3;color:var(--ink);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.topic .t{flex:1}
+.stamp{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.stamp.hi{color:var(--warn)}
+.kv{display:grid;grid-template-columns:fit-content(35%) minmax(0,1fr);gap:4px 12px}
+.kv .k{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.kv .v{font-size:17px;color:var(--meta);font-variant-numeric:tabular-nums}
+.flag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;padding:3px 8px;white-space:nowrap;flex:none;line-height:1.2}
+.c-good{color:var(--good)}.c-warn{color:var(--warn)}.c-acc{color:var(--accent)}.c-mute{color:var(--muted)}.c-bad{color:var(--bad)}
+/* roadmap rows */
+.rd{border-top:1px solid var(--line);padding:0}
+.rd:first-of-type{border-top:0}
+.rd summary{list-style:none;display:grid;grid-template-columns:28px 1fr 30px;gap:10px 12px;align-items:start;cursor:pointer;padding:16px 20px}
+.rd summary::-webkit-details-marker{display:none}
+.rd .num{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--accent);padding-top:2px}
+.rd .body{display:flex;flex-direction:column;gap:4px;min-width:0}
+.rd .d{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.rd .d.hi{color:var(--warn)}
+.rd .t{font-size:17px;color:var(--ink);line-height:1.35}
+.rd .m{font-family:var(--mono);font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tg{width:30px;height:30px;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:18px;color:var(--accent)}
+.rd[open] .tg::before{content:"−"}.rd:not([open]) .tg::before{content:"+"}
+.rd .note{padding:0 20px 16px 50px;font-size:16px;color:var(--meta)}
+/* posts */
+.post .txt{font-size:16px;color:var(--meta);overflow-wrap:anywhere}
+.post .txt a{word-break:break-all}
+.post .src{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.media{font-size:15px;color:var(--muted);font-style:normal}
+.filter{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fbtn{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);min-height:32px;padding:4px 10px;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--accent);color:var(--ground)}
+.fbtn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.foot{font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.6}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="grain5-gold" x1="-200" y1="-320" x2="200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F9E27D"/><stop offset="0.45" stop-color="#D4A017"/><stop offset="0.75" stop-color="#B8860B"/><stop offset="1" stop-color="#E6C34A"/>
+    </linearGradient>
+    <path id="grain5-unit" d="M 36 0 C 36 -22, 54 -34, 76 -34 C 104 -34, 126 -20, 136 -7 C 180 -5, 240 -3, 305 -1.6 L 305 1.6 C 240 3, 180 5, 136 7 C 126 20, 104 34, 76 34 C 54 34, 36 22, 36 0 Z"/>
+    <symbol id="grain5" viewBox="-320 -320 640 640">
+      <g fill="url(#grain5-gold)">
+        <use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="head">
+    <svg aria-label="Grain 5 mark"><use href="#grain5"/></svg>
+    <div>
+      <h1>Trump Desk</h1>
+      <div class="lbl" id="stampline">trump tape · loading</div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Trump tape cards">
+    <button class="tab" role="tab" id="tab-hl" aria-controls="card-hl" aria-selected="true" data-card="hl"><span class="n">1</span>Highlights</button>
+    <button class="tab" role="tab" id="tab-rm" aria-controls="card-rm" aria-selected="false" data-card="rm"><span class="n">2</span>Roadmap</button>
+    <button class="tab" role="tab" id="tab-ts" aria-controls="card-ts" aria-selected="false" data-card="ts"><span class="n">3</span>Truth Social</button>
+  </div>
+
+  <section class="card" id="card-hl" role="tabpanel" aria-labelledby="tab-hl">
+    <div class="lbl"><span>1 · Highlights</span><span class="upd" data-upd></span></div>
+    <div id="hl"></div>
+  </section>
+
+  <section class="card" id="card-rm" role="tabpanel" aria-labelledby="tab-rm" hidden>
+    <div class="lbl"><span>2 · Roadmap of events</span><span class="upd" data-upd></span></div>
+    <div id="rm"></div>
+  </section>
+
+  <section class="card" id="card-ts" role="tabpanel" aria-labelledby="tab-ts" hidden>
+    <div class="lbl"><span>3 · Truth Social</span><span class="upd" data-upd></span></div>
+    <div class="filter" role="group" aria-label="Filter posts">
+      <button class="fbtn" id="f-all" aria-pressed="true" data-f="all">All</button>
+      <button class="fbtn" id="f-mk" aria-pressed="false" data-f="market">Market only</button>
+    </div>
+    <div id="ts"></div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+  var DATA=JSON.parse(document.getElementById('data').textContent);
+  var FLAG={positive:'c-good',negative:'c-warn',mix:'c-acc',market:'c-acc','no market':'c-mute',media:'c-mute',high:'c-warn',med:'c-acc',low:'c-mute'};
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function link(s){return esc(s).replace(/(https?:\/\/[^\s]+)/g,function(u){return '<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>'})}
+  function chip(f){return '<span class="flag '+(FLAG[f]||'c-mute')+'">'+esc(f)+'</span>'}
+  var filter='all';
+  function render(D){
+    var m=D.meta||{};
+    document.getElementById('stampline').textContent='trump tape · '+(m.updated||'');
+    document.querySelectorAll('[data-upd]').forEach(function(e){e.textContent='last updated '+(m.updated||'—')});
+    document.getElementById('hl').innerHTML=(D.highlights||[]).map(function(h){
+      return '<div class="item"><div class="topic"><span class="t">'+esc(h.topic)+'</span>'+chip(h.flag)+'</div>'+
+        '<div class="stamp">'+esc(h.stamp)+'</div>'+
+        '<div class="kv"><span class="k">Cause</span><span class="v">'+esc(h.cause)+'</span>'+
+        '<span class="k">Effect</span><span class="v">'+esc(h.effect)+'</span>'+
+        '<span class="k">Expect</span><span class="v">'+esc(h.expect)+'</span></div></div>';
+    }).join('')||'<div class="item"><div class="media">Nothing market-relevant in the window.</div></div>';
+    document.getElementById('rm').innerHTML=(D.roadmap||[]).map(function(r,i){
+      var hi=r.impact==='high'?' hi':'';
+      return '<details class="rd"'+(i<2?' open':'')+'><summary><span class="num">'+(i+1)+'</span><span class="body">'+
+        '<span class="d'+hi+'">'+esc(r.date)+' · '+esc(r.time)+'</span><span class="t">'+esc(r.title)+'</span>'+
+        '<span class="m">'+esc(r.meta)+' '+chip(r.impact)+'</span></span><span class="tg" aria-hidden="true"></span></summary>'+
+        '<div class="note">'+esc(r.note)+'</div></details>';
+    }).join('');
+    var posts=(D.posts||[]).filter(function(p){return filter==='all'||p.flag==='market'});
+    document.getElementById('ts').innerHTML=posts.map(function(p){
+      if(p.media){return '<div class="item post"><div class="topic"><span class="t media">'+p.media+' image/video post'+(p.media>1?'s':'')+', no text</span>'+chip('media')+'</div>'+
+        '<div class="stamp">'+esc(p.stamp)+(p.media>1?' → '+esc(p.last.split('· ')[1]):'')+'</div></div>'}
+      return '<div class="item post"><div class="topic"><span class="t">'+esc(p.topic)+'</span>'+chip(p.flag)+'</div>'+
+        '<div class="stamp'+(p.flag==='market'?' hi':'')+'">'+esc(p.stamp)+'</div>'+
+        '<div class="txt">'+link(p.text)+'</div>'+
+        '<div class="src"><a href="'+esc(p.url)+'" target="_blank" rel="noopener">source</a></div></div>';
+    }).join('')||'<div class="item"><div class="media">No posts match.</div></div>';
+    document.getElementById('foot').innerHTML='Window: '+esc(m.window||'')+'<br>Posts: '+esc(m.source_posts||'')+' · Schedule: '+esc(m.source_schedule||'')+'<br>Times ET (Israel in brackets). Grain 5 rules 6.9, 8.9, 9.7.';
+  }
+  render(DATA);
+  document.querySelectorAll('.tab').forEach(function(b){b.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected',x===b?'true':'false')});
+    ['hl','rm','ts'].forEach(function(k){document.getElementById('card-'+k).hidden=(k!==b.dataset.card)});
+    try{localStorage.setItem('td-tab',b.dataset.card)}catch(e){}
+  })});
+  document.querySelectorAll('.fbtn').forEach(function(b){b.addEventListener('click',function(){
+    filter=b.dataset.f;document.querySelectorAll('.fbtn').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});render(CUR);
+  })});
+  var CUR=DATA;
+  try{var t=localStorage.getItem('td-tab');if(t){var tb=document.querySelector('.tab[data-card="'+t+'"]');if(tb)tb.click()}}catch(e){}
+  if(location.hash==='#roadmap')document.getElementById('tab-rm').click();
+  if(location.hash==='#truth')document.getElementById('tab-ts').click();
+  // db: routines write desk/data; the page follows it live
+  if(window.claude&&window.claude.use){window.claude.use('db').then(function(db){
+    if(!db)return;
+    db.doc('desk/data').onSnapshot(function(snap){
+      if(snap.exists){var d=snap.data();if(d&&d.meta){CUR=d;render(d)}}
+    },function(){});
+  }).catch(function(){})}
+})();
+</script>
