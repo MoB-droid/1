@@ -56,3 +56,16 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Trump artifact — display rules
+
+- Trump info lives in ONE dedicated Trump artifact (single source of truth).
+  Other artifacts (e.g. Premarket News) read from it, never duplicate it.
+- Tapping "Trump tape" opens 3 cards:
+  1. Highlights
+  2. Roadmap of events (White House schedule, meetings, announcements) — timeline format
+  3. Truth Social announcements
+- Every item shown (announcement, event, highlight) MUST carry a date + time stamp
+  (ET, with Israel time in brackets), placed ON TOP of the item:
+  topic → date/time → information (same CAUSE/EFFECT/EXPECT layout as other cards).
+- Each card shows a "last updated" stamp.
