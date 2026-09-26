@@ -65,4 +65,5 @@ Trader, Premarket News, Daily Price, etc.). Grain 5 is the shared gold mark
 (artifact https://claude.ai/artifact/SNtHN6xbwhm6HQsPCHDfsD).
 Spelling rule: always write "Grain 5" (capital G, space, digit 5), never "grain5".
 Whenever the user saves a rule about trading artifacts, add it to this guidebook.
-URL: (not yet published)
+URL: https://claude.ai/artifact/2WXGQv6ySeY6uFmuHTttHi
+Rules are numbered by section (e.g. "Grain 5 rule 7.3"). Never renumber; retire instead.

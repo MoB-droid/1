@@ -1,0 +1,441 @@
+<title>Grain 5 Guidebook</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --ground:#0a1a2f;--surface:#102843;--surface-2:#0e2138;--line:#22456e;
+  --ink:#dce9fa;--muted:#6f92bd;--meta:#9ab6da;--accent:#5fb3ff;--accent-dim:#4d86c9;
+  --warn:#a8dcff;--good:#5fd3a6;--bad:#f07a7a;
+  --gold:#D4A017;
+  --serif:"Instrument Serif",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.5;padding:0 22px;padding-block:28px 60px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+a{color:var(--accent)}
+b{color:var(--ink);font-weight:600}
+/* header */
+.head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--ink);padding-bottom:18px}
+.head svg{width:84px;height:84px;flex:none}
+.head h1{font-family:var(--serif);font-weight:400;font-size:52px;line-height:.95;margin:0;text-wrap:balance}
+.lbl{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.head .lbl{margin-top:8px;font-size:14px}
+.note{background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--accent);padding:12px 16px;font-size:16px;color:var(--meta)}
+/* toc */
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 18px;font-family:var(--mono);font-size:14px}
+.toc a{text-decoration:none;color:var(--meta)}
+.toc a:hover{color:var(--accent)}
+.toc span{color:var(--accent);display:inline-block;min-width:2ch;margin-right:8px}
+/* sections */
+section{background:var(--surface);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px;scroll-margin-top:12px}
+section.alt{background:var(--surface-2)}
+h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.05;margin:0;display:flex;gap:14px;align-items:baseline}
+h2 .n{font-family:var(--mono);font-size:16px;color:var(--accent);letter-spacing:.06em}
+h3{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:6px 0 0}
+p{margin:0;color:var(--meta);max-width:65ch}
+/* numbered rules */
+ol.rules{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;counter-reset:r}
+ol.rules>li{display:grid;grid-template-columns:34px 1fr;gap:10px;counter-increment:r;border-top:1px solid var(--line);padding-top:8px;color:var(--meta)}
+ol.rules>li::before{content:counter(r);font-family:var(--mono);color:var(--accent);font-size:15px;font-weight:600;padding-top:2px}
+ol.rules>li:first-child{border-top:0;padding-top:0}
+code{font-family:var(--mono);font-size:.88em;color:var(--ink);background:var(--ground);border:1px solid var(--line);padding:1px 6px}
+/* tables */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-family:var(--mono);font-size:13.5px;font-variant-numeric:tabular-nums}
+th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--surface-2);text-align:left;padding:8px 8px;border-bottom:2px solid var(--meta);font-weight:500;white-space:nowrap}
+td{padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--meta)}
+td:first-child,th:first-child{color:var(--accent);width:2.5em}
+td.i{color:var(--ink);font-weight:600;white-space:nowrap}
+td.s{font-family:var(--sans);font-size:14.5px}
+.sw{display:inline-block;width:14px;height:14px;border:1px solid var(--line);vertical-align:-2px;margin-right:8px}
+/* chips */
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;padding:3px 8px;display:inline-block;line-height:1.2}
+.c-good{color:var(--good)}.c-warn{color:var(--warn)}.c-acc{color:var(--accent)}.c-mute{color:var(--muted)}.c-bad{color:var(--bad)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* type specimens */
+.spec{display:grid;grid-template-columns:150px 1fr;gap:10px 16px;align-items:baseline}
+.spec .lbl{font-size:11px}
+.sp-serif{font-family:var(--serif);font-size:38px;line-height:1}
+.sp-sans{font-family:var(--sans);font-size:17px;color:var(--meta)}
+.sp-mono{font-family:var(--mono);font-size:16px;font-weight:600}
+@media (max-width:520px){.spec{grid-template-columns:1fr}}
+/* example card */
+.card{background:var(--surface-2);border:1px solid var(--line);padding:0}
+.card .lbl{padding:16px 20px 0}
+.rd{border-top:1px solid var(--line);padding:16px 20px}
+.rd summary{list-style:none;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer}
+.rd summary::-webkit-details-marker{display:none}
+.rd .d{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--accent);font-variant-numeric:tabular-nums}
+.rd .t{font-size:17px;color:var(--ink)}
+.tg{width:30px;height:30px;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:18px;color:var(--accent)}
+.rd[open] .tg::before{content:"−"}.rd:not([open]) .tg::before{content:"+"}
+.st{margin:10px 0 0}
+.kv{display:grid;grid-template-columns:fit-content(35%) minmax(0,1fr);gap:4px 12px;margin-top:12px}
+.kv .k{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.kv .v{font-size:16px;color:var(--meta);font-variant-numeric:tabular-nums}
+.pos{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:12px}
+.ptab{display:grid;grid-template-columns:auto 1fr auto;column-gap:18px;row-gap:8px;font-family:var(--mono);font-size:17px;font-variant-numeric:tabular-nums;padding:16px 20px}
+.ptab .nm{font-weight:600;color:var(--ink)}.ptab .px{color:var(--meta);text-align:right}.ptab .pc{font-weight:600;text-align:right}
+/* code block */
+pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5;color:var(--meta)}
+.pre-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.copy{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);padding:5px 12px;cursor:pointer}
+.copy:hover{background:var(--accent);color:var(--ground)}
+.copy:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+/* log */
+.log{display:flex;flex-direction:column;gap:6px;font-size:15px;color:var(--meta)}
+.log span{font-family:var(--mono);color:var(--muted);font-size:13px;margin-right:10px}
+.grain{display:flex;gap:24px;align-items:flex-end;flex-wrap:wrap}
+.grain figure{margin:0;display:grid;gap:6px;justify-items:center}
+.grain figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
+.grain .dk{background:var(--ground);border:1px solid var(--line);padding:10px}
+.grain .lt{background:#FFFDF8;border:1px solid var(--line);padding:10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="grain5-gold" x1="-200" y1="-320" x2="200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F9E27D"/><stop offset="0.45" stop-color="#D4A017"/><stop offset="0.75" stop-color="#B8860B"/><stop offset="1" stop-color="#E6C34A"/>
+    </linearGradient>
+    <path id="grain5-unit" d="M 36 0 C 36 -22, 54 -34, 76 -34 C 104 -34, 126 -20, 136 -7 C 180 -5, 240 -3, 305 -1.6 L 305 1.6 C 240 3, 180 5, 136 7 C 126 20, 104 34, 76 34 C 54 34, 36 22, 36 0 Z"/>
+    <symbol id="grain5" viewBox="-320 -320 640 640">
+      <g fill="url(#grain5-gold)">
+        <use href="#grain5-unit" transform="rotate(270)"/><use href="#grain5-unit" transform="rotate(342)"/><use href="#grain5-unit" transform="rotate(54)"/><use href="#grain5-unit" transform="rotate(126)"/><use href="#grain5-unit" transform="rotate(198)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+<header class="head">
+  <svg aria-label="Grain 5 mark"><use href="#grain5"/></svg>
+  <div>
+    <h1>Grain 5 Guidebook</h1>
+    <div class="lbl">trading artifacts · rules &amp; graphics · living document · 26 Sep 2026</div>
+  </div>
+</header>
+
+<div class="note">Read before building or editing any trading artifact. Every rule has a number. Say "Grain 5 rule 7.3" to point at one. When a rule is approved in chat, it is added here the same day, then the change log is updated.</div>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#s1"><span>1</span>Artifacts covered</a>
+  <a href="#s2"><span>2</span>The Grain 5 mark</a>
+  <a href="#s3"><span>3</span>Colors</a>
+  <a href="#s4"><span>4</span>Typography</a>
+  <a href="#s5"><span>5</span>Page layout</a>
+  <a href="#s6"><span>6</span>Components</a>
+  <a href="#s7"><span>7</span>Number, date, time format</a>
+  <a href="#s8"><span>8</span>Content rules</a>
+  <a href="#s9"><span>9</span>Ownership &amp; data flow</a>
+  <a href="#s10"><span>10</span>Example built to spec</a>
+  <a href="#s11"><span>11</span>Known deviations</a>
+  <a href="#s12"><span>12</span>CSS tokens to copy</a>
+  <a href="#s13"><span>13</span>How to add a rule</a>
+  <a href="#s14"><span>14</span>Change log</a>
+</nav>
+
+<section id="s1">
+  <h2><span class="n">1</span>Artifacts covered</h2>
+  <p>The trading desk is one family of pages. All share the dark navy ground, the three typefaces and the square, borderless card language below.</p>
+  <div class="tw"><table>
+    <tr><th>#</th><th>Artifact</th><th>Job</th><th>Width</th><th>Base</th><th>Logo</th><th>Follows</th></tr>
+    <tr><td>1.1</td><td class="i"><a href="https://claude.ai/artifact/PdNcLUaNjsyVrbPGUy4LLe">Trade Map</a></td><td class="s">ASTS playbook: today card, event watch, roadmap analysis, numbers</td><td>480</td><td>18</td><td>no</td><td class="s">All, plus Trade Map Spec</td></tr>
+    <tr><td>1.2</td><td class="i"><a href="https://claude.ai/artifact/Ya7HuN4qbpa5V1kr3P7MVx">Ticker Desk</a></td><td class="s">Pivot point + roadmap per ticker; owns the roadmap</td><td>480</td><td>21</td><td>64</td><td class="s">All; orange still in use (11.2)</td></tr>
+    <tr><td>1.3</td><td class="i"><a href="https://claude.ai/artifact/88oBm5CZfdTvwTdQHHUWYC">Macro Desk</a></td><td class="s">Market macro update: numbers, 3 pillars, macro roadmap</td><td>480</td><td>21</td><td>84</td><td class="s">All</td></tr>
+    <tr><td>1.4</td><td class="i"><a href="https://claude.ai/artifact/PmKrqj3zfQU4865kdMhuZL">Premarket News</a></td><td class="s">Overnight edition: stories with Cause / Effect / Expect</td><td>480</td><td>21</td><td>84</td><td class="s">All</td></tr>
+    <tr><td>1.5</td><td class="i"><a href="https://claude.ai/artifact/SJ3JXkePMjEKDco5fjpfuP">Trader</a></td><td class="s">Trade ledger, totals, last run verdict</td><td>720</td><td>18</td><td>56</td><td class="s">All; wide table page (11.1)</td></tr>
+    <tr><td>1.6</td><td class="i"><a href="https://claude.ai/artifact/8RZcadAK6NhvTQFha3YqDW">Daily Price</a></td><td class="s">Watchlist table from Google Sheets, sparklines, history</td><td>1440</td><td>14</td><td>no</td><td class="s">Own light theme (11.3)</td></tr>
+    <tr><td>1.7</td><td class="i"><a href="https://claude.ai/artifact/UfWf3mhmb8KS6NitWjseEr">Trade Map Spec</a></td><td class="s">Display spec for the Trade Map only; its rules are folded into section 8</td><td>720</td><td>15</td><td>no</td><td class="s">Spec page, own look</td></tr>
+  </table></div>
+</section>
+
+<section id="s2" class="alt">
+  <h2><span class="n">2</span>The Grain 5 mark</h2>
+  <div class="grain">
+    <figure class="dk"><svg width="84" height="84"><use href="#grain5"/></svg><figcaption>84 · HEADER</figcaption></figure>
+    <figure class="dk"><svg width="64" height="64"><use href="#grain5"/></svg><figcaption>64 · HEADER</figcaption></figure>
+    <figure class="dk"><svg width="56" height="56"><use href="#grain5"/></svg><figcaption>56 · HEADER</figcaption></figure>
+    <figure class="dk"><svg width="24" height="24"><use href="#grain5"/></svg><figcaption>24 · INLINE</figcaption></figure>
+    <figure class="lt"><svg width="64" height="64"><use href="#grain5"/></svg><figcaption>ON LIGHT</figcaption></figure>
+  </div>
+  <ol class="rules">
+    <li>Spelling: always <b>Grain 5</b>. Capital G, one space, digit 5. Never "grain5" in text. The CSS ids stay <code>grain5-gold</code> and <code>grain5-unit</code>.</li>
+    <li>Five gold grains, one tail straight up. Gradient stops <code>#F9E27D</code> → <code>#D4A017</code> → <code>#B8860B</code> → <code>#E6C34A</code>, top-left to bottom-right.</li>
+    <li>Placement: in the page header only, left of the h1, vertically centred on the title block. Not repeated inside cards.</li>
+    <li>Size matches the title block height: 84 px when h1 is 60 px with a stamp line under it (Macro Desk, Premarket News); 64 px for Ticker Desk; 56 px on the wide Trader page.</li>
+    <li>Always inline SVG with the sprite from the <a href="https://claude.ai/artifact/SNtHN6xbwhm6HQsPCHDfsD">grain5 artifact</a>, <code>aria-label="Grain 5 mark"</code>. Never a raster image.</li>
+    <li>Trade Map and Daily Price do not carry the mark yet. Adding it is allowed and follows 2.3 and 2.4.</li>
+  </ol>
+</section>
+
+<section id="s3">
+  <h2><span class="n">3</span>Colors</h2>
+  <p>One dark theme. The desk pages hard-code these on <code>:root</code>; there is no light variant. Everything is blue-scale except the Grain 5 gold and the two signal greens/reds.</p>
+  <div class="tw"><table>
+    <tr><th>#</th><th>Token</th><th>Hex</th><th>Use</th></tr>
+    <tr><td>3.1</td><td class="i"><i class="sw" style="background:#0a1a2f"></i>--ground</td><td>#0a1a2f</td><td class="s">Page background. Also modal background.</td></tr>
+    <tr><td>3.2</td><td class="i"><i class="sw" style="background:#102843"></i>--surface</td><td>#102843</td><td class="s">Cards.</td></tr>
+    <tr><td>3.3</td><td class="i"><i class="sw" style="background:#0e2138"></i>--surface-2</td><td>#0e2138</td><td class="s">Nested cards, story rows, table headers, "last run" strip.</td></tr>
+    <tr><td>3.4</td><td class="i"><i class="sw" style="background:#22456e"></i>--line</td><td>#22456e</td><td class="s">All 1 px borders and row dividers.</td></tr>
+    <tr><td>3.5</td><td class="i"><i class="sw" style="background:#dce9fa"></i>--ink</td><td>#dce9fa</td><td class="s">Titles, bold values, the 3 px header rule.</td></tr>
+    <tr><td>3.6</td><td class="i"><i class="sw" style="background:#9ab6da"></i>--meta</td><td>#9ab6da</td><td class="s">Body text and card values.</td></tr>
+    <tr><td>3.7</td><td class="i"><i class="sw" style="background:#6f92bd"></i>--muted</td><td>#6f92bd</td><td class="s">Labels, stamps, captions, "waiting" state.</td></tr>
+    <tr><td>3.8</td><td class="i"><i class="sw" style="background:#5fb3ff"></i>--accent</td><td>#5fb3ff</td><td class="s">Dates, list numbers, links, buttons, "polling" state, mix flag.</td></tr>
+    <tr><td>3.9</td><td class="i"><i class="sw" style="background:#4d86c9"></i>--accent-dim</td><td>#4d86c9</td><td class="s">Negative peer moves in Ticker Desk, cluster rail.</td></tr>
+    <tr><td>3.10</td><td class="i"><i class="sw" style="background:#a8dcff"></i>--warn</td><td>#a8dcff</td><td class="s">Emphasis: ice blue. Highlighted roadmap dates, "pending" state, down flag. Orange retired 14 Sep 2026.</td></tr>
+    <tr><td>3.11</td><td class="i"><i class="sw" style="background:#5fd3a6"></i>--good</td><td>#5fd3a6</td><td class="s">Up moves, buy, "known" state, positive flag.</td></tr>
+    <tr><td>3.12</td><td class="i"><i class="sw" style="background:#f07a7a"></i>--bad</td><td>#f07a7a</td><td class="s">Losses, sold flag, "timed" state. Trade Map and Trader only.</td></tr>
+    <tr><td>3.13</td><td class="i"><i class="sw" style="background:#D4A017"></i>gold</td><td>#D4A017</td><td class="s">Grain 5 mark only. Never for text or chips.</td></tr>
+  </table></div>
+  <ol class="rules">
+    <li>No orange anywhere on the desk. Emphasis is ice blue <code>--warn</code>. Set by the user, 14 Sep 2026.</li>
+    <li>Negative numbers on Macro Desk and Premarket News use <code>--warn</code>, not red. Red <code>--bad</code> is only for money lost (Trader) and Trade Map price levels.</li>
+    <li>Signal colors (good / warn / bad) are never used as decoration. A color on a value always means a state.</li>
+    <li>New pages copy the token block in section 12 verbatim.</li>
+  </ol>
+</section>
+
+<section id="s4" class="alt">
+  <h2><span class="n">4</span>Typography</h2>
+  <div class="spec">
+    <div class="lbl">Instrument Serif 400</div><div class="sp-serif">Trade Map · Macro Desk</div>
+    <div class="lbl">IBM Plex Sans 400/500/600</div><div class="sp-sans">Values, body text, reasons. Buy ≤ $58.00 = 10 sh, then re-check at 09:45 ET.</div>
+    <div class="lbl">IBM Plex Mono 400/500/600</div><div class="sp-mono">25 SEP 2026 · 16:15 ET · +1.23% · $61.81</div>
+  </div>
+  <ol class="rules">
+    <li>Three faces, one Google Fonts link: <code>Instrument+Serif</code>, <code>IBM+Plex+Sans:wght@400;500;600</code>, <code>IBM+Plex+Mono:wght@400;500;600</code>. No other family.</li>
+    <li>Serif = titles only: h1 60 px (line-height 0.95), h2 26–34 px, ticker names 36 px, pillar titles. Weight 400, never bold.</li>
+    <li>Mono = every label, stamp, chip, date, time and number. Uppercase labels get letter-spacing 0.10–0.14 em. Numbers get <code>tabular-nums</code>.</li>
+    <li>Sans = values and prose. Card values 16–18 px in <code>--meta</code>; a bold inside a value is <code>--ink</code> 600.</li>
+    <li>Base size: 21 px on reading pages (Ticker Desk, Macro Desk, Premarket News), 18 px on dense pages (Trade Map, Trader).</li>
+    <li>Label sizes: stamp line 14–15 px, kv keys 12–13 px, chips 11–12 px, table headers 11 px.</li>
+  </ol>
+</section>
+
+<section id="s5">
+  <h2><span class="n">5</span>Page layout</h2>
+  <ol class="rules">
+    <li>Phone first. One column, <code>.wrap</code> max-width 480 px centred, padding <code>28px 22px 40px</code>, flex column, gap 26 px. Trader is 720 px because of its table.</li>
+    <li>Header: logo + h1 + stamp line, then a <b>3 px solid --ink</b> rule with 18 px padding below. This rule is the page's signature; never thinner, never a color.</li>
+    <li>Stamp line under the title, mono uppercase muted: <code>market macro update · 25 Sep 2026 · midday, 11:20 ET</code>. Parts joined by " · ".</li>
+    <li>Border radius 0 everywhere. Cards, chips, buttons and tables are square. Only exceptions: pill FABs (999 px) and the 9 px status dot.</li>
+    <li>No shadows on cards. Only the fixed FABs carry a shadow.</li>
+    <li>Cards: <code>--surface</code>, 1 px <code>--line</code> border, 20 px padding, 14 px inner gap. Nested rows use <code>--surface-2</code>.</li>
+    <li>Safe areas respected: fixed bottom bars add <code>env(safe-area-inset-bottom)</code>.</li>
+    <li>Nothing scrolls sideways except a table inside its own <code>overflow-x:auto</code> wrapper (Trader adds a sticky scroll proxy bar).</li>
+  </ol>
+</section>
+
+<section id="s6" class="alt">
+  <h2><span class="n">6</span>Components</h2>
+  <h3>6.1 Status chips and flags</h3>
+  <div class="chips">
+    <span class="chip c-good">known</span><span class="chip c-warn">pending</span><span class="chip c-mute">waiting</span><span class="chip c-acc">polling</span><span class="chip c-bad">timed</span>
+    <span class="chip c-good">up</span><span class="chip c-warn">down</span><span class="chip c-acc">mix</span><span class="chip c-mute">flat</span>
+    <span class="chip c-good">buy</span><span class="chip c-acc">sell</span><span class="chip c-warn">hold</span>
+  </div>
+  <ol class="rules">
+    <li>Chip: mono 11–12 px uppercase, 1 px border in <code>currentColor</code>, padding 3px 8px, no fill, no radius. Color is the state (section 3).</li>
+    <li>Event status set: KNOWN · PENDING · WAITING · POLLING · TIMED (Trade Map). Trade Map Spec names them PENDING / CONFIRMED / DONE / CANCELLED; map one to one when writing text.</li>
+    <li>Flag words: UP = two or more space names +3% or more while S&amp;P is not; DOWN = same at −3%; FLAT otherwise. Story flags: positive / negative / mix.</li>
+  </ol>
+  <h3>6.2 Folding rows (details)</h3>
+  <ol class="rules">
+    <li>A list item is a <code>&lt;details&gt;</code>: summary shows date or time (mono 18 px 600 accent) + title (17–18 px) + a 30 px square "+" toggle. "−" when open.</li>
+    <li>Rows are separated by 1 px <code>--line</code>, padding 16px 20px. The card holding them has padding 0 and a padded label on top.</li>
+    <li>Highlighted rows (<code>.hi</code>) show the date in <code>--warn</code>.</li>
+  </ol>
+  <h3>6.3 Key-value rows</h3>
+  <ol class="rules">
+    <li>Grid <code>fit-content(35%) minmax(0,1fr)</code>, gap 4px 12px. Label column at most 35% of the card, value column at least 65%. Labels may wrap to 2 lines; values never more than 4.</li>
+    <li>Keys mono 12–13 px uppercase muted. Values sans 16–18 px meta.</li>
+    <li>Fixed key sets: Trade Map today card = Outcome / Expect / one row per scenario / History / Fired. Event watch = Window / Last check / Checks / Outcome / Source / Fired. Roadmap and stories = Cause / Effect / Expect (Ticker Desk adds Exceptions; Trade Map adds Do).</li>
+  </ol>
+  <h3>6.4 Numbers block</h3>
+  <ol class="rules">
+    <li>Grid <code>auto 1fr auto</code>, column gap 18 px, row gap 8 px: name (mono 18 px 600 ink) · short note (sans 14 px meta) · value (mono 18–22 px 600, right-aligned, colored by sign).</li>
+    <li>Same card on Trade Map ("Numbers") and Macro Desk (7 rows: S&amp;P, Nasdaq, 10Y, Hike odds, Oil WTI, Gold, Dollar DXY). Label on top, 20 px padding.</li>
+  </ol>
+  <h3>6.5 Roadmap rows</h3>
+  <ol class="rules">
+    <li>Numbered rows: bold mono date (<code>30 Sep · after close</code>) + one-line description + mono 13–14 px meta line <code>Regulatory · confirmed · impact med</code> + impact chip + "+" that opens the note.</li>
+    <li>Same look on Ticker Desk, Macro Desk and Premarket News. Ticker Desk is the source (section 9).</li>
+  </ol>
+  <h3>6.6 Tables (Trader, Daily Price)</h3>
+  <ol class="rules">
+    <li>Outer border 2 px <code>--meta</code>, cell borders 1 px <code>--line</code>, header row <code>--surface-2</code> with 2 px bottom rule. Cells mono 14 px tabular, right-aligned, first column left, date centred, height 40 px.</li>
+    <li>Side chips inside cells: buy good, sell accent, hold warn, flat muted. New rows tinted <code>rgba(95,179,255,.10)</code>.</li>
+  </ol>
+  <h3>6.7 Buttons</h3>
+  <ol class="rules">
+    <li>Outlined only: mono 11–14 px uppercase, 1 px <code>--accent</code> border, accent text, min-height 36 px, no fill. Hover inverts.</li>
+    <li>Fixed pill FABs (Back / Log) sit bottom left and right, <code>--surface</code> fill, 1 px accent border.</li>
+  </ol>
+  <h3>6.8 Position line</h3>
+  <ol class="rules">
+    <li>Last line of a Trade Map card, mono 12–13 px muted: <code>$58.00 = 10 sh (unchanged); 6 sh held, 25-share max</code>.</li>
+  </ol>
+</section>
+
+<section id="s7">
+  <h2><span class="n">7</span>Number, date, time format</h2>
+  <div class="tw"><table>
+    <tr><th>#</th><th>Item</th><th>Write</th><th>Not</th></tr>
+    <tr><td>7.1</td><td class="i">Price</td><td>$61.81 · $1,777.80</td><td class="s">61.81 USD, $1777.8</td></tr>
+    <tr><td>7.2</td><td class="i">Percent</td><td>+1.23% · −6.68%</td><td class="s">+1.23 %, -6.68% (hyphen), 1.23 pct</td></tr>
+    <tr><td>7.3</td><td class="i">Minus sign</td><td>− (U+2212)</td><td class="s">- (hyphen) in any number</td></tr>
+    <tr><td>7.4</td><td class="i">Range</td><td>61.06 → 61.81 · UP 3–6%</td><td class="s">61.06-61.81, 3 to 6 %</td></tr>
+    <tr><td>7.5</td><td class="i">Date</td><td>25 Sep 2026 · 25 Sep · Mon 28 Sep 2026</td><td class="s">09/25/2026, Sep 25, 2026-09-25 in UI</td></tr>
+    <tr><td>7.6</td><td class="i">Date header</td><td>TODAY · MON 28 SEP 2026 · IN 3 DAYS · MON 28 SEP 2026</td><td class="s">"Today" on a card whose date is not the real ET date</td></tr>
+    <tr><td>7.7</td><td class="i">Time</td><td>08:15 ET · 16:41 ET · 01:09 ET (08:09 Israel)</td><td class="s">8:15am, 16:41 EST, 4:41 PM</td></tr>
+    <tr><td>7.8</td><td class="i">Window</td><td>08:10–09:45 ET, every 2 min</td><td class="s">from 8:10 to 9:45</td></tr>
+    <tr><td>7.9</td><td class="i">Shares</td><td>6 sh @ $58.00 · 10 sh</td><td class="s">6 shares, 10 units</td></tr>
+    <tr><td>7.10</td><td class="i">Basis points</td><td>+5bp · ~65%</td><td class="s">5 bps, approx. 65 percent</td></tr>
+    <tr><td>7.11</td><td class="i">Separator</td><td>a · b · c (middle dot, spaces)</td><td class="s">a | b, a - b, a, b</td></tr>
+    <tr><td>7.12</td><td class="i">Empty value</td><td>—</td><td class="s">n/a, null, blank</td></tr>
+    <tr><td>7.13</td><td class="i">Ledger date</td><td>25 Sep 26</td><td class="s">Trader table only; elsewhere 7.5</td></tr>
+  </table></div>
+  <ol class="rules">
+    <li>All numbers, dates and times in Plex Mono with <code>tabular-nums</code>.</li>
+    <li>Times are 24-hour, always with the zone. ET is the desk clock; Israel time only as a second value in parentheses.</li>
+    <li>"TODAY" only when the event date equals the real current ET date. Otherwise "Tomorrow", "In N days", or the plain weekday.</li>
+  </ol>
+</section>
+
+<section id="s8" class="alt">
+  <h2><span class="n">8</span>Content rules</h2>
+  <ol class="rules">
+    <li>Each card value is at most 25 words. Numbers and the action; cut the prose.</li>
+    <li>No number is repeated across rows of one card. Past moves go once, in the HISTORY row.</li>
+    <li>EXPECT holds the moves only (<code>UP 3–6% clean flight · DOWN 5–7% slip</code>). Scenario rows hold the action only (<code>Buy ≤ $58.00 = 10 sh</code>).</li>
+    <li>Driver template for every story, pillar and roadmap note: Cause / Effect / Expect, each ≤ 25 words, plain words, no jargon. Ticker Desk adds Exceptions.</li>
+    <li>Read line: one sentence that says what the numbers mean, right under the numbers.</li>
+    <li>Every page shows its own stamp: date, session (open+30 / midday / close / overnight) and the time it was rendered, in ET.</li>
+    <li>Change notes live in the page as comments with date and "Moran" when the user asked for them, and in this guidebook's change log.</li>
+    <li>Sample data is labelled as such. Never show example numbers as live.</li>
+  </ol>
+</section>
+
+<section id="s9">
+  <h2><span class="n">9</span>Ownership &amp; data flow</h2>
+  <ol class="rules">
+    <li>Ticker Desk owns the roadmap. Trade Map analyses it and Premarket News shows it; neither edits it.</li>
+    <li>Trade Map owns the plan (buy line, stop, trim, size). Other pages quote its numbers, never recompute them.</li>
+    <li>Trader owns the ledger and the last-run verdict; profit on sells uses oldest lots first.</li>
+    <li>Daily Price reads the Google Sheet as is; day change, price, YTD and since-dip are the sheet's own columns.</li>
+    <li>Routines rewrite the data blocks; the renderer below each block is what this guidebook governs. Do not hand-edit data blocks.</li>
+    <li>Run clock (ET): Ticker Desk 10:00 and 16:15 · Trade Map re-score 10:30 and 16:30 · Trader 10:45, 15:50, 16:45 · scheduler 05:20 and 17:20.</li>
+  </ol>
+</section>
+
+<section id="s10" class="alt">
+  <h2><span class="n">10</span>Example built to spec</h2>
+  <p>A Trade Map event card and a numbers block, rendered with the tokens on this page. Sample data.</p>
+  <div class="card">
+    <div class="lbl">Today · Mon 28 Sep 2026 · sample</div>
+    <details class="rd" open>
+      <summary><span class="d">08:15 ET</span><span class="t">SpaceX Starship Flight 14 orbital debut, NET 28 Sep</span><span class="tg" aria-hidden="true"></span></summary>
+      <div class="st"><span class="chip c-warn">pending</span></div>
+      <div class="kv">
+        <span class="k">Outcome</span><span class="v">Pending · polling 08:10–09:45 ET, every 2 min</span>
+        <span class="k">Expect</span><span class="v">UP 3–6% clean flight · DOWN 5–7% slip or failure. Sector-wide, ASTS with it.</span>
+        <span class="k">Flew clean</span><span class="v"><b>Buy ≤ $58.00 = 10 sh</b></span>
+        <span class="k">Slipped / failed</span><span class="v">No buy. Re-check 09:45 ET.</span>
+        <span class="k">History</span><span class="v">21 Sep date-confirm +5.76% · last slip −6.68%</span>
+      </div>
+      <div class="pos">$58.00 = 10 sh (unchanged); 6 sh held, 25-share max</div>
+    </details>
+  </div>
+  <div class="card">
+    <div class="lbl">Numbers · 25 Sep 2026 · 16:41 ET · close · sample</div>
+    <div class="ptab">
+      <span class="nm">ASTS</span><span class="px">$61.81</span><span class="pc c-good">+1.23%</span>
+      <span class="nm">Buy line</span><span class="px">limit</span><span class="pc">$58.00</span>
+      <span class="nm">Stop</span><span class="px">hard</span><span class="pc c-bad">$54.14</span>
+      <span class="nm">Trim</span><span class="px">+8% at 15:50 ET</span><span class="pc c-good">$62.64</span>
+      <span class="nm">S&amp;P</span><span class="px">6,643.70</span><span class="pc c-warn">−0.50%</span>
+    </div>
+  </div>
+</section>
+
+<section id="s11">
+  <h2><span class="n">11</span>Known deviations</h2>
+  <p>Where a live page differs from the rules above. Fix when the page is next edited, unless listed as kept.</p>
+  <ol class="rules">
+    <li><b>Trader</b>: 720 px wrap and full-screen modal, kept for the ledger table. Still uses orange <code>--warn #f0a35e</code> for hold / no-go; move to ice blue on next edit (rule 3.1).</li>
+    <li><b>Ticker Desk</b>: still uses orange <code>--warn #f0a35e</code> for the no-go flag; move to ice blue on next edit (rule 3.1).</li>
+    <li><b>Daily Price</b>: light theme by default with a system dark theme, IBM Plex Sans Condensed titles, 10 px radius tiles, 1440 px wrap. Kept as a data table page outside the desk look. Its number and date format follows section 7.</li>
+    <li><b>Trade Map</b> and <b>Daily Price</b>: no Grain 5 mark in the header (rule 2.6).</li>
+    <li><b>Trade Map Spec</b> page: blue light-and-dark spec look, "+5.76 %" with a space. Superseded by this guidebook; section 7 (no space) wins.</li>
+  </ol>
+</section>
+
+<section id="s12" class="alt">
+  <h2><span class="n">12</span>CSS tokens to copy</h2>
+  <div class="pre-head"><p>Paste at the top of every new desk page.</p><button class="copy" type="button" data-target="tok">Copy</button></div>
+<pre><code id="tok">&lt;link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap"&gt;
+&lt;style&gt;
+:root{
+  color-scheme:dark;
+  --ground:#0a1a2f; --surface:#102843; --surface-2:#0e2138; --line:#22456e;
+  --ink:#dce9fa; --meta:#9ab6da; --muted:#6f92bd;
+  --accent:#5fb3ff; --accent-dim:#4d86c9;
+  --warn:#a8dcff;   /* emphasis: ice blue. orange retired 14 Sep 2026 */
+  --good:#5fd3a6; --bad:#f07a7a;
+  --serif:"Instrument Serif",Georgia,serif;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:21px;line-height:1.5;padding:0 22px;padding-block:28px 40px}
+.wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:26px;min-height:100vh}
+.head{display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--ink);padding-bottom:18px}
+.head svg{width:84px;height:84px}
+h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margin:0}
+.lbl{font-family:var(--mono);font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px}
+.kv{display:grid;grid-template-columns:fit-content(35%) minmax(0,1fr);gap:4px 12px}
+.kv .k{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kv .v{font-size:17px;color:var(--meta);font-variant-numeric:tabular-nums}
+.flag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid currentColor;padding:3px 8px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+&lt;/style&gt;</code></pre>
+</section>
+
+<section id="s13">
+  <h2><span class="n">13</span>How to add a rule</h2>
+  <ol class="rules">
+    <li>User approves a change in chat ("save this as a rule").</li>
+    <li>Add it to the right section here, with the next number. Never renumber old rules; retire them with "(retired DATE)" instead.</li>
+    <li>Add a line to the change log (section 14) with the date and the rule number.</li>
+    <li>Apply it to the page it came from in the same session. If other pages break the new rule, list them in section 11.</li>
+    <li>Republish this guidebook. Commit the spec note in the repo.</li>
+  </ol>
+</section>
+
+<section id="s14" class="alt">
+  <h2><span class="n">14</span>Change log</h2>
+  <div class="log">
+    <div><span>2026-09-26</span>Created. Built from Trade Map, Ticker Desk, Macro Desk, Premarket News, Trader, Daily Price and the Trade Map Spec. Sections 1–13.</div>
+    <div><span>2026-09-26</span>Name set to "Grain 5 Guidebook"; spelling rule 2.1.</div>
+    <div><span>2026-09-25</span>Trade Map Spec rules 1–5 folded in as 6.3.1, 7.3, 8.1, 8.2, 8.3.</div>
+    <div><span>2026-09-23</span>Numbers block (6.4) and pillar / roadmap rows (6.2, 6.5) fixed on Macro Desk by Moran.</div>
+    <div><span>2026-09-19</span>Driver template Cause / Effect / Exceptions / Expect fixed by Moran (8.4).</div>
+    <div><span>2026-09-14</span>Orange retired; emphasis is ice blue (3.1).</div>
+  </div>
+</section>
+
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.addEventListener('click',function(){
+    var el=document.getElementById(b.dataset.target);var t=el.textContent;
+    function done(l){b.textContent=l;setTimeout(function(){b.textContent='Copy'},1400);}
+    try{navigator.clipboard.writeText(t).then(function(){done('Copied')},function(){sel()});}catch(e){sel()}
+    function sel(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);done('Selected');}
+  });
+});
+</script>
