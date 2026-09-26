@@ -69,3 +69,6 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
   (ET, with Israel time in brackets), placed ON TOP of the item:
   topic → date/time → information (same CAUSE/EFFECT/EXPECT layout as other cards).
 - Each card shows a "last updated" stamp.
+- Trump Desk artifact: https://claude.ai/artifact/2xvhwAa31RypVqW1mWwDkK (data doc `desk/data`).
+  Routines (ET): 00:45 daily · 09:40 and 16:03 weekdays · Sun 17:59. Always before its readers.
+  Ad-hoc keyword-triggered runs: deferred by user (credit cost).
