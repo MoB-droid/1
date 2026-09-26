@@ -57,11 +57,12 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
 
-# Graphic Guidebook grain5 (trading artifacts rulebook)
+# Grain 5 Guidebook (trading artifacts rulebook)
 
-Artifact name: "Graphic Guidebook grain5". It holds every rule, regulation and
+Artifact name: "Grain 5 Guidebook". It holds every rule, regulation and
 graphic standard for the trading artifacts (Trade Map, Ticker Desk, Macro Desk,
-Trader, Premarket News, Daily Price, etc.). grain5 is the shared gold mark
+Trader, Premarket News, Daily Price, etc.). Grain 5 is the shared gold mark
 (artifact https://claude.ai/artifact/SNtHN6xbwhm6HQsPCHDfsD).
+Spelling rule: always write "Grain 5" (capital G, space, digit 5), never "grain5".
 Whenever the user saves a rule about trading artifacts, add it to this guidebook.
 URL: (not yet published)
