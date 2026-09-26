@@ -131,7 +131,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
   <a href="#s7"><span>7</span>Number, date, time format</a>
   <a href="#s8"><span>8</span>Content rules</a>
   <a href="#s9"><span>9</span>Ownership &amp; data flow</a>
-  <a href="#s10"><span>10</span>Example built to spec</a>
+  <a href="#s10"><span>10</span>Trade Map structure &amp; example</a>
   <a href="#s11"><span>11</span>Known deviations</a>
   <a href="#s12"><span>12</span>CSS tokens to copy</a>
   <a href="#s13"><span>13</span>How to add a rule</a>
@@ -149,7 +149,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <tr><td>1.4</td><td class="i"><a href="https://claude.ai/artifact/PmKrqj3zfQU4865kdMhuZL">Premarket News</a></td><td class="s">Overnight edition: stories with Cause / Effect / Expect</td><td>480</td><td>21</td><td>84</td><td class="s">All</td></tr>
     <tr><td>1.5</td><td class="i"><a href="https://claude.ai/artifact/SJ3JXkePMjEKDco5fjpfuP">Trader</a></td><td class="s">Trade ledger, totals, last run verdict</td><td>720</td><td>18</td><td>56</td><td class="s">All; wide table page (11.1)</td></tr>
     <tr><td>1.6</td><td class="i"><a href="https://claude.ai/artifact/8RZcadAK6NhvTQFha3YqDW">Daily Price</a></td><td class="s">Watchlist table from Google Sheets, sparklines, history</td><td>1440</td><td>14</td><td>no</td><td class="s">Own light theme (11.3)</td></tr>
-    <tr><td>1.7</td><td class="i"><a href="https://claude.ai/artifact/UfWf3mhmb8KS6NitWjseEr">Trade Map Spec</a></td><td class="s">Display spec for the Trade Map only; its rules are folded into section 8</td><td>720</td><td>15</td><td>no</td><td class="s">Spec page, own look</td></tr>
+    <tr><td>1.7</td><td class="i"><a href="https://claude.ai/artifact/UfWf3mhmb8KS6NitWjseEr">Trade Map Spec</a></td><td class="s">Old display spec for the Trade Map. Fully absorbed into sections 6, 7, 8, 10 and 14; safe to delete</td><td>720</td><td>15</td><td>no</td><td class="s">Superseded</td></tr>
   </table></div>
 </section>
 
@@ -333,7 +333,22 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
 </section>
 
 <section id="s10" class="alt">
-  <h2><span class="n">10</span>Example built to spec</h2>
+  <h2><span class="n">10</span>Trade Map structure &amp; example</h2>
+  <p>Carried over from the Trade Map Spec (25 Sep 2026). Governs the renderer of the <a href="https://claude.ai/artifact/PdNcLUaNjsyVrbPGUy4LLe">Trade Map</a>; the MAP data block above it is rewritten by routines.</p>
+  <ol class="rules">
+    <li>Screen title: "Trade Map". Sub-title h2 "ASTS Playbook" with stamp <code>ASTS · 25 Sep 2026 · close · re-scored 16:41 ET</code>.</li>
+    <li>Events grouped under a date header, mono uppercase: <code>TODAY · MON 28 SEP 2026</code> / <code>IN 3 DAYS · MON 28 SEP 2026</code> / <code>TUE 29 SEP 2026</code>. Date label follows rule 7.3.</li>
+    <li>One card per event, in this order: time + zone bold (<code>08:15 ET</code>) then a one-sentence headline; status chip; key-value rows; position line.</li>
+    <li>Status chip set: PENDING / CONFIRMED / DONE / CANCELLED (Trade Map Spec names). Renderer classes: pending = warn, known / confirmed = good, waiting = muted, polling = accent, timed = bad.</li>
+    <li>Row order: OUTCOME · EXPECT · one row per scenario (move + action) · HISTORY. OUTCOME shows the result, or <code>Pending · polling 08:10–09:45 ET, every 2 min</code>.</li>
+    <li>EXPECT: one line per direction, e.g. <code>UP 3–6% clean flight · DOWN 5–7% slip/failure</code>. Scenario rows (FLEW CLEAN / SLIPPED / FAILED): the action only, e.g. <code>Buy ≤ $58.00 = 10 sh</code>.</li>
+    <li>Position line closes the card: <code>$58.00 = 10 sh (unchanged); 6 sh held, 25-share max</code>.</li>
+    <li>Layout: label column ≤ 35%, value column ≥ 65% (6.3.1); values ≤ 25 words (8.1); no number repeated, History once (8.2, 8.3).</li>
+    <li>Safety rules shown on the map: Stop · Trail 15% (17 Sep) · Event exit · Trim +8% at 15:50 ET (18 Sep) · Max size 50% of cash / 25 sh (23 Sep).</li>
+    <li>Event day cycle, 7 steps: Tag → Plan → Schedule → Poll → Update → Fire → Pass (24–25 Sep).</li>
+    <li>Process: after every approved change to the Trade Map, update this guidebook in the same session, commit, push. This page is the single source of truth; the old TRADE_MAP_SPEC.md file is retired.</li>
+  </ol>
+  <h3>10.12 Example built to spec</h3>
   <p>A Trade Map event card and a numbers block, rendered with the tokens on this page. Sample data.</p>
   <div class="card">
     <div class="lbl">Today · Mon 28 Sep 2026 · sample</div>
@@ -370,7 +385,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li><b>Ticker Desk</b>: still uses orange <code>--warn #f0a35e</code> for the no-go flag; move to ice blue on next edit (rule 3.1).</li>
     <li><b>Daily Price</b>: light theme by default with a system dark theme, IBM Plex Sans Condensed titles, 10 px radius tiles, 1440 px wrap. Kept as a data table page outside the desk look. Its number and date format follows section 7.</li>
     <li><b>Trade Map</b> and <b>Daily Price</b>: no Grain 5 mark in the header (rule 2.6).</li>
-    <li><b>Trade Map Spec</b> page: blue light-and-dark spec look, "+5.76 %" with a space. Superseded by this guidebook; section 7 (no space) wins.</li>
+    <li><b>Trade Map Spec</b> page: blue light-and-dark spec look, "+5.76 %" with a space. Fully absorbed here (section 10); section 7 (no space) wins. The page can be deleted.</li>
   </ol>
 </section>
 
@@ -421,7 +436,10 @@ h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margi
   <div class="log">
     <div><span>2026-09-26</span>Created. Built from Trade Map, Ticker Desk, Macro Desk, Premarket News, Trader, Daily Price and the Trade Map Spec. Sections 1–13.</div>
     <div><span>2026-09-26</span>Name set to "Grain 5 Guidebook"; spelling rule 2.1.</div>
+    <div><span>2026-09-26</span>Trade Map Spec absorbed in full: structure, chip set, row order, position line, safety rules, event-day cycle and its change log moved to section 10. Trade Map Spec artifact and TRADE_MAP_SPEC.md retired.</div>
     <div><span>2026-09-25</span>Trade Map Spec rules 1–5 folded in as 6.3.1, 7.3, 8.1, 8.2, 8.3.</div>
+    <div><span>2026-09-25</span>Trade Map Spec applied to Trade Map v116: real-date label (Today / Tomorrow / In N days by ET date), label column capped at 35%, Expect = moves only, scenario rows = actions only, History once.</div>
+    <div><span>2026-09-25</span>Trade Map Spec created from screenshot review; rules 1–4 added.</div>
     <div><span>2026-09-23</span>Numbers block (6.4) and pillar / roadmap rows (6.2, 6.5) fixed on Macro Desk by Moran.</div>
     <div><span>2026-09-19</span>Driver template Cause / Effect / Exceptions / Expect fixed by Moran (8.4).</div>
     <div><span>2026-09-14</span>Orange retired; emphasis is ice blue (3.1).</div>

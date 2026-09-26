@@ -67,3 +67,4 @@ Spelling rule: always write "Grain 5" (capital G, space, digit 5), never "grain5
 Whenever the user saves a rule about trading artifacts, add it to this guidebook.
 URL: https://claude.ai/artifact/2WXGQv6ySeY6uFmuHTttHi
 Rules are numbered by section (e.g. "Grain 5 rule 7.3"). Never renumber; retire instead.
+Supersedes TRADE_MAP_SPEC.md and the Trade Map Spec artifact (both retired 26 Sep 2026).
