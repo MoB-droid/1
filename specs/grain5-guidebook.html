@@ -22,7 +22,7 @@ b{color:var(--ink);font-weight:600}
 .head h1{font-family:var(--serif);font-weight:400;font-size:52px;line-height:.95;margin:0;text-wrap:balance}
 .lbl{font-family:var(--mono);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .head .lbl{margin-top:8px;font-size:14px}
-.note{background:var(--surface-2);border:1px solid var(--line);border-left:4px solid var(--accent);padding:12px 16px;font-size:16px;color:var(--meta)}
+.note{background:var(--surface-2);border:1px solid var(--line);padding:12px 16px;font-size:16px;color:var(--meta)}
 /* toc */
 .toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px 18px;font-family:var(--mono);font-size:14px}
 .toc a{text-decoration:none;color:var(--meta)}
@@ -227,6 +227,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li>Cards: <code>--surface</code>, 1 px <code>--line</code> border, 20 px padding, 14 px inner gap. Nested rows use <code>--surface-2</code>.</li>
     <li>Safe areas respected: fixed bottom bars add <code>env(safe-area-inset-bottom)</code>.</li>
     <li>Nothing scrolls sideways except a table inside its own <code>overflow-x:auto</code> wrapper (Trader adds a sticky scroll proxy bar).</li>
+    <li>No thick accent line on the left of any box. Notes, strips and cards use the plain 1 px <code>--line</code> border on all sides. Set by the user, 26 Sep 2026.</li>
   </ol>
 </section>
 
@@ -385,7 +386,8 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li><b>Ticker Desk</b>: still uses orange <code>--warn #f0a35e</code> for the no-go flag; move to ice blue on next edit (rule 3.1).</li>
     <li><b>Daily Price</b>: light theme by default with a system dark theme, IBM Plex Sans Condensed titles, 10 px radius tiles, 1440 px wrap. Kept as a data table page outside the desk look. Its number and date format follows section 7.</li>
     <li><b>Trade Map</b> and <b>Daily Price</b>: no Grain 5 mark in the header (rule 2.6).</li>
-    <li><b>Trade Map Spec</b> page: blue light-and-dark spec look, "+5.76 %" with a space. Fully absorbed here (section 10); section 7 (no space) wins. The page can be deleted.</li>
+    <li><b>Trade Map Spec</b> page: deleted 26 Sep 2026. Fully absorbed here (section 10); section 7 (no space) wins.</li>
+    <li><b>Trader</b> "last run" strip has a 4 px accent line on the left; <b>Ticker Desk</b> has an unused 5 px cluster rail in CSS. Remove on next edit (rule 5.9).</li>
   </ol>
 </section>
 
@@ -434,6 +436,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margi
 <section id="s14" class="alt">
   <h2><span class="n">14</span>Change log</h2>
   <div class="log">
+    <div><span>2026-09-26</span>Rule 5.9: no thick left accent line on boxes. Removed from this page's note; Trader and Ticker Desk listed in 11.6. Trade Map Spec artifact deleted.</div>
     <div><span>2026-09-26</span>Created. Built from Trade Map, Ticker Desk, Macro Desk, Premarket News, Trader, Daily Price and the Trade Map Spec. Sections 1–13.</div>
     <div><span>2026-09-26</span>Name set to "Grain 5 Guidebook"; spelling rule 2.1.</div>
     <div><span>2026-09-26</span>Trade Map Spec absorbed in full: structure, chip set, row order, position line, safety rules, event-day cycle and its change log moved to section 10. Trade Map Spec artifact and TRADE_MAP_SPEC.md retired.</div>
