@@ -92,6 +92,16 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
 .grain figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
 .grain .dk{background:var(--ground);border:1px solid var(--line);padding:10px}
 .grain .lt{background:#FFFDF8;border:1px solid var(--line);padding:10px}
+/* 6.10 sample: tab row + sub-filter row */
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tab{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);min-height:40px;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--ground)}
+.tab:focus-visible,.fbtn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.tab .n{font-weight:600}
+.filter{display:flex;gap:8px;padding:12px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fbtn{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);min-height:32px;padding:4px 10px;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--accent);color:var(--ground)}
+.sample-stack{display:flex;flex-direction:column;gap:14px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -149,7 +159,8 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <tr><td>1.4</td><td class="i"><a href="https://claude.ai/artifact/PmKrqj3zfQU4865kdMhuZL">Premarket News</a></td><td class="s">Overnight edition: stories with Cause / Effect / Expect</td><td>480</td><td>21</td><td>84</td><td class="s">All</td></tr>
     <tr><td>1.5</td><td class="i"><a href="https://claude.ai/artifact/SJ3JXkePMjEKDco5fjpfuP">Trader</a></td><td class="s">Trade ledger, totals, last run verdict</td><td>720</td><td>18</td><td>56</td><td class="s">All; wide table page (11.1)</td></tr>
     <tr><td>1.6</td><td class="i"><a href="https://claude.ai/artifact/8RZcadAK6NhvTQFha3YqDW">Daily Price</a></td><td class="s">Watchlist table from Google Sheets, sparklines, history</td><td>1440</td><td>14</td><td>no</td><td class="s">Own light theme (11.3)</td></tr>
-    <tr><td>1.7</td><td class="i"><a href="https://claude.ai/artifact/UfWf3mhmb8KS6NitWjseEr">Trade Map Spec</a></td><td class="s">Old display spec for the Trade Map. Fully absorbed into sections 6, 7, 8, 10 and 14; safe to delete</td><td>720</td><td>15</td><td>no</td><td class="s">Superseded</td></tr>
+    <tr><td>1.7</td><td class="i">Trade Map Spec</td><td class="s">Old display spec for the Trade Map. Fully absorbed into sections 6, 7, 8, 10 and 14. Deleted 26 Sep 2026</td><td>720</td><td>15</td><td>no</td><td class="s">Retired</td></tr>
+    <tr><td>1.8</td><td class="i"><a href="https://claude.ai/artifact/2xvhwAa31RypVqW1mWwDkK">Trump Desk</a></td><td class="s">Single source for all Trump info: Highlights, Roadmap of events, Truth Social posts (6.9, 9.7). Data doc <code>desk/data</code></td><td>480</td><td>21</td><td>84</td><td class="s">All</td></tr>
   </table></div>
 </section>
 
@@ -227,7 +238,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li>Cards: <code>--surface</code>, 1 px <code>--line</code> border, 20 px padding, 14 px inner gap. Nested rows use <code>--surface-2</code>.</li>
     <li>Safe areas respected: fixed bottom bars add <code>env(safe-area-inset-bottom)</code>.</li>
     <li>Nothing scrolls sideways except a table inside its own <code>overflow-x:auto</code> wrapper (Trader adds a sticky scroll proxy bar).</li>
-    <li>No thick accent line on the left of any box. Notes, strips and cards use the plain 1 px <code>--line</code> border on all sides. Set by the user, 26 Sep 2026.</li>
+    <li>No thick accent rail on the left (or any side) of a box. Notes, callouts and cards use the plain 1 px <code>--line</code> border only. Set by Moran, 26 Sep 2026.</li>
   </ol>
 </section>
 
@@ -280,6 +291,39 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
   <ol class="rules">
     <li>Last line of a Trade Map card, mono 12–13 px muted: <code>$58.00 = 10 sh (unchanged); 6 sh held, 25-share max</code>.</li>
   </ol>
+  <h3>6.9 Trump tape</h3>
+  <ol class="rules">
+    <li>Tapping "Trump tape" opens three cards, in this order: <b>Highlights</b> · <b>Roadmap of events</b> (White House schedule, meetings, announcements; timeline format per 6.5) · <b>Truth Social announcements</b>.</li>
+    <li>Every item on these cards (highlight, event, post) is stacked <b>topic → date + time stamp → information</b>. The stamp sits on top of the information, never at the end. Time per 7.7: <code>25 Sep 2026 · 23:26 ET (06:26 Israel)</code>.</li>
+    <li>The information block uses the Cause / Effect / Expect key-value rows (6.3, 8.4), same as every other story card.</li>
+    <li>Each of the three cards carries its own "last updated" stamp in the card label (mono, muted, 8.6 format).</li>
+    <li>Every item is a folding row (6.2), closed by default. Closed it shows only topic, stamp and flag with the "+" toggle; "+" opens the information (Cause / Effect / Expect, or the post text and source link). Set by Moran, 26 Sep 2026.</li>
+  </ol>
+  <h3>6.10 Card groups: tab row and sub-filter row</h3>
+  <p>Display option for a page that holds more than one group of cards (first used on Trump Desk, 26 Sep 2026). One tap moves between groups; a second, smaller row narrows the group in view. Sample below.</p>
+  <div class="sample-stack">
+    <div class="tabs" role="tablist" aria-label="Sample tab row">
+      <button class="tab" type="button" role="tab" aria-selected="true"><span class="n">1</span>Highlights</button>
+      <button class="tab" type="button" role="tab" aria-selected="false"><span class="n">2</span>Roadmap</button>
+      <button class="tab" type="button" role="tab" aria-selected="false"><span class="n">3</span>Truth Social</button>
+    </div>
+    <div class="card">
+      <div class="lbl">3 · Truth Social · last updated 26 Sep 2026 · 13:06 ET (20:06 Israel) · sample</div>
+      <div class="filter" role="group" aria-label="Sample sub-filter row">
+        <button class="fbtn" type="button" aria-pressed="true">All</button>
+        <button class="fbtn" type="button" aria-pressed="false">Market only</button>
+      </div>
+    </div>
+  </div>
+  <ol class="rules">
+    <li><b>Tab row</b> (group switch): sits directly under the header rule, above the cards. Equal-width grid, one column per group, gap 8 px. Each tab: mono 11 px uppercase, letter-spacing .08 em, 1 px <code>--accent</code> border, no fill, min-height 40 px, square. Label = group number + name (<code>1 Highlights</code>); the number is the one the user says in chat.</li>
+    <li>Selected tab: filled <code>--accent</code>, text <code>--ground</code>. One tab is always selected; the page opens on tab 1 unless the URL hash names another (<code>#roadmap</code>, <code>#truth</code>). The last tab used is remembered per device.</li>
+    <li>Only the selected group's card is visible; the others are hidden, not collapsed. Each group is one card with its own label and "last updated" stamp (6.9.4).</li>
+    <li><b>Sub-filter row</b> (narrows the group in view): first row inside the card, under the label, padding 12px 20px, 1 px <code>--line</code> under it. Buttons: mono 11 px uppercase, 1 px <code>--accent</code> border, min-height 32 px, no fill; pressed = filled accent (<code>aria-pressed</code>). First button is always "All".</li>
+    <li>Use 2 to 4 tabs and 2 to 4 sub-filters. More than that: split the page or use the folding rows of 6.2 inside one card.</li>
+    <li>Both rows use <code>&lt;button&gt;</code> with <code>role="tab"</code> / <code>aria-pressed</code>, visible focus ring in <code>--warn</code>. Tapping a tab must not scroll the page.</li>
+    <li>Pages that may adopt it: Ticker Desk (one tab per ticker), Macro Desk (Numbers · Pillars · Roadmap), Premarket News (Overnight · Pre-market · Trump). Adoption is a per-page decision; note it in section 11 until done.</li>
+  </ol>
 </section>
 
 <section id="s7">
@@ -318,6 +362,8 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li>Every page shows its own stamp: date, session (open+30 / midday / close / overnight) and the time it was rendered, in ET.</li>
     <li>Change notes live in the page as comments with date and "Moran" when the user asked for them, and in this guidebook's change log.</li>
     <li>Sample data is labelled as such. Never show example numbers as live.</li>
+    <li>Every announcement, event or highlight shown on any page carries its own date + time stamp (7.5, 7.7), placed on top of the item: topic → date/time → information. No undated items.</li>
+    <li>Information is folded by default: a list item shows its title (topic, stamp, flag) and a "+" button; the full text opens on tap (6.2, 6.9.5). Long text is never shown open in a list.</li>
   </ol>
 </section>
 
@@ -329,7 +375,8 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li>Trader owns the ledger and the last-run verdict; profit on sells uses oldest lots first.</li>
     <li>Daily Price reads the Google Sheet as is; day change, price, YTD and since-dip are the sheet's own columns.</li>
     <li>Routines rewrite the data blocks; the renderer below each block is what this guidebook governs. Do not hand-edit data blocks.</li>
-    <li>Run clock (ET): Ticker Desk 10:00 and 16:15 · Trade Map re-score 10:30 and 16:30 · Trader 10:45, 15:50, 16:45 · scheduler 05:20 and 17:20.</li>
+    <li>Run clock (ET): Trump Desk 00:45 daily, 09:40, 16:03, Sun 17:59 · Ticker Desk 10:00 and 16:15 · Trade Map re-score 10:30 and 16:30 · Trader 10:45, 15:50, 16:45 · scheduler 05:20 and 17:20. Trump Desk always runs before its readers.</li>
+    <li><b>Trump Desk</b> owns all Trump information (highlights, roadmap of events, Truth Social posts). Premarket News, Macro Desk and every other page read from it and never duplicate or re-summarise it. If the Trump Desk run fails, readers show its last "last updated" stamp, not stale text presented as fresh.</li>
   </ol>
 </section>
 
@@ -436,7 +483,12 @@ h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margi
 <section id="s14" class="alt">
   <h2><span class="n">14</span>Change log</h2>
   <div class="log">
-    <div><span>2026-09-26</span>Rule 5.9: no thick left accent line on boxes. Removed from this page's note; Trader and Ticker Desk listed in 11.6. Trade Map Spec artifact deleted.</div>
+    <div><span>2026-09-26</span>5.9: no accent rail on boxes; removed from this page's note box. Trader and Ticker Desk listed in 11.6. Trade Map Spec artifact deleted. Set by Moran.</div>
+    <div><span>2026-09-26</span>6.9.5 and 8.10: list items fold, title + stamp + "+" shown, text opens on tap. Applied to Trump Desk. Set by Moran.</div>
+    <div><span>2026-09-26</span>6.10 added: tab row for card groups and sub-filter row inside a card, from Trump Desk. Display option for every desk page. Set by Moran.</div>
+    <div><span>2026-09-26</span>Trump Desk run clock added to 9.6: 00:45 daily, 09:40 and 16:03 weekdays, Sun 17:59 ET. Four routines, no notifications.</div>
+    <div><span>2026-09-26</span>Trump Desk built and published (1.8): 3 tabs, db doc desk/data, sources trumpstruth.org mirror + Factba.se schedule.</div>
+    <div><span>2026-09-26</span>Trump tape split into 3 cards (6.9); timestamp on top of every item (8.9); Trump Desk as single source (1.8, 9.7). Set by Moran.</div>
     <div><span>2026-09-26</span>Created. Built from Trade Map, Ticker Desk, Macro Desk, Premarket News, Trader, Daily Price and the Trade Map Spec. Sections 1–13.</div>
     <div><span>2026-09-26</span>Name set to "Grain 5 Guidebook"; spelling rule 2.1.</div>
     <div><span>2026-09-26</span>Trade Map Spec absorbed in full: structure, chip set, row order, position line, safety rules, event-day cycle and its change log moved to section 10. Trade Map Spec artifact and TRADE_MAP_SPEC.md retired.</div>
