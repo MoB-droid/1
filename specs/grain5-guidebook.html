@@ -102,6 +102,17 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
 .fbtn{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:none;border:1px solid var(--accent);min-height:32px;padding:4px 10px;cursor:pointer}
 .fbtn[aria-pressed="true"]{background:var(--accent);color:var(--ground)}
 .sample-stack{display:flex;flex-direction:column;gap:14px}
+/* 6.4 samples */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.stats div{background:var(--surface);padding:14px 12px;display:flex;flex-direction:column;gap:6px}
+.stats .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:22px;font-weight:600}
+.stats .n{font-size:13px;line-height:1.3;color:var(--meta)}
+.stats .lbl{font-size:11px}
+.plan{display:grid;grid-template-columns:auto 1fr auto;column-gap:18px;row-gap:14px;align-items:start;padding:16px 20px}
+.plan .t{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink)}
+.plan .d{font-size:14px;color:var(--meta);line-height:1.4}
+.plan .v{font-family:var(--mono);font-size:22px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.ptab.sm{font-size:16px;row-gap:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -267,10 +278,43 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     <li>Keys mono 12–13 px uppercase muted. Values sans 16–18 px meta.</li>
     <li>Fixed key sets: Trade Map today card = Outcome / Expect / one row per scenario / History / Fired. Event watch = Window / Last check / Checks / Outcome / Source / Fired. Roadmap and stories = Cause / Effect / Expect (Ticker Desk adds Exceptions; Trade Map adds Do).</li>
   </ol>
-  <h3>6.4 Numbers block</h3>
+  <h3>6.4 Numbers blocks</h3>
+  <p>Three approved ways to show numbers (Moran, 26 Sep 2026). Pick by what the numbers are; do not invent a fourth.</p>
+  <div class="sample-stack">
+    <div class="card">
+      <div class="lbl" style="display:flex;align-items:center;gap:12px;padding-bottom:12px">Sector numbers · A · sample<span class="chip c-mute" style="margin-left:auto">flat</span></div>
+      <div class="ptab sm" style="padding-top:0">
+        <span class="nm">ASTS</span><span class="px">61.81</span><span class="pc c-acc">+1.23%</span>
+        <span class="nm">RKLB</span><span class="px">73.95</span><span class="pc c-acc">+0.46%</span>
+        <span class="nm">LUNR</span><span class="px">15.61</span><span class="pc" style="color:var(--accent-dim)">−0.57%</span>
+        <span class="nm">S&amp;P</span><span class="px">7,743.41</span><span class="pc c-acc">+0.51%</span>
+      </div>
+    </div>
+    <div>
+      <div class="lbl" style="margin-bottom:8px">Updated numbers · B · sample</div>
+      <div class="stats">
+        <div><span class="lbl">YTD</span><span class="v" style="color:var(--accent-dim)">−25.95%</span><span class="n">from 83.47 on 02 Jan (Yahoo)</span></div>
+        <div><span class="lbl">From dip</span><span class="v c-acc">+16.56%</span><span class="n">last dip 53.03 · 29 Jul 2026</span></div>
+        <div><span class="lbl">Upside</span><span class="v c-acc">+28.80%</span><span class="n">consensus 79.61 · 14 analysts, Hold</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl">Numbers · C · sample</div>
+      <div class="plan">
+        <span class="t">Stop</span><span class="d">a close at or under this sells everything; trails 15% under the highest close</span><span class="v c-bad">$54.14</span>
+        <span class="t">Trim</span><span class="d">half sold before the bell at +8% with no ASTS catalyst</span><span class="v c-good">$62.64</span>
+        <span class="t">Buy</span><span class="d">second-half tranche, arms at or under this level</span><span class="v c-good">$58.00</span>
+        <span class="t">Size</span><span class="d">50% of cash at $58.00 = 10 sh; 6 sh held, 25-share max</span><span class="v">10 sh</span>
+      </div>
+    </div>
+  </div>
   <ol class="rules">
     <li>Grid <code>auto 1fr auto</code>, column gap 18 px, row gap 8 px: name (mono 18 px 600 ink) · short note (sans 14 px meta) · value (mono 18–22 px 600, right-aligned, colored by sign).</li>
     <li>Same card on Trade Map ("Numbers") and Macro Desk (7 rows: S&amp;P, Nasdaq, 10Y, Hike odds, Oil WTI, Gold, Dollar DXY). Label on top, 20 px padding.</li>
+    <li><b>A · Peer table</b>: one row per name, three mono columns, ticker 600 ink · price right meta · change right 600, positive <code>--accent</code>, negative <code>--accent-dim</code>. Flag chip at the label's right. Use for a group of tickers or indices side by side (Sector numbers, Macro Desk numbers).</li>
+    <li><b>B · Stat tiles</b>: 3 equal tiles in one row, 1 px <code>--line</code> gaps and border, each tile = small uppercase label · big mono value 22 px 600 colored by sign · sans 13 px note. Use for 2–3 headline figures about one thing (YTD / from dip / upside).</li>
+    <li><b>C · Plan rows</b>: term (mono 18 px 600 ink) · plain-words note (sans 14 px meta, wraps) · value (mono 22 px 600, right, <code>--bad</code> for a stop, <code>--good</code> for a buy or profit level, ink for a count). Use for levels and rules that need a sentence of explanation (Stop, Trim, Target, Buy, Size).</li>
+    <li>All three: mono numbers with <code>tabular-nums</code>, values right-aligned, label in the card top, no side numbers.</li>
   </ol>
   <h3>6.5 Roadmap rows</h3>
   <ol class="rules">
@@ -489,6 +533,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margi
 <section id="s14" class="alt">
   <h2><span class="n">14</span>Change log</h2>
   <div class="log">
+    <div><span>2026-09-26</span>6.4.3–6.4.6: three number-block types approved (A peer table, B stat tiles, C plan rows) with samples. Set by Moran.</div>
     <div><span>2026-09-26</span>6.11.3: dated row format approved, bold date then inline text edge to edge. Set by Moran.</div>
     <div><span>2026-09-26</span>6.11: no side numbers on dated lists. Applied to Ticker Desk past 7 days and beyond the window. Set by Moran.</div>
     <div><span>2026-09-26</span>5.9: no accent rail on boxes; removed from this page's note box. Trader and Ticker Desk listed in 11.6. Trade Map Spec artifact deleted. Set by Moran.</div>
