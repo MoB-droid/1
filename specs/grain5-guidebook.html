@@ -347,9 +347,9 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
   <p>Display option for a page that holds more than one group of cards (first used on Trump Desk, 26 Sep 2026). One tap moves between groups; a second, smaller row narrows the group in view. Sample below.</p>
   <div class="sample-stack">
     <div class="tabs" role="tablist" aria-label="Sample tab row">
-      <button class="tab" type="button" role="tab" aria-selected="true"><span class="n">1</span>Highlights</button>
-      <button class="tab" type="button" role="tab" aria-selected="false"><span class="n">2</span>Roadmap</button>
-      <button class="tab" type="button" role="tab" aria-selected="false"><span class="n">3</span>Truth Social</button>
+      <button class="tab" type="button" role="tab" aria-selected="true">Highlights</button>
+      <button class="tab" type="button" role="tab" aria-selected="false">Roadmap</button>
+      <button class="tab" type="button" role="tab" aria-selected="false">Truth Social</button>
     </div>
     <div class="card">
       <div class="lbl">3 · Truth Social · last updated 26 Sep 2026 · 13:06 ET (20:06 Israel) · sample</div>
@@ -360,7 +360,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
     </div>
   </div>
   <ol class="rules">
-    <li><b>Tab row</b> (group switch): sits directly under the header rule, above the cards. Equal-width grid, one column per group, gap 8 px. Each tab: mono 11 px uppercase, letter-spacing .08 em, 1 px <code>--accent</code> border, no fill, min-height 40 px, square. Label = group number + name (<code>1 Highlights</code>); the number is the one the user says in chat.</li>
+    <li><b>Tab row</b> (group switch): sits directly under the header rule, above the cards. Equal-width grid, one column per group, gap 8 px. Each tab: mono 11 px uppercase, letter-spacing .08 em, 1 px <code>--accent</code> border, no fill, min-height 40 px, square. Label = group name only (<code>Space</code>, <code>Highlights</code>). No number in the tab (Moran, 27 Sep 2026); the user refers to tabs by name.</li>
     <li>Selected tab: filled <code>--accent</code>, text <code>--ground</code>. One tab is always selected; the page opens on tab 1 unless the URL hash names another (<code>#roadmap</code>, <code>#truth</code>). The last tab used is remembered per device.</li>
     <li>Only the selected group's card is visible; the others are hidden, not collapsed. Each group is one card with its own label and "last updated" stamp (6.9.4).</li>
     <li><b>Sub-filter row</b> (narrows the group in view): first row inside the card, under the label, padding 12px 20px, 1 px <code>--line</code> under it. Buttons: mono 11 px uppercase, 1 px <code>--accent</code> border, min-height 32 px, no fill; pressed = filled accent (<code>aria-pressed</code>). First button is always "All".</li>
@@ -370,7 +370,7 @@ pre{margin:0;background:var(--ground);border:1px solid var(--line);padding:14px 
   </ol>
   <h3>6.11 Side numbers on lists</h3>
   <ol class="rules">
-    <li>Side numbers only where the user refers to rows by number: roadmap rows (6.5), triggers, and the tab labels of 6.10.</li>
+    <li>Side numbers only where the user refers to rows by number: roadmap rows (6.5) and triggers. Not on tabs (6.10.1).</li>
     <li>Dated lists carry no side numbers. The bold date at the start of the row is the key: past 7 days, beyond the window, log entries, Truth Social posts. Set by Moran, 26 Sep 2026.</li>
     <li>Dated row format: bold mono date first (<code>22 Sep close</code>), then the text runs on inline after it, filling the row edge to edge, no second column, no indent. Approved by Moran, 26 Sep 2026.</li>
   </ol>
@@ -533,6 +533,7 @@ h1{font-family:var(--serif);font-weight:400;font-size:60px;line-height:.95;margi
 <section id="s14" class="alt">
   <h2><span class="n">14</span>Change log</h2>
   <div class="log">
+    <div><span>2026-09-27</span>6.10.1: tab labels are the name only, no number. Applied to Ticker Desk (Space · Memory). Set by Moran.</div>
     <div><span>2026-09-26</span>6.4.3–6.4.6: three number-block types approved (A peer table, B stat tiles, C plan rows) with samples. Set by Moran.</div>
     <div><span>2026-09-26</span>6.11.3: dated row format approved, bold date then inline text edge to edge. Set by Moran.</div>
     <div><span>2026-09-26</span>6.11: no side numbers on dated lists. Applied to Ticker Desk past 7 days and beyond the window. Set by Moran.</div>
