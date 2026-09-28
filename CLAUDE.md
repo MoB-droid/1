@@ -56,3 +56,10 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Verify before answering (ALWAYS)
+
+Never state a fact about an artifact, dashboard, doc, sheet or file without
+reading its actual content first (Artifact read, Drive read, file read).
+A screenshot or a spec doc is NOT the source of truth for what is displayed.
+If it cannot be read, say so instead of guessing.
