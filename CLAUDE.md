@@ -56,3 +56,7 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Desktop app tips
+
+- Pop out an artifact window: open the artifact, click its name dropdown (top-left) > "Pop out". Not in the panel or the ⋮ menu.
