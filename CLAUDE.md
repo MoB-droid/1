@@ -56,3 +56,11 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Change-request protocol (Grain 5 Guidebook)
+
+When the user asks to change anything in a trading artifact (layout, labels, format, rules):
+1. FIRST read the Grain 5 Guidebook (https://claude.ai/artifact/2WXGQv6ySeY6uFmuHTttHi) and find the rule(s) covering it.
+2. Tell the user exactly what the guidebook says (rule numbers, GO MO style) before touching anything.
+3. Discuss with the user whether to change it or not. Only edit after they decide.
+4. If they approve a change, update the guidebook (rule + change log) in the same session.
