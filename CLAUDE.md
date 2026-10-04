@@ -56,3 +56,8 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 17. DIP (Charter)
 18. ALERT (Charter)
 19. COMMON (Charter) — COMMON AGENT (voice of market consensus)
+
+# Monthly reports rule
+
+Always value end-of-month holdings at the official closing price of the
+month's last trading day.
