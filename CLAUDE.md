@@ -60,4 +60,6 @@ bot, uamy log-bot, fact bot, ROADMAP (Charter).
 # Monthly reports rule
 
 Always value end-of-month holdings at the official closing price of the
-month's last trading day.
+month's last trading day, taken from the Daily price sheet
+(https://docs.google.com/spreadsheets/d/1-I8rGODnqLC_AARz0uXjst4fIks-Pllbpwfx1-lJmD0).
+Never use an intraday or news-article price. Grain 5 Guidebook rule 2.5.
