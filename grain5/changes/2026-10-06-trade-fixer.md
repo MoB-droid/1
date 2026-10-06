@@ -17,5 +17,9 @@ Guidebook change (Grain 5 rule 4.3.1, step 5: the spec note in the repo).
    (b) lots held before the post trim half at +5% that session;
    (c) the rebuy waits for the box Buy (stop + one ATR).
    Evidence: 08 Sep 2026 +6.11% on "THE MOON IS OURS", 09 Sep −5.60%.
-5. Open item 4.3.2.17: the Trump Desk routines, Trade Map routines and safety
-   block, and the Trader runs do not apply 3.7.8 / 3.1.17 yet.
+5. Applied the same day (4.3.2.17 closed): the four Trump Desk routines flag
+   space posts and write the "Space post" roadmap row; the two Trade Map
+   re-score routines write the space-post daily plan; the Trader 10:45, 15:50
+   and 16:45 runs fill at the open, trim at +5% and sell at the close; the
+   Trade Map safety block carries the rule; the Monthly Report page lost its
+   Fix advice box and its routine no longer writes lessons.
