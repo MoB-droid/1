@@ -1,12 +1,12 @@
 {
   "ticker": "ASTS",
-  "stamp": "25 Sep 2026 · close · re-scored 16:41 ET",
-  "updated": "2026-09-25T20:56:09Z",
+  "stamp": "07 Oct 2026 · 14:55 ET · after-drop buy filled by hand",
+  "updated": "2026-10-07T18:56:00Z",
   "mode": "limit",
-  "buy": 58.0,
-  "sell": null,
+  "buy": 58.25,
+  "sell": 67.0,
   "stop": 54.14,
-  "size": 10,
-  "position": "6 sh @ 58.00",
-  "note": "second-half buy 58.00 arms Mon 10:45 ET or close, $3.81 below the 61.81 close; hold 6 sh, trim watch 62.64 no trigger today, stop 54.14 unchanged"
+  "size": 1,
+  "position": "27 sh @ 58.56",
+  "note": "after-drop buy (3.1.20) filled 13 sh @ 59.14 (09:35 ET touch); cash 91.78 buys 1 sh at the 58.25 base line; target 67.00, stop 54.14"
 }
