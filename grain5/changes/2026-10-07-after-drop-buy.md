@@ -3,8 +3,7 @@
 Guidebook change (Grain 5 rule 4.3.1, step 5: the spec note in the repo).
 From Trade Fixer Sep 2026, card 3, refined in chat and approved by Moran.
 
-1. 3.1.20 added. Trigger: ASTS closes down 7% or more (or more than twice its
-   20-session average daily move, when that is larger) on news not about ASTS.
+1. 3.1.20 added. Trigger: ASTS closes down 7% or more on news not about ASTS.
    The next session's Buy is that close, a limit, when all six checks pass:
    1. News: no ASTS press release or filing that day.
    2. Roadmap: no high-impact event in the next 5 trading days.
@@ -23,3 +22,6 @@ From Trade Fixer Sep 2026, card 3, refined in chat and approved by Moran.
    MAP.safety "After-drop buy" and the playbook testing note on the Trade Map;
    both Trade Map re-score routines (AFTER-DROP BUY paragraph, safety list);
    Trade Fixer card 3 set to approved (page and Sep 2026 doc).
+5. Amended the same day (Moran): the "twice the 20-day average daily move"
+   clause was dropped. With ASTS moving about 5% a day it lifted the real
+   trigger to about −10%; the trigger is now a flat −7% close.
