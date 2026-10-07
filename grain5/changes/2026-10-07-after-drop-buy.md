@@ -25,3 +25,18 @@ From Trade Fixer Sep 2026, card 3, refined in chat and approved by Moran.
 5. Amended the same day (Moran): the "twice the 20-day average daily move"
    clause was dropped. With ASTS moving about 5% a day it lifted the real
    trigger to about −10%; the trigger is now a flat −7% close.
+6. Rewritten the same day (Moran), the Trim's mirror, light like the Trim:
+   1. Trigger: an intraday touch of previous close x 0.937 (−6.3%), on a
+      move not about ASTS. A touch is the trade, like a resting limit buy.
+   2. Size: only the cash the last Trim freed, once; no Trim cash, no line.
+   3. Checks kept: news, roadmap (no high-impact event in 5 trading days),
+      cooldown (5 trading days).
+   4. Dropped: the close test, volume, support, after-hours gap, the
+      short-interest half size.
+   5. Exit: the existing levels.
+   6. First fill 07 Oct 2026: touch in the 09:35 ET bar (low $58.95), 13 sh
+      @ $59.14 with the $822.38 Trim cash (Trader oct26-04); position 27 sh
+      @ $58.56, cash $91.78. Levels file updated (it was stale since 25 Sep).
+   7. 18 Sep 2026 (−7.8% touch) would not have bought: no Trim cash then.
+   8. Applied: Guidebook v101, Trade Map v241, Trade Fixer page v7 and
+      Sep 2026 doc v10, both Trade Map re-score routines.
