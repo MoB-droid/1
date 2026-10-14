@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office Design Tel Aviv | Studio BA – Interior Design &amp; Architecture</title>
+<meta name="description" content="Studio BA designs creative, timeless and sustainable offices, cafeterias and hospitality spaces in Tel Aviv since 2008. See our work and book a free consultation.">
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --ink:#151515; --muted:#55575a; --line:#e3e1db;
+  --green:#2f5d3a; --green-soft:#e6efe5; --accent:#151515; --ph:#9a5b00; --ph-bg:#fff4df;
+  --max:1180px; --gutter:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Helvetica Neue",Arial,sans-serif;overflow-x:hidden}
+img{max-width:100%;display:block;height:auto}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+section{padding:64px 0}
+h1,h2,h3{line-height:1.15;margin:0 0 .5em;letter-spacing:-.01em}
+h2{font-size:clamp(1.7rem,4vw,2.6rem)}
+h3{font-size:1.15rem}
+.eyebrow{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green);font-weight:700;margin:0 0 .6em}
+.lead{color:var(--muted);max-width:60ch}
+.btn{display:inline-block;padding:14px 22px;border-radius:999px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;border:0;cursor:pointer;font-size:1rem}
+.btn.light{background:#fff;color:var(--ink)}
+.btn.green{background:#1f7a3f}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+/* placeholder marker */
+.ph{background:var(--ph-bg);color:var(--ph);border:1px dashed var(--ph);border-radius:4px;padding:0 4px;font-style:normal}
+.ph::before{content:"PLACEHOLDER: ";font-size:.7em;font-weight:700;letter-spacing:.05em}
+.ph-note{font-size:.8rem;color:var(--ph)}
+/* concept banner */
+.concept{background:var(--ph-bg);color:#5e3a00;text-align:center;font-size:.85rem;padding:8px var(--gutter);border-bottom:1px solid #f0d6a6}
+/* header */
+header.site{position:sticky;top:0;z-index:20;background:rgba(251,250,247,.95);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-weight:900;font-size:1.6rem;text-decoration:none;letter-spacing:-.04em}
+.logo span{font-weight:400;font-size:.95rem;letter-spacing:.05em;margin-inline-start:6px}
+.menu-btn{background:none;border:2px solid var(--ink);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.95rem;cursor:pointer;color:var(--ink)}
+nav.main ul{list-style:none;margin:0;padding:0}
+nav.main{display:none;position:absolute;top:64px;inset-inline:0;background:var(--bg);border-bottom:1px solid var(--line);padding:8px var(--gutter) 20px}
+nav.main.open{display:block}
+nav.main a{display:block;padding:12px 0;text-decoration:none;font-weight:600;border-bottom:1px solid var(--line)}
+.nav-cta{display:none}
+@media(min-width:900px){
+  .menu-btn{display:none}
+  nav.main{display:block;position:static;padding:0;border:0;background:none}
+  nav.main ul{display:flex;gap:28px}
+  nav.main a{border:0;padding:0}
+  .nav-cta{display:inline-block;padding:10px 18px}
+}
+/* hero */
+.hero{position:relative;padding:0;min-height:88vh;display:flex;align-items:flex-end;color:#fff;background:#24412b}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.7) 100%)}
+.hero .wrap{position:relative;z-index:1;padding-bottom:56px;padding-top:120px;width:100%}
+.hero h1{font-size:clamp(2.4rem,8vw,5.2rem);max-width:13ch;font-weight:800}
+.hero p{font-size:clamp(1rem,2.6vw,1.25rem);margin:0 0 28px;color:#f1f1f1}
+.hero .ph{background:rgba(255,244,223,.95)}
+/* clients */
+.clients{padding:28px 0;border-bottom:1px solid var(--line);background:var(--surface)}
+.clients p{margin:0 0 12px;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:center}
+.clients ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 36px}
+.clients li{font-weight:800;font-size:1.25rem;color:#3d3d3d;letter-spacing:-.02em}
+/* work grid */
+.grid{display:grid;gap:24px;grid-template-columns:1fr}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.grid.three{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card img{aspect-ratio:4/3;object-fit:cover;width:100%;background:var(--green-soft)}
+.card .body{padding:18px 20px 22px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card .meta{color:var(--muted);font-size:.9rem;margin:0}
+.card a.more{margin-top:auto;font-weight:700;text-decoration:none;padding-top:8px}
+.card a.more::after{content:" →"}
+.num{display:inline-block;min-width:1.8em;font-weight:700;color:var(--green)}
+/* case study */
+.case{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.case-cols{display:grid;gap:24px;grid-template-columns:1fr;margin:28px 0}
+@media(min-width:800px){.case-cols{grid-template-columns:repeat(3,1fr)}}
+.case-cols h3{border-top:3px solid var(--ink);padding-top:12px}
+.ba{display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:700px){.ba{grid-template-columns:1fr 1fr}}
+figure{margin:0}
+figcaption{font-size:.85rem;color:var(--muted);padding-top:6px}
+.ba img{aspect-ratio:3/2;object-fit:cover;width:100%;border-radius:10px}
+/* process */
+.steps{list-style:none;margin:32px 0 0;padding:0;display:grid;gap:16px;grid-template-columns:1fr;counter-reset:s}
+@media(min-width:700px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1000px){.steps{grid-template-columns:repeat(3,1fr)}}
+.steps li{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;counter-increment:s}
+.steps li::before{content:counter(s,decimal-leading-zero);display:block;font-weight:800;font-size:1.6rem;color:var(--green);margin-bottom:6px}
+.steps li p{margin:0;color:var(--muted)}
+.steps li.vr{background:var(--green);color:#fff;border-color:var(--green)}
+.steps li.vr::before{color:#cfe6d2}
+.steps li.vr p{color:#e8f2e9}
+.video{margin-top:28px;position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#1d2b20;display:grid;place-items:center;color:#fff;text-align:center;padding:16px}
+.video .play{width:72px;height:72px;border-radius:50%;background:#fff;display:grid;place-items:center;margin:0 auto 12px}
+.video .play::after{content:"";border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #1d2b20;margin-left:5px}
+/* stats */
+.stats{background:var(--ink);color:#fff}
+.stats ol{list-style:none;margin:0;padding:0;display:grid;gap:28px;grid-template-columns:1fr}
+@media(min-width:700px){.stats ol{grid-template-columns:repeat(3,1fr)}}
+.stats strong{display:block;font-size:clamp(2.8rem,8vw,4.5rem);line-height:1;font-weight:800}
+.stats span{color:#d6d6d6}
+.stats .ph{color:#5e3a00}
+.stats strong .ph::before{content:none}
+/* quotes */
+blockquote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:14px}
+blockquote p{margin:0;font-size:1.1rem}
+blockquote footer{color:var(--muted);font-size:.9rem}
+/* contact */
+.contact{background:var(--green-soft)}
+.contact-cols{display:grid;gap:32px;grid-template-columns:1fr}
+@media(min-width:900px){.contact-cols{grid-template-columns:1.3fr 1fr}}
+form .row{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:600px){form .row.two{grid-template-columns:1fr 1fr}}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:4px}
+input,select{width:100%;padding:12px 14px;border:1px solid #9a9a9a;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+.panel{background:var(--surface);border-radius:14px;padding:24px;border:1px solid var(--line)}
+.panel + .panel{margin-top:16px}
+.contact dl{margin:0}
+.contact dt{font-weight:700;margin-top:10px}
+.contact dd{margin:0;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.status{margin-top:12px;font-weight:600;color:var(--green)}
+/* footer */
+footer.site{background:#111;color:#e9e9e9;padding:48px 0 32px}
+footer.site a{color:#fff}
+.foot{display:grid;gap:28px;grid-template-columns:1fr}
+@media(min-width:800px){.foot{grid-template-columns:2fr 1fr 1fr 1fr}}
+.foot ul{list-style:none;margin:0;padding:0}
+.foot li{margin:6px 0}
+.foot h2{font-size:1rem;margin-bottom:10px}
+.lang{display:inline-flex;border:1px solid #777;border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:#fff;padding:8px 14px;cursor:pointer;font:inherit}
+.lang button[aria-pressed="true"]{background:#fff;color:#111;font-weight:700}
+.legal{margin-top:32px;font-size:.85rem;color:#b5b5b5}
+.footer-ph{background:#3a2a10;color:#ffd99a;border-color:#ffd99a}
+.section-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:16px;margin-bottom:28px}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<p class="concept">Redesign concept mockup – not the official Studio BA website. Items marked <span class="ph" style="font-size:.8em">like this</span> need real content from the studio.</p>
+
+<header class="site">
+  <div class="wrap bar">
+    <a class="logo" href="#top" aria-label="Studio BA – home">BA<span>STUDIO</span></a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="mainnav" data-he="תפריט">Menu</button>
+    <nav class="main" id="mainnav" aria-label="Main">
+      <ul>
+        <li><a href="#work" data-he="פרויקטים">Work</a></li>
+        <li><a href="#process" data-he="תהליך">Process</a></li>
+        <li><a href="#about" data-he="אודות">About</a></li>
+        <li><a href="#insights" data-he="תובנות">Insights</a></li>
+        <li><a href="#contact" data-he="צור קשר">Contact</a></li>
+      </ul>
+    </nav>
+    <a class="btn nav-cta" href="#contact" data-he="לפגישת ייעוץ">Free consultation</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- 1. HERO -->
+<section class="hero" aria-labelledby="hero-title">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1000'%3E%3Crect width='1600' height='1000' fill='%2333553c'/%3E%3Crect y='620' width='1600' height='380' fill='%23d9cfbf'/%3E%3Crect x='120' y='120' width='520' height='400' fill='%23a9c7a6'/%3E%3Crect x='760' y='120' width='720' height='400' fill='%23c6d9c2'/%3E%3Ccircle cx='300' cy='620' r='140' fill='%23417a4c'/%3E%3Ccircle cx='1350' cy='640' r='170' fill='%23356a40'/%3E%3Crect x='560' y='560' width='520' height='120' fill='%23f3eee5'/%3E%3C/svg%3E"
+       alt="Placeholder: open-ceiling office lounge with plants and modular seating (replace with a Studio BA project photo)" width="1600" height="1000" fetchpriority="high">
+  <div class="wrap">
+    <p class="eyebrow" style="color:#cfe6d2" data-he="סטודיו לעיצוב פנים ואדריכלות">Interior design &amp; architecture studio</p>
+    <h1 id="hero-title" data-he="יצירתי, על־זמני ובר־קיימא">Creative, timeless and sustainable</h1>
+    <p data-he="עיצוב פנים למשרדים ולאירוח · תל אביב · מאז 2008">Office and hospitality interiors · Tel Aviv · since 2008</p>
+    <a class="btn light" href="#contact" data-he="לקביעת פגישת ייעוץ חינם">Book a free consultation</a>
+  </div>
+</section>
+
+<!-- 2. CLIENTS -->
+<section class="clients" aria-label="Selected clients">
+  <div class="wrap">
+    <p data-he="בין לקוחותינו">Trusted by</p>
+    <ol>
+      <li>Plus500</li><li>Perion</li><li>Harman</li><li>XT Group</li><li>Spaces</li>
+    </ol>
+    <p class="ph-note" style="text-transform:none;letter-spacing:0;margin:12px 0 0">Text stand-ins – replace with client logo files (SVG) and confirm permission to show them.</p>
+  </div>
+</section>
+
+<!-- 3. SELECTED WORK -->
+<section id="work" aria-labelledby="work-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Selected work</p>
+        <h2 id="work-title" data-he="פרויקטים נבחרים">Uniquely tailored projects</h2>
+      </div>
+      <a class="btn ghost" href="#contact">Download full portfolio</a>
+    </div>
+    <div class="grid three">
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: Plus500 office work area" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23c9dac5'/%3E%3Crect y='2' width='4' height='1' fill='%23e8e1d3'/%3E%3Ccircle cx='1' cy='2' r='.45' fill='%234f8a5b'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">01</span>Plus500</h3>
+          <p class="meta">Headquarters offices · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: Perion cafeteria with long communal tables" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23e4d8c4'/%3E%3Crect x='.5' y='1.8' width='3' height='.25' fill='%237a5a3a'/%3E%3Ccircle cx='3.3' cy='1' r='.5' fill='%23467c51'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">02</span>Perion</h3>
+          <p class="meta">Offices &amp; cafeteria · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: Harman meeting rooms with glass partitions" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23d3dde0'/%3E%3Crect x='.4' y='.6' width='1.4' height='1.6' fill='%23f4f6f6'/%3E%3Crect x='2.2' y='.6' width='1.4' height='1.6' fill='%23f4f6f6'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">03</span>Harman</h3>
+          <p class="meta">Offices · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: XT Group reception with green wall" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23efe9df'/%3E%3Crect x='.3' y='.3' width='1.6' height='2.4' fill='%233f7349'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">04</span>XT Group</h3>
+          <p class="meta">Offices · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: Spaces Innovate co-working lounge" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23dfe7d6'/%3E%3Crect y='2.1' width='4' height='.9' fill='%23c5b49a'/%3E%3Ccircle cx='2.8' cy='1.7' r='.55' fill='%23558f5e'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">05</span>Spaces – Innovate</h3>
+          <p class="meta">Co-working · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: open-plan office on floors 42–43 with city view" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23cfdbe4'/%3E%3Crect y='2' width='4' height='1' fill='%23ece6da'/%3E%3Crect x='.3' y='.4' width='3.4' height='1.4' fill='%23e9f0f4'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">06</span><span class="ph">Client name for "L42-43"</span></h3>
+          <p class="meta">Two-floor offices · <em class="ph">size m²</em></p>
+          <a class="more" href="#case">Read the case study</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 3b. CASE STUDY EXAMPLE -->
+<section class="case" id="case" aria-labelledby="case-title">
+  <div class="wrap">
+    <p class="eyebrow">Case study</p>
+    <h2 id="case-title">Perion: a cafeteria people actually stay in</h2>
+    <p class="lead"><span class="ph">Year, size in m², location, team size</span></p>
+    <div class="case-cols">
+      <div><h3>01 · Problem</h3><p><span class="ph">What wasn't working: e.g., a closed kitchen nobody used, staff eating at desks, no space for company events.</span></p></div>
+      <div><h3>02 · Approach</h3><p><span class="ph">Design moves: e.g., open ceiling, Mediterranean materials, planting, modular furniture that turns the cafeteria into an event space.</span></p></div>
+      <div><h3>03 · Result</h3><p><span class="ph">Measurable outcome: e.g., daily users, events per month, employee survey score.</span></p></div>
+    </div>
+    <div class="ba">
+      <figure>
+        <img loading="lazy" width="900" height="600" alt="Placeholder: Perion cafeteria before the redesign" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='3' height='2' fill='%23b9b9b6'/%3E%3Crect x='.3' y='.3' width='2.4' height='.8' fill='%23d7d7d4'/%3E%3C/svg%3E">
+        <figcaption>Before</figcaption>
+      </figure>
+      <figure>
+        <img loading="lazy" width="900" height="600" alt="Placeholder: Perion cafeteria after the redesign, with plants and long wooden tables" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3 2'%3E%3Crect width='3' height='2' fill='%23e7dcc8'/%3E%3Crect x='.4' y='1.2' width='2.2' height='.18' fill='%23825f3d'/%3E%3Ccircle cx='.5' cy='.7' r='.35' fill='%23477e52'/%3E%3Ccircle cx='2.5' cy='.6' r='.4' fill='%233a6e45'/%3E%3C/svg%3E">
+        <figcaption>After</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 4. PROCESS -->
+<section id="process" aria-labelledby="process-title">
+  <div class="wrap">
+    <p class="eyebrow">How we work</p>
+    <h2 id="process-title" data-he="קודם כל, מדברים על החלומות שלכם">First we talk about your dreams</h2>
+    <p class="lead">Six steps from the first meeting to the day your team moves in.</p>
+    <ol class="steps">
+      <li><h3>Brief</h3><p>We listen: how your team works, how it will grow, budget and timeline.</p></li>
+      <li><h3>Concept</h3><p>Layout options, mood and materials – global influences, local design.</p></li>
+      <li><h3>Detailed design</h3><p>Detailed drawings, specifications and a schedule of works, coordinated with all consultants.</p></li>
+      <li class="vr"><h3>VR walkthrough</h3><p>Walk through your new space in virtual reality and adjust it before anything is built.</p></li>
+      <li><h3>Build</h3><p>Our project managers supervise the works on site, on schedule and on budget.</p></li>
+      <li><h3>Move in</h3><p>Enjoy your new space – and we keep checking in after you move in.</p></li>
+    </ol>
+    <div class="video" role="img" aria-label="Placeholder for a VR walkthrough video">
+      <div><div class="play" aria-hidden="true"></div>
+      <p style="margin:0"><strong>See a VR walkthrough</strong><br><span class="ph">60–90 second screen recording of a real VR walkthrough</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. STATS / ABOUT -->
+<section class="stats" id="about" aria-labelledby="about-title">
+  <div class="wrap">
+    <p class="eyebrow" style="color:#9fd0a9">About Studio BA</p>
+    <h2 id="about-title">Global influences, local design</h2>
+    <p class="lead" style="color:#d6d6d6;margin-bottom:40px">A team of architects, interior designers, product and graphic designers and project managers, working in Tel Aviv since 2008 on workspaces, food areas, hospitality and living spaces – blending creative playfulness with local Mediterranean influences.</p>
+    <ol>
+      <li><strong>18</strong><span>years of experience (since 2008)</span></li>
+      <li><strong><span class="ph">300+</span></strong><span>projects completed <em class="ph">confirm number</em></span></li>
+      <li><strong><span class="ph">45</span></strong><span>people in the studio <em class="ph">confirm number</em></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 6. QUOTES -->
+<section aria-labelledby="quotes-title">
+  <div class="wrap">
+    <p class="eyebrow">Clients</p>
+    <h2 id="quotes-title">What our clients say</h2>
+    <div class="grid three">
+      <blockquote><p>“<span class="ph">Client quote about the process or result.</span>”</p>
+        <footer>1 · <span class="ph">Full name</span>, <span class="ph">Role</span>, Plus500</footer></blockquote>
+      <blockquote><p>“<span class="ph">Client quote about the VR walkthrough or timeline.</span>”</p>
+        <footer>2 · <span class="ph">Full name</span>, <span class="ph">Role</span>, Perion</footer></blockquote>
+      <blockquote><p>“<span class="ph">Client quote about how the team uses the space.</span>”</p>
+        <footer>3 · <span class="ph">Full name</span>, <span class="ph">Role</span>, Harman</footer></blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- 7. INSIGHTS -->
+<section id="insights" aria-labelledby="insights-title" style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">Insights</p>
+    <h2 id="insights-title">Lessons from our projects</h2>
+    <div class="grid three">
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: Perion cafeteria at lunchtime" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23eadfcb'/%3E%3Ccircle cx='1' cy='1.4' r='.6' fill='%234c835a'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">01</span>How we designed Perion's cafeteria</h3>
+          <p class="meta"><span class="ph">Author</span> · <span class="ph">Date</span></p>
+          <a class="more" href="#case">Read article</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: modular furniture reconfigured for a team meeting" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23dfe6dd'/%3E%3Crect x='.6' y='1.6' width='1' height='.6' fill='%23b18d63'/%3E%3Crect x='2.2' y='1.6' width='1' height='.6' fill='%23b18d63'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">02</span>Modular furniture at Harman: one floor, many uses</h3>
+          <p class="meta"><span class="ph">Author</span> · <span class="ph">Date</span></p>
+          <a class="more" href="#insights">Read article</a></div>
+      </article>
+      <article class="card">
+        <img loading="lazy" width="800" height="600" alt="Placeholder: material and colour samples for the Plus500 offices" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3Crect width='4' height='3' fill='%23f2ede4'/%3E%3Crect x='.5' y='.8' width='.8' height='1.4' fill='%237f9c7b'/%3E%3Crect x='1.6' y='.8' width='.8' height='1.4' fill='%23c79f6e'/%3E%3Crect x='2.7' y='.8' width='.8' height='1.4' fill='%23d8d2c6'/%3E%3C/svg%3E">
+        <div class="body"><h3><span class="num">03</span>Choosing colours and materials for Plus500</h3>
+          <p class="meta"><span class="ph">Author</span> · <span class="ph">Date</span></p>
+          <a class="more" href="#insights">Read article</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- 8. CONTACT -->
+<section class="contact" id="contact" aria-labelledby="contact-title">
+  <div class="wrap contact-cols">
+    <div class="panel">
+      <p class="eyebrow">Start a project</p>
+      <h2 id="contact-title" data-he="לקביעת פגישת ייעוץ חינם">Book a free consultation</h2>
+      <form id="lead" novalidate>
+        <div class="row two">
+          <div><label for="f-name">Name</label><input id="f-name" name="name" autocomplete="name" required></div>
+          <div><label for="f-company">Company</label><input id="f-company" name="company" autocomplete="organization" required></div>
+        </div>
+        <div class="row two" style="margin-top:14px">
+          <div><label for="f-size">Office size (m²)</label><input id="f-size" name="size" type="number" inputmode="numeric" min="0" placeholder="e.g. 1200"></div>
+          <div><label for="f-time">Timeline</label>
+            <select id="f-time" name="timeline">
+              <option value="">Choose…</option>
+              <option>Within 3 months</option><option>3–6 months</option><option>6–12 months</option><option>Just exploring</option>
+            </select></div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Send request</button>
+          <a class="btn green" href="https://wa.me/972000000000" rel="noopener">WhatsApp us</a>
+        </div>
+        <p class="status" id="lead-status" role="status"></p>
+      </form>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Studio BA, Tel Aviv</h3>
+        <dl>
+          <dt>Phone</dt><dd><a href="tel:+972000000000"><span class="ph">+972 phone number</span></a></dd>
+          <dt>Email</dt><dd><a href="mailto:office@studioba.co.il">office@studioba.co.il</a></dd>
+          <dt>Address</dt><dd><span class="ph">Street address</span>, Tel Aviv</dd>
+        </dl>
+      </div>
+      <div class="panel">
+        <h3>Download our portfolio</h3>
+        <form id="pf" novalidate>
+          <label for="pf-email">Your email</label>
+          <input id="pf-email" type="email" autocomplete="email" required placeholder="name@company.com">
+          <div class="actions"><button class="btn ghost" type="submit">Get the portfolio (PDF)</button></div>
+          <p class="status" id="pf-status" role="status"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- 9. FOOTER -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <p class="logo" style="color:#fff;margin:0 0 8px">BA<span>STUDIO</span></p>
+        <p style="margin:0;color:#cfcfcf">Interior design &amp; architecture · Tel Aviv · since 2008</p>
+      </div>
+      <div><h2>Visit</h2><ul><li><span class="ph footer-ph">Street address</span></li><li>Tel Aviv, Israel</li></ul></div>
+      <div><h2>Contact</h2><ul><li><span class="ph footer-ph">Phone</span></li><li><a href="mailto:office@studioba.co.il">office@studioba.co.il</a></li></ul></div>
+      <div><h2>Follow</h2><ul>
+        <li><a href="https://www.linkedin.com/company/2430827" rel="noopener">LinkedIn</a></li>
+        <li><a href="https://www.instagram.com/studio___ba" rel="noopener">Instagram</a></li>
+        <li><a href="https://www.facebook.com/studioba" rel="noopener">Facebook</a></li>
+      </ul></div>
+    </div>
+    <div class="legal" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between">
+      <span>© 2026 Studio BA</span>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">English</button>
+        <button type="button" data-lang="he" aria-pressed="false">עברית</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Mobile menu
+const btn=document.querySelector('.menu-btn'),nav=document.getElementById('mainnav');
+btn.addEventListener('click',()=>{const o=nav.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
+nav.addEventListener('click',e=>{if(e.target.tagName==='A'){nav.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+
+// Lead form (demo only)
+document.getElementById('lead').addEventListener('submit',e=>{
+  e.preventDefault();
+  const n=document.getElementById('f-name'),c=document.getElementById('f-company'),s=document.getElementById('lead-status');
+  s.textContent=(!n.value.trim()||!c.value.trim())?'Please add your name and company.':'Thanks – we\'ll be in touch within one working day. (Demo: form not connected yet.)';
+});
+
+// Gated portfolio download
+document.getElementById('pf').addEventListener('submit',e=>{
+  e.preventDefault();
+  const em=document.getElementById('pf-email'),s=document.getElementById('pf-status');
+  if(!em.checkValidity()){s.textContent='Please enter a valid email.';return;}
+  s.innerHTML='Thanks! <a href="https://studioba.co.il/wp-content/uploads/2023/11/BA-2023.pdf" rel="noopener">Download the portfolio (PDF)</a>';
+});
+
+// Hebrew / English switch (key headings only in this mockup)
+document.querySelectorAll('[data-he]').forEach(el=>el.dataset.en=el.textContent);
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>{
+  const he=b.dataset.lang==='he';
+  document.documentElement.lang=he?'he':'en';
+  document.documentElement.dir=he?'rtl':'ltr';
+  document.querySelectorAll('[data-he]').forEach(el=>el.textContent=he?el.dataset.he:el.dataset.en);
+  document.querySelectorAll('.lang button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+}));
+</script>
+</body>
+</html>
