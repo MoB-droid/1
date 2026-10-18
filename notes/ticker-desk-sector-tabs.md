@@ -18,3 +18,8 @@ Guidebook updated: 1.2, 6.10.7, 11.2, 11.6, change log 2026-09-27.
 - Closed: title, flag, refresh button, stamp and the "+" toggle. Open: peer numbers, read line, Cause / Effect / Exceptions / Expect.
 - Closed by default. The refresh button inside the summary does not toggle the fold; a refresh opens the card.
 - Guidebook: 3.2 Shows amended, change log 2026-10-18.
+
+## 18 Oct 2026: roadmap card folds
+
+- The `<TICKER> roadmap` card on the ticker page is a folding card (Grain 5 rules 5.5.5.5, 5.7.10): label and "+" shown, closed by default, the rows open on tap.
+- Guidebook: 3.2 Shows amended, change log 2026-10-18.
