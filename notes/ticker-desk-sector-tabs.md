@@ -23,3 +23,8 @@ Guidebook updated: 1.2, 6.10.7, 11.2, 11.6, change log 2026-09-27.
 
 - The `<TICKER> roadmap` card on the ticker page is a folding card (Grain 5 rules 5.5.5.5, 5.7.10): label and "+" shown, closed by default, the rows open on tap.
 - Guidebook: 3.2 Shows amended, change log 2026-10-18.
+
+## 18 Oct 2026: past 7 days card folds
+
+- The `<TICKER> past 7 days` card folds the same way as the roadmap card (Grain 5 rules 5.5.2, 5.7.10): label and "+" shown, closed by default.
+- Guidebook: 3.2 Shows amended, change log 2026-10-18.
