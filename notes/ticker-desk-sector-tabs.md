@@ -11,3 +11,11 @@ Rule: Grain 5 Guidebook 6.10 (tab row for card groups), adopted per sector.
 - Same edit: `--warn` moved to ice blue `#a8dcff` (deviation 11.2) and the unused `.cluster` rail removed (11.6).
 
 Guidebook updated: 1.2, 6.10.7, 11.2, 11.6, change log 2026-09-27.
+
+## 18 Oct 2026: sector card folds
+
+- The sector card (Space sector / Memory sector) is now a folding card (Grain 5 rules 5.5.2, 5.7.10).
+- Closed: title, flag, refresh button, stamp and the "+" toggle. Open: peer numbers, read line, Cause / Effect / Exceptions / Expect.
+- Closed by default; the open state is remembered per device (`tkd-desk-open:<sector>`).
+- The refresh button inside the summary no longer toggles the fold.
+- Guidebook: 3.2 Shows amended, change log 2026-10-18.
